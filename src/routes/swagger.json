@@ -1,0 +1,178 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Catalog Server",
+    "version": "1.0.0",
+    "contact": {
+      "email": "romello@asylumconnect.org"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://catalog-server-api.herokuapp.com/asylum_connect/api/v1.0",
+      "description": "Production Server"
+    }
+  ],
+  "paths": {
+    "/users": {
+      "get": {
+        "summary": "Returns hello_world",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/components/schemas/hello_world"
+            }
+          }
+        }
+      }
+    },
+    "/user=<user_id>": {
+      "get": {
+        "summary": "Returns hello_world",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/components/schemas/hello_world"
+            }
+          }
+        }
+      }
+    },
+    "/organizations": {
+      "get": {
+        "summary": "Returns hello_world",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/components/schemas/hello_world"
+            }
+          }
+        }
+      }
+    },
+    "/organization/<id>": {
+      "get": {
+        "summary": "Returns hello_world",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/components/schemas/hello_world"
+            }
+          }
+        }
+      }
+    },
+    "/organization/<id>/<column_name>": {
+      "get": {
+        "summary": "Returns hello_world",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/components/schemas/hello_world"
+            }
+          }
+        }
+      }
+    },
+    "/services": {
+      "get": {
+        "summary": "Returns hello_world",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/components/schemas/hello_world"
+            }
+          }
+        }
+      }
+    },
+    "/service/<id>": {
+      "get": {
+        "summary": "Returns hello_world",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/components/schemas/hello_world"
+            }
+          }
+        }
+      }
+    },
+    "/service/<id>/<column_name>": {
+      "get": {
+        "summary": "Returns hello_world",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/components/schemas/hello_world"
+            }
+          }
+        }
+      }
+    },
+    "/locations": {
+      "get": {
+        "summary": "Returns hello_world",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/components/schemas/hello_world"
+            }
+          }
+        }
+      }
+    },
+    "/tags": {
+      "get": {
+        "summary": "Returns hello_world",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/components/schemas/hello_world"
+            }
+          }
+        }
+      }
+    },
+    "/<user_id>/favorites": {
+      "get": {
+        "summary": "Returns hello_world",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/components/schemas/hello_world"
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "hello_world": {
+        "type": "object",
+        "properties": {
+          "foo": {
+            "type": "string",
+            "format": "string"
+          },
+          "bar": {
+            "type": "string",
+            "format": "email"
+          }
+        }
+      }
+    }
+  }
+}
