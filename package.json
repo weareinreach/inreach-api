@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "backpack-core": "^0.8.4",
+    "body-parser": "^1.19.0",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
@@ -20,15 +21,33 @@
   "devDependencies": {
     "@babel/core": "^7.8.7",
     "@babel/preset-env": "^7.8.7",
+    "babel-eslint": "^10.1.0",
     "babel-jest": "^25.1.0",
     "dotenv-webpack": "^1.7.0",
+    "eslint": "^6.8.0",
     "husky": "^4.2.3",
+    "jest": "^25.1.0",
     "lint-staged": "^10.0.8",
-    "prettier": "^1.18.2",
-    "jest": "^25.1.0"
+    "prettier": "^1.18.2"
   },
   "engines": {
     "node": "12.x"
+  },
+  "eslintConfig": {
+    "extends": "eslint:recommended",
+    "env": {
+      "browser": true,
+      "commonjs": true,
+      "node": true,
+      "es6": true
+    },
+    "parserOptions": {
+      "ecmaVersion": 2020,
+      "sourceType": "module"
+    },
+    "rules": {
+      "no-console": "warn"
+    }
   },
   "husky": {
     "hooks": {

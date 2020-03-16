@@ -1,3 +1,4 @@
+import bodyParser from 'body-parser';
 import cors from 'cors';
 import express from 'express';
 
@@ -8,6 +9,7 @@ const server = express();
 const port = process.env.PORT || 8080;
 
 server.use(cors());
+server.use(bodyParser.json());
 server.use(router);
 
 server.listen(port, () =>
