@@ -1,8 +1,8 @@
 import mongoose from 'mongoose';
 
-const mongoURL = process.env.MONGO_URL || '';
+const mongoURL = process.env.MONGODB_URL || '';
 
-mongoose.connect(mongoURL, {useNewUrlParser: true});
+mongoose.connect(mongoURL, {useNewUrlParser: true, useUnifiedTopology: true});
 
 const db = mongoose.connection;
 

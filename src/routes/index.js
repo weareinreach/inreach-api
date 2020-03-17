@@ -1,23 +1,19 @@
 import {Router} from 'express';
 import swaggerUi from 'swagger-ui-express';
 
-import swaggerDocument from './swagger.json';
-import {commentsCreate, commentsGet} from './comments';
+import {commentsGet, commentsUpdate, ratingsGet, ratingsUpdate} from './entity';
 import {
   organizationDelete,
   organizationGet,
   organizationsCreate,
   organizationsGet,
-  organizationUpdate
-} from './organizations';
-import {ratingsCreate, ratingsGet} from './ratings';
-import {
+  organizationUpdate,
   serviceDelete,
   serviceGet,
   servicesCreate,
   servicesGet,
   serviceUpdate
-} from './services';
+} from './organizations';
 import {
   userDelete,
   userFavoritesUpdate,
@@ -26,41 +22,63 @@ import {
   usersGet,
   userUpdate
 } from './users';
+import swaggerDocument from '../swagger.json';
 
-const router = Router();
+export const baseRouter = Router();
+export const versionOneRouter = Router();
 
-router.get('/', (req, res) => res.json({ok: true}));
-router.use('/docs', swaggerUi.serve);
-router.get('/docs', swaggerUi.setup(swaggerDocument));
+baseRouter.get('/', (req, res) => res.json({ok: true}));
+baseRouter.use('/docs', swaggerUi.serve);
+baseRouter.get('/docs', swaggerUi.setup(swaggerDocument));
 
 // Organizations
-router.get('/organizations', organizationsGet);
-router.post('/organizations', organizationsCreate);
-router.get('/organizations/:id', organizationGet);
-router.patch('/organizations/:id', organizationUpdate);
-router.delete('/organizations/:id', organizationDelete);
+versionOneRouter.get('/organizations', organizationsGet);
+versionOneRouter.post('/organizations', organizationsCreate);
+versionOneRouter.get('/organizations/:orgId', organizationGet);
+versionOneRouter.patch('/organizations/:orgId', organizationUpdate);
+versionOneRouter.delete('/organizations/:orgId', organizationDelete);
 
 // Services
-router.get('/organizations/:id/services', servicesGet);
-router.post('/organizations/:id/services', servicesCreate);
-router.get('/organizations/:id/services/:id', serviceGet);
-router.patch('/organizations/:id/services/:id', serviceUpdate);
-router.delete('/organizations/:id/services/:id', serviceDelete);
-
-// Users
-router.get('/users', usersGet);
-router.post('/users', usersCreate);
-router.get('/users/:id', userGet);
-router.patch('/users/:id', userUpdate);
-router.delete('/users/:id', userDelete);
-router.patch('/users/:id/favorites', userFavoritesUpdate);
+versionOneRouter.get('/organizations/:orgId/services', servicesGet);
+versionOneRouter.post('/organizations/:orgId/services', servicesCreate);
+versionOneRouter.get('/organizations/:orgId/services/:serviceId', serviceGet);
+versionOneRouter.patch(
+  '/organizations/:orgId/services/:serviceId',
+  serviceUpdate
+);
+versionOneRouter.delete(
+  '/organizations/:orgId/services/:serviceId',
+  serviceDelete
+);
 
 // Comments
-router.get('/comments/:id', commentsGet);
-router.post('/comments/:id', commentsCreate);
+versionOneRouter.get('/organizations/:orgId/comments', commentsGet);
+versionOneRouter.patch('/organizations/:orgId/comments', commentsUpdate);
+versionOneRouter.get(
+  '/organizations/:orgId/services/:serviceId/comments',
+  commentsGet
+);
+versionOneRouter.patch(
+  '/organizations/:orgId/services/:serviceId/comments',
+  commentsUpdate
+);
 
 // Ratings
-router.get('/ratings/:id', ratingsGet);
-router.post('/ratings/:id', ratingsCreate);
+versionOneRouter.get('/organizations/:orgId/ratings', ratingsGet);
+versionOneRouter.patch('/organizations/:orgId/ratings', ratingsUpdate);
+versionOneRouter.get(
+  '/organizations/:orgId/services/:serviceId/ratings',
+  ratingsGet
+);
+versionOneRouter.patch(
+  '/organizations/:orgId/services/:serviceId/ratings',
+  ratingsUpdate
+);
 
-export default router;
+// Users
+versionOneRouter.get('/users', usersGet);
+versionOneRouter.post('/users', usersCreate);
+versionOneRouter.get('/users/:userId', userGet);
+versionOneRouter.patch('/users/:userId', userUpdate);
+versionOneRouter.delete('/users/:userId', userDelete);
+versionOneRouter.patch('/users/:userId/favorites', userFavoritesUpdate);

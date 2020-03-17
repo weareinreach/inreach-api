@@ -1,0 +1,321 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Catalog API",
+    "version": "1.0.0",
+    "contact": {
+      "email": "romello@asylumconnect.org"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://catalog-api.herokuapp.com/v1",
+      "description": "Powering the Catalog and Control Panel"
+    }
+  ],
+  "paths": {
+    "/organizations": {
+      "get": {
+        "summary": "tk",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/components/schemas/tk"
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "tk",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/components/schemas/tk"
+            }
+          }
+        }
+      }
+    },
+    "/organizations/:orgId": {
+      "get": {
+        "summary": "tk",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/components/schemas/tk"
+            }
+          }
+        }
+      },
+      "patch": {
+        "summary": "tk",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/components/schemas/tk"
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "tk",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/components/schemas/tk"
+            }
+          }
+        }
+      }
+    },
+    "/organizations/:orgId/services": {
+      "get": {
+        "summary": "tk",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/components/schemas/tk"
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "tk",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/components/schemas/tk"
+            }
+          }
+        }
+      }
+    },
+    "/organizations/:orgId/services/:serviceId": {
+      "get": {
+        "summary": "tk",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/components/schemas/tk"
+            }
+          }
+        }
+      },
+      "patch": {
+        "summary": "tk",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/components/schemas/tk"
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "tk",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/components/schemas/tk"
+            }
+          }
+        }
+      }
+    },
+    "/organizations/:orgId/comments": {
+      "get": {
+        "summary": "tk",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/components/schemas/tk"
+            }
+          }
+        }
+      },
+      "patch": {
+        "summary": "tk",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/components/schemas/tk"
+            }
+          }
+        }
+      }
+    },
+    "/organizations/:orgId/services/:serviceId/comments": {
+      "get": {
+        "summary": "tk",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/components/schemas/tk"
+            }
+          }
+        }
+      },
+      "patch": {
+        "summary": "tk",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/components/schemas/tk"
+            }
+          }
+        }
+      }
+    },
+    "/organizations/:orgId/ratings": {
+      "get": {
+        "summary": "tk",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/components/schemas/tk"
+            }
+          }
+        }
+      },
+      "patch": {
+        "summary": "tk",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/components/schemas/tk"
+            }
+          }
+        }
+      }
+    },
+    "/organizations/:orgId/services/:serviceId/ratings": {
+      "get": {
+        "summary": "tk",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/components/schemas/tk"
+            }
+          }
+        }
+      },
+      "patch": {
+        "summary": "tk",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/components/schemas/tk"
+            }
+          }
+        }
+      }
+    },
+    "/users": {
+      "get": {
+        "summary": "tk",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/components/schemas/tk"
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "tk",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/components/schemas/tk"
+            }
+          }
+        }
+      }
+    },
+    "/users/:userId": {
+      "get": {
+        "summary": "tk",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/components/schemas/tk"
+            }
+          }
+        }
+      },
+      "patch": {
+        "summary": "tk",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/components/schemas/tk"
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "tk",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/components/schemas/tk"
+            }
+          }
+        }
+      }
+    },
+    "/users/:userId/favorites": {
+      "patch": {
+        "summary": "tk",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/components/schemas/tk"
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "tk": {
+        "type": "object",
+        "properties": {
+          "foo": {
+            "type": "string",
+            "format": "string"
+          },
+          "bar": {
+            "type": "string",
+            "format": "email"
+          }
+        }
+      }
+    }
+  }
+}

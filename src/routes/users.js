@@ -1,25 +1,67 @@
+import {handleErr} from '../utils';
+import {User} from '../utils/mongoose';
+
 export const userDelete = async (req, res) => {
-  res.json({userDelete: true});
-};
-export const userFavoritesUpdate = async (req, res) => {
-  res.json({userFavoritesUpdate: true});
+  const {userId} = req?.params;
+
+  // TODO: check for bad req and send 401
+
+  await User.findByIdAndDelete(userId)
+    .then(() => {
+      return res.json({deleted: true});
+    })
+    .catch(err => handleErr(err, res));
 };
 
 export const userGet = async (req, res) => {
   // TODO: do not return emails
-  res.json({userGet: true});
+  const {userId} = req?.params;
+
+  // TODO: check for bad req and send 401
+
+  await User.findById(userId)
+    .then(user => {
+      return res.json(user);
+    })
+    .catch(err => handleErr(err, res));
+};
+
+export const userUpdate = async (req, res) => {
+  const {userId} = req?.params;
+
+  // TODO: check for bad req and send 401
+
+  res.json({udpated: true, userId});
+};
+
+export const userFavoritesUpdate = async (req, res) => {
+  const {userId} = req?.params;
+
+  // TODO: check for bad req and send 401
+
+  res.json({services: {userId}});
 };
 
 export const usersCreate = async (req, res) => {
-  res.json({usersCreate: true});
+  const body = req?.body;
+  const user = new User(body);
+
+  // TODO: check for bad req and send 401
+
+  await user
+    .save()
+    .then(user => {
+      return res.json({created: true, user});
+    })
+    .catch(err => handleErr(err, res));
 };
 
 export const usersGet = async (req, res) => {
   // TODO: pagination and query
   // TODO: do not return emails
-  res.json({usersGet: true});
-};
-
-export const userUpdate = async (req, res) => {
-  res.json({userUpdate: true});
+  await User.find({})
+    .then(users => {
+      return res.json({users});
+    })
+    .catch(err => handleErr(err, res));
 };
