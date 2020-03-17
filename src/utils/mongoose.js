@@ -10,16 +10,27 @@ const organizationSchema = new Schema({
   created_at,
   updated_at,
   alert_message: String,
+  description: String,
   name: String,
+  is_at_capacity: Boolean,
   is_published,
+  last_verified: Date,
   services: [
     {
       created_at,
       updated_at,
-      is_published
+      access_instructions: String,
+      description: String,
+      is_appointment: Boolean,
+      is_at_capacity: Boolean,
+      is_published: Boolean,
+      name: String,
+      slug: String
     }
   ],
-  source: String
+  slug: String,
+  source: String,
+  website: String
 });
 
 export const Organization = model('Organization', organizationSchema);

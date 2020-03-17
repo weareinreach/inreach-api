@@ -9,6 +9,7 @@ export const commentsGet = async (req, res) => {
 
   await Comment.findOne(query)
     .then(({comments = []}) => {
+      // TODO: check and send 404
       return res.json({comments});
     })
     .catch(err => handleErr(err, res));
@@ -27,7 +28,8 @@ export const commentsUpdate = async (req, res) => {
     {upsert: true}
   )
     .then(() => {
-      res.json({updated: true});
+      // TODO: check and send 404
+      return res.json({updated: true});
     })
     .catch(err => handleErr(err, res));
 };
@@ -41,6 +43,7 @@ export const ratingsGet = async (req, res) => {
   await Rating.findOne(query)
     .then(({ratings = []}) => {
       const average = 0;
+      // TODO: check and send 404
       // TODO: return the average rating
       return res.json({rating: average, ratings});
     })
@@ -60,7 +63,8 @@ export const ratingsUpdate = async (req, res) => {
     {upsert: true}
   )
     .then(() => {
-      res.json({updated: true});
+      // TODO: check and send 404
+      return res.json({updated: true});
     })
     .catch(err => handleErr(err, res));
 };

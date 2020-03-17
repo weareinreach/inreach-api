@@ -8,6 +8,7 @@ export const userDelete = async (req, res) => {
 
   await User.findByIdAndDelete(userId)
     .then(() => {
+      // TODO: check and send 404
       return res.json({deleted: true});
     })
     .catch(err => handleErr(err, res));
@@ -21,6 +22,7 @@ export const userGet = async (req, res) => {
 
   await User.findById(userId)
     .then(user => {
+      // TODO: check and send 404
       return res.json(user);
     })
     .catch(err => handleErr(err, res));
@@ -39,6 +41,7 @@ export const userFavoritesUpdate = async (req, res) => {
 
   // TODO: check for bad req and send 401
 
+  // TODO: check and send 404
   res.json({services: {userId}});
 };
 
@@ -51,6 +54,7 @@ export const usersCreate = async (req, res) => {
   await user
     .save()
     .then(user => {
+      // TODO: check and send 404
       return res.json({created: true, user});
     })
     .catch(err => handleErr(err, res));
@@ -61,6 +65,7 @@ export const usersGet = async (req, res) => {
   // TODO: do not return emails
   await User.find({})
     .then(users => {
+      // TODO: check and send 404
       return res.json({users});
     })
     .catch(err => handleErr(err, res));
