@@ -6,7 +6,7 @@
     "start": "backpack",
     "build": "backpack build",
     "test": "jest",
-    "serve": "./build/main.js"
+    "serve": "node ./build/main.js"
   },
   "dependencies": {
     "backpack-core": "^0.8.4",
