@@ -67,25 +67,6 @@ export const organizationsGet = async (req, res) => {
     .catch(err => handleErr(err, res));
 };
 
-export const serviceDelete = async (req, res) => {
-  const {orgId, serviceId} = req?.params;
-
-  // TODO: check for bad req and send 401
-
-  await Organization.findById(orgId)
-    .then(organization => {
-      return organization.services
-        .id(serviceId)
-        .remove()
-        .then(() => {
-          // TODO: check and send 404
-          return res.json({deleted: true});
-        })
-        .catch(err => handleErr(err, res));
-    })
-    .catch(err => handleErr(err, res));
-};
-
 export const serviceGet = async (req, res) => {
   const {orgId, serviceId} = req?.params;
 
@@ -97,44 +78,6 @@ export const serviceGet = async (req, res) => {
 
       // TODO: check and send 404
       return res.json(service);
-    })
-    .catch(err => handleErr(err, res));
-};
-
-export const serviceUpdate = async (req, res) => {
-  const {orgId, serviceId} = req?.params;
-  const body = req?.body;
-
-  // TODO: check for bad req and send 401
-
-  await Organization.findOneAndUpdate(
-    {_id: orgId, 'services._id': serviceId},
-    {$set: {'services.$': body}}
-  )
-    .then(() => {
-      // TODO: check and send 404
-      return res.json({updated: true});
-    })
-    .catch(err => handleErr(err, res));
-};
-
-export const servicesCreate = async (req, res) => {
-  const {orgId} = req?.params;
-  const body = req?.body;
-
-  // TODO: check for bad req and send 401
-
-  await Organization.findById(orgId)
-    .then(organization => {
-      organization.services.push(body);
-
-      return organization
-        .save()
-        .then(() => {
-          // TODO: check and send 404
-          return res.json({created: true});
-        })
-        .catch(err => handleErr(err, res));
     })
     .catch(err => handleErr(err, res));
 };

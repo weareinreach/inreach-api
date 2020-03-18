@@ -2,40 +2,96 @@
 import {model, Schema} from 'mongoose';
 
 const created_at = {type: Date, default: Date.now};
-const updated_at = Date;
+const updated_at = {type: Date};
 const is_published = {type: Boolean, default: true};
 
-// TODO: validate schemas
+const day = {
+  start_time: String,
+  end_time: String
+};
+
+const schedule = {
+  sunday: day,
+  monday: day,
+  tuesday: day,
+  wednesday: day,
+  thursday: day,
+  friday: day,
+  saturday: day
+};
+
+// TODO: validate schemas & update updated_at to now()
 const organizationSchema = new Schema({
   created_at,
   updated_at,
   alert_message: String,
   description: String,
+  emails: [
+    {
+      email: String,
+      first_name: String,
+      is_primary: Boolean,
+      last_name: String,
+      show_on_org: Boolean,
+      title: String
+    }
+  ],
   name: String,
   is_at_capacity: Boolean,
   is_published,
   last_verified: Date,
+  locations: [
+    {
+      address: String,
+      city: String,
+      country: String,
+      is_primary: Boolean,
+      name: String,
+      state: String,
+      zip: String
+    }
+  ],
+  phones: [
+    {
+      digits: String,
+      is_primary: Boolean
+    }
+  ],
+  schedule,
   services: [
     {
       created_at,
       updated_at,
       access_instructions: String,
       description: String,
+      emailId: String,
       is_appointment: Boolean,
       is_at_capacity: Boolean,
       is_published: Boolean,
+      locationId: String,
       name: String,
+      phoneId: String,
+      schedule,
+      // TODO: update slug on save
       slug: String
     }
   ],
+  // TODO: update slug on save
   slug: String,
   source: String,
   website: String
 });
 
+organizationSchema.pre('save', function(next) {
+  console.log('organizationSchema save');
+
+  this.updated_at = Date.now();
+  next();
+});
+
 export const Organization = model('Organization', organizationSchema);
 
-// TODO: validate schemas
+// TODO: validate schemas & update updated_at to now()
 const commentSchema = new Schema({
   organizationId: String,
   serviceId: String,
@@ -51,7 +107,7 @@ const commentSchema = new Schema({
 
 export const Comment = model('Comment', commentSchema);
 
-// TODO: validate schemas
+// TODO: validate schemas & update updated_at to now()
 const ratingSchema = new Schema({
   organizationId: String,
   serviceId: String,
@@ -67,10 +123,16 @@ const ratingSchema = new Schema({
 
 export const Rating = model('Rating', ratingSchema);
 
-// TODO: validate schemas
+// TODO: validate schemas & update updated_at to now()
 const userSchema = new Schema({
   created_at,
-  updated_at
+  updated_at,
+  favorites: []
+});
+
+userSchema.pre('save', next => {
+  this.updated_at(Date.now());
+  next();
 });
 
 export const User = model('User', userSchema);
