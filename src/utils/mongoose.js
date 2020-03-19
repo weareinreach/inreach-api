@@ -2,24 +2,8 @@
 import {model, Schema} from 'mongoose';
 
 const created_at = {type: Date, default: Date.now};
-const updated_at = {type: Date};
+const updated_at = Date;
 const is_published = {type: Boolean, default: true};
-
-const day = {
-  start_time: String,
-  end_time: String,
-  timezone: String
-};
-
-const schedule = {
-  sunday: day,
-  monday: day,
-  tuesday: day,
-  wednesday: day,
-  thursday: day,
-  friday: day,
-  saturday: day
-};
 
 // TODO: validate schemas & update updated_at to now()
 const organizationSchema = new Schema({
@@ -33,14 +17,12 @@ const organizationSchema = new Schema({
       first_name: String,
       is_primary: Boolean,
       last_name: String,
-      show_on_org: Boolean,
+      show_on_organization: Boolean,
       title: String
     }
   ],
   name: String,
-  is_at_capacity: Boolean,
   is_published,
-  last_verified: Date,
   locations: [
     {
       address: String,
@@ -48,45 +30,78 @@ const organizationSchema = new Schema({
       country: String,
       is_primary: Boolean,
       name: String,
+      show_on_organization: Boolean,
       state: String,
-      zip: String
+      unit: String,
+      zip_code: String
     }
   ],
   phones: [
     {
+      phone_type: String,
       digits: String,
-      extension: String,
       is_primary: Boolean
     }
   ],
-  schedule,
+  properties: {},
+  region: String,
+  schedules: [
+    {
+      monday_start: String,
+      monday_end: String,
+      tuesday_start: String,
+      tuesday_end: String,
+      wednesday_start: String,
+      wednesday_end: String,
+      thursday_start: String,
+      thursday_end: String,
+      friday_start: String,
+      friday_end: String,
+      saturday_start: String,
+      saturday_end: String,
+      sunday_start: String,
+      sunday_end: String,
+      note: String
+    }
+  ],
   services: [
     {
       created_at,
       updated_at,
-      access_instructions: String,
+      access_instructions: [
+        {
+          access_value: String,
+          access_type: String,
+          instructions: String
+        }
+      ],
       description: String,
       emailId: String,
       is_appointment: Boolean,
-      is_at_capacity: Boolean,
       is_published: Boolean,
       locationId: String,
+      organization: {},
+      properties: {},
       name: String,
       phoneId: String,
-      schedule,
+      scheduleId: String,
       // TODO: update slug on save
-      slug: String
+      slug: String,
+      tags: [String]
     }
   ],
   // TODO: update slug on save
   slug: String,
   source: String,
+  verified_at: Date,
   website: String
 });
 
 // TODO: validate schemas & update updated_at to now()
 organizationSchema.pre(['findOneAndUpdate', 'save', 'updateOne'], next => {
-  this.updated_at(Date.now());
+  if (this) {
+    this.updated_at = Date.now();
+  }
   next();
 });
 
@@ -132,7 +147,9 @@ const userSchema = new Schema({
 });
 
 userSchema.pre(['findOneAndUpdate', 'save', 'updateOne'], next => {
-  this.updated_at(Date.now());
+  if (this) {
+    this.updated_at = Date.now();
+  }
   next();
 });
 

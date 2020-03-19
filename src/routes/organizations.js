@@ -103,8 +103,15 @@ export const serviceGet = async (req, res) => {
   // TODO: check for bad req and send 401
 
   await Organization.findById(orgId)
-    .then(organization => {
-      const service = organization.services.id(serviceId);
+    .then(orgDocument => {
+      const serviceDocument = orgDocument.services.id(serviceId);
+      const service = {
+        ...(serviceDocument?.toJSON() || {}),
+        organization: {
+          ...(orgDocument?.toJSON() || {}),
+          services: undefined
+        }
+      };
 
       // TODO: check and send 404
       return res.json(service);
