@@ -7,7 +7,8 @@ const is_published = {type: Boolean, default: true};
 
 const day = {
   start_time: String,
-  end_time: String
+  end_time: String,
+  timezone: String
 };
 
 const schedule = {
@@ -54,6 +55,7 @@ const organizationSchema = new Schema({
   phones: [
     {
       digits: String,
+      extension: String,
       is_primary: Boolean
     }
   ],
@@ -82,10 +84,9 @@ const organizationSchema = new Schema({
   website: String
 });
 
-organizationSchema.pre('save', function(next) {
-  console.log('organizationSchema save');
-
-  this.updated_at = Date.now();
+// TODO: validate schemas & update updated_at to now()
+organizationSchema.pre(['findOneAndUpdate', 'save', 'updateOne'], next => {
+  this.updated_at(Date.now());
   next();
 });
 
@@ -130,7 +131,7 @@ const userSchema = new Schema({
   favorites: []
 });
 
-userSchema.pre('save', next => {
+userSchema.pre(['findOneAndUpdate', 'save', 'updateOne'], next => {
   this.updated_at(Date.now());
   next();
 });

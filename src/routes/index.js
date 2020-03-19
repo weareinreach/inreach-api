@@ -8,8 +8,11 @@ import {
   organizationsCreate,
   organizationsGet,
   organizationUpdate,
+  serviceDelete,
   serviceGet,
-  servicesGet
+  servicesCreate,
+  servicesGet,
+  serviceUpdate
 } from './organizations';
 import {
   userDelete,
@@ -37,7 +40,16 @@ versionOneRouter.delete('/organizations/:orgId', organizationDelete);
 
 // Services
 versionOneRouter.get('/organizations/:orgId/services', servicesGet);
+versionOneRouter.post('/organizations/:orgId/services', servicesCreate);
 versionOneRouter.get('/organizations/:orgId/services/:serviceId', serviceGet);
+versionOneRouter.patch(
+  '/organizations/:orgId/services/:serviceId',
+  serviceUpdate
+);
+versionOneRouter.delete(
+  '/organizations/:orgId/services/:serviceId',
+  serviceDelete
+);
 
 // Comments
 versionOneRouter.get('/organizations/:orgId/comments', commentsGet);
