@@ -18,6 +18,10 @@ export const getEntityQuery = ({organizationId, serviceId}) => {
   return query;
 };
 
+export const handleBadRequest = res => {
+  return res.status(400).json({error: true});
+};
+
 /**
  * [handleErr description]
  * @param  {[type]} err [description]

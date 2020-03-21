@@ -1,11 +1,9 @@
-import {getEntityQuery, handleErr} from '../utils';
+import {getEntityQuery, handleBadRequest, handleErr} from '../utils';
 import {Comment, Rating} from '../utils/mongoose';
 
 export const commentsGet = async (req, res) => {
   const {orgId, serviceId} = req?.params;
   const query = getEntityQuery({organizationId: orgId, serviceId});
-
-  // TODO: check for bad req and send 401
 
   await Comment.findOne(query)
     .then(({comments = []}) => {
@@ -20,7 +18,9 @@ export const commentsUpdate = async (req, res) => {
   const {comment, source, userId} = req?.body;
   const query = getEntityQuery({organizationId: orgId, serviceId});
 
-  // TODO: check for bad req and send 401
+  if (!comment) {
+    return handleBadRequest(res);
+  }
 
   await Comment.updateOne(
     query,
@@ -38,14 +38,12 @@ export const ratingsGet = async (req, res) => {
   const {orgId, serviceId} = req?.params;
   const query = getEntityQuery({organizationId: orgId, serviceId});
 
-  // TODO: check for bad req and send 401
-
   await Rating.findOne(query)
     .then(({ratings = []}) => {
       const average = 0;
       // TODO: check and send 404
       // TODO: return the average rating
-      return res.json({rating: average, ratings});
+      return res.json({average_rating: average, ratings});
     })
     .catch(err => handleErr(err, res));
 };
@@ -55,7 +53,9 @@ export const ratingsUpdate = async (req, res) => {
   const {rating, source, userId} = req?.body;
   const query = getEntityQuery({organizationId: orgId, serviceId});
 
-  // TODO: check for bad req and send 401
+  if (!rating) {
+    return handleBadRequest(res);
+  }
 
   await Rating.updateOne(
     query,

@@ -1,10 +1,8 @@
-import {handleErr} from '../utils';
+import {handleBadRequest, handleErr} from '../utils';
 import {Organization} from '../utils/mongoose';
 
 export const organizationDelete = async (req, res) => {
   const {orgId} = req?.params;
-
-  // TODO: check for bad req and send 401
 
   await Organization.findByIdAndDelete(orgId)
     .then(() => {
@@ -16,8 +14,6 @@ export const organizationDelete = async (req, res) => {
 
 export const organizationGet = async (req, res) => {
   const {orgId} = req?.params;
-
-  // TODO: check for bad req and send 401
 
   await Organization.findById(orgId)
     .then(organization => {
@@ -32,13 +28,16 @@ export const organizationUpdate = async (req, res) => {
   const body = req?.body;
   const updated_at = Date.now();
 
-  // TODO: check for bad req and send 401
+  if (!body) {
+    return handleBadRequest(res);
+  }
 
   await Organization.findOneAndUpdate(
     {_id: orgId},
     {$set: {...body, updated_at}}
   )
     .then(() => {
+      // TODO: check and send 404
       return res.json({updated: true});
     })
     .catch(err => handleErr(err, res));
@@ -48,31 +47,45 @@ export const organizationsCreate = async (req, res) => {
   const body = req?.body;
   const org = new Organization(body);
 
-  // TODO: check for bad req and send 401
+  if (!body) {
+    return handleBadRequest(res);
+  }
 
   await org
     .save()
     .then(organization => {
-      // TODO: check and send 404
       return res.json({created: true, organization});
     })
     .catch(err => handleErr(err, res));
 };
 
 export const organizationsGet = async (req, res) => {
-  const {page = '1'} = req.query;
+  const {name, page = '1', properties} = req.query;
   const parsedPage = parseInt(page);
   const limit = 20;
   const offset = limit * (parsedPage - 1);
 
-  // TODO: check for bad req and send 401
+  let query = {};
 
-  await Organization.find({})
+  if (name) {
+    query.$text = {$search: name};
+  }
+
+  if (properties) {
+    const props = properties.split(',').reduce((result, prop) => {
+      result[`properties.${prop}`] = 'true';
+
+      return result;
+    }, {});
+
+    query.services = {$elemMatch: props};
+  }
+
+  await Organization.find(query)
     .sort({updated_at: -1})
     .skip(offset)
     .limit(limit)
     .then(organizations => {
-      // TODO: check and send 404
       return res.json({organizations});
     })
     .catch(err => handleErr(err, res));
@@ -80,8 +93,6 @@ export const organizationsGet = async (req, res) => {
 
 export const serviceDelete = async (req, res) => {
   const {orgId, serviceId} = req?.params;
-
-  // TODO: check for bad req and send 401
 
   await Organization.findById(orgId)
     .then(organization => {
@@ -99,8 +110,6 @@ export const serviceDelete = async (req, res) => {
 
 export const serviceGet = async (req, res) => {
   const {orgId, serviceId} = req?.params;
-
-  // TODO: check for bad req and send 401
 
   await Organization.findById(orgId)
     .then(orgDocument => {
@@ -124,7 +133,9 @@ export const serviceUpdate = async (req, res) => {
   const body = req?.body;
   const updated_at = Date.now();
 
-  // TODO: check for bad req and send 401
+  if (!body) {
+    return handleBadRequest(res);
+  }
 
   await Organization.findOneAndUpdate(
     {_id: orgId, 'services._id': serviceId},
@@ -141,7 +152,9 @@ export const servicesCreate = async (req, res) => {
   const {orgId} = req?.params;
   const body = req?.body;
 
-  // TODO: check for bad req and send 401
+  if (!body) {
+    return handleBadRequest(res);
+  }
 
   await Organization.findById(orgId)
     .then(organization => {
@@ -150,7 +163,6 @@ export const servicesCreate = async (req, res) => {
       return organization
         .save()
         .then(() => {
-          // TODO: check and send 404
           return res.json({created: true});
         })
         .catch(err => handleErr(err, res));
@@ -160,8 +172,6 @@ export const servicesCreate = async (req, res) => {
 
 export const servicesGet = async (req, res) => {
   const {orgId} = req?.params;
-
-  // TODO: check for bad req and send 401
 
   await Organization.findById(orgId)
     .then(({services = []}) => {

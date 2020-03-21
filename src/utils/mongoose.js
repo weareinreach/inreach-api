@@ -61,7 +61,8 @@ const organizationSchema = new Schema({
       saturday_end: String,
       sunday_start: String,
       sunday_end: String,
-      note: String
+      note: String,
+      timezone: String
     }
   ],
   services: [
@@ -143,6 +144,11 @@ export const Rating = model('Rating', ratingSchema);
 const userSchema = new Schema({
   created_at,
   updated_at,
+  email: String,
+  password: String,
+  type: String,
+  isDataManager: Boolean,
+  isAdminDataManager: Boolean,
   favorites: []
 });
 
