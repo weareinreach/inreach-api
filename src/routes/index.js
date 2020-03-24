@@ -5,6 +5,7 @@ import {commentsGet, commentsUpdate, ratingsGet, ratingsUpdate} from './entity';
 import {
   organizationDelete,
   organizationGet,
+  organizationsGetCount,
   organizationsCreate,
   organizationsGet,
   organizationUpdate,
@@ -34,6 +35,7 @@ baseRouter.get('/docs', swaggerUi.setup(swaggerDocument));
 // Organizations
 versionOneRouter.get('/organizations', organizationsGet);
 versionOneRouter.post('/organizations', organizationsCreate);
+versionOneRouter.get('/organizations/count', organizationsGetCount);
 versionOneRouter.get('/organizations/:orgId', organizationGet);
 versionOneRouter.patch('/organizations/:orgId', organizationUpdate);
 versionOneRouter.delete('/organizations/:orgId', organizationDelete);

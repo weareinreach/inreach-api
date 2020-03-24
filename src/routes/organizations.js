@@ -1,5 +1,5 @@
-import {handleBadRequest, handleErr} from '../utils';
-import {Organization} from '../utils/mongoose';
+import {getOrganizationQuery, handleBadRequest, handleErr} from '../utils';
+import {Organization} from '../mongoose';
 
 export const organizationDelete = async (req, res) => {
   const {orgId} = req?.params;
@@ -60,31 +60,23 @@ export const organizationsCreate = async (req, res) => {
 };
 
 export const organizationsGet = async (req, res) => {
-  const {name, page = '1', properties} = req.query;
-  const parsedPage = parseInt(page);
-  const limit = 20;
-  const offset = limit * (parsedPage - 1);
-
-  let query = {};
-
-  if (name) {
-    query.$text = {$search: name};
-  }
-
-  if (properties) {
-    const props = properties.split(',').reduce((result, prop) => {
-      result[`properties.${prop}`] = 'true';
-
-      return result;
-    }, {});
-
-    query.services = {$elemMatch: props};
-  }
+  const {params, query} = getOrganizationQuery(req?.query);
 
   await Organization.find(query)
     .sort({updated_at: -1})
-    .skip(offset)
-    .limit(limit)
+    .skip(params.offset)
+    .limit(params.limit)
+    .then(organizations => {
+      return res.json({organizations});
+    })
+    .catch(err => handleErr(err, res));
+};
+
+export const organizationsGetCount = async (req, res) => {
+  const {query} = getOrganizationQuery(req?.query);
+
+  await Organization.find(query)
+    .count()
     .then(organizations => {
       return res.json({organizations});
     })

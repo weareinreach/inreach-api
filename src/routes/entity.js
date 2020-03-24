@@ -1,5 +1,5 @@
+import {Comment, Rating} from '../mongoose';
 import {getEntityQuery, handleBadRequest, handleErr} from '../utils';
-import {Comment, Rating} from '../utils/mongoose';
 
 export const commentsGet = async (req, res) => {
   const {orgId, serviceId} = req?.params;

@@ -22,13 +22,21 @@ Folder structure
 
 ```
 catalog-api/
-├── src             # All of the source code for the server
-├── src/routes      # Server's routes used in the router
-├── src/utils       # Shared utilities
-└── src/index.js    # Initializes the Express server
+├── src               # All of the source code for the server
+├── src/routes        # Server's routes and router functions
+├── src/db.js         # Initializes connection to database
+├── src/mongoose.js   # Mongoose Schemas
+├── src/swagger.json  # Swagger spec
+├── src/utils.js      # Shared utilities
+└── src/index.js      # Initializes the Express server
 ```
 
 Technologies
 
 - [Express](https://expressjs.com/)
+- [Mongoose](https://mongoosejs.com/)
 - [Backpack](https://github.com/jaredpalmer/backpack)
+
+Code Standards
+
+In order to enforce code standards we use [eslint](https://eslint.org/) and [prettier](https://prettier.io/). Setting up eslint in your code editor is the easiest way to adhere to guidlines while programming but we also lint and prettify code during the commit process using [lint-staged](https://github.com/okonet/lint-staged).

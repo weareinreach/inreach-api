@@ -1,5 +1,5 @@
 import {handleBadRequest, handleErr} from '../utils';
-import {User} from '../utils/mongoose';
+import {User} from '../mongoose';
 
 export const userDelete = async (req, res) => {
   const {userId} = req?.params;
