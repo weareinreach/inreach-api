@@ -137,6 +137,10 @@
                     "count": {
                       "type": "integer",
                       "example": 100
+                    },
+                    "pages": {
+                      "type": "integer",
+                      "example": 5
                     }
                   }
                 }

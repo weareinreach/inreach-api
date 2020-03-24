@@ -18,6 +18,8 @@ export const getEntityQuery = ({organizationId, serviceId} = {}) => {
   return query;
 };
 
+export const ORG_PAGE_LIMIT = 20;
+
 /**
  * Format a query to retrieve organizations
  * @param  {Object} name Name of organation
@@ -27,7 +29,7 @@ export const getEntityQuery = ({organizationId, serviceId} = {}) => {
  */
 export const getOrganizationQuery = ({name, page = '1', properties} = {}) => {
   const parsedPage = parseInt(page);
-  const limit = 20;
+  const limit = ORG_PAGE_LIMIT;
   const offset = limit * (parsedPage - 1);
 
   let query = {};

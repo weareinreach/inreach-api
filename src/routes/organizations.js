@@ -1,4 +1,9 @@
-import {getOrganizationQuery, handleBadRequest, handleErr} from '../utils';
+import {
+  ORG_PAGE_LIMIT,
+  getOrganizationQuery,
+  handleBadRequest,
+  handleErr
+} from '../utils';
 import {Organization} from '../mongoose';
 
 export const organizationDelete = async (req, res) => {
@@ -75,10 +80,11 @@ export const organizationsGet = async (req, res) => {
 export const organizationsGetCount = async (req, res) => {
   const {query} = getOrganizationQuery(req?.query);
 
-  await Organization.find(query)
-    .count()
-    .then(organizations => {
-      return res.json({organizations});
+  await Organization.countDocuments(query)
+    .then(count => {
+      const pages = Math.ceil(count / ORG_PAGE_LIMIT);
+
+      return res.json({count, pages});
     })
     .catch(err => handleErr(err, res));
 };
