@@ -1,8 +1,9 @@
 import {
-  ORG_PAGE_LIMIT,
+  ITEM_PAGE_LIMIT,
   getOrganizationQuery,
   handleBadRequest,
-  handleErr
+  handleErr,
+  handleNotFound
 } from '../utils';
 import {Organization} from '../mongoose';
 
@@ -11,7 +12,6 @@ export const organizationDelete = async (req, res) => {
 
   await Organization.findByIdAndDelete(orgId)
     .then(() => {
-      // TODO: check and send 404
       return res.json({deleted: true});
     })
     .catch(err => handleErr(err, res));
@@ -22,7 +22,10 @@ export const organizationGet = async (req, res) => {
 
   await Organization.findById(orgId)
     .then(organization => {
-      // TODO: check and send 404
+      if (!organization) {
+        return handleNotFound(res);
+      }
+
       return res.json(organization);
     })
     .catch(err => handleErr(err, res));
@@ -41,8 +44,11 @@ export const organizationUpdate = async (req, res) => {
     {_id: orgId},
     {$set: {...body, updated_at}}
   )
-    .then(() => {
-      // TODO: check and send 404
+    .then(doc => {
+      if (!doc) {
+        return handleNotFound(res);
+      }
+
       return res.json({updated: true});
     })
     .catch(err => handleErr(err, res));
@@ -82,7 +88,7 @@ export const organizationsGetCount = async (req, res) => {
 
   await Organization.countDocuments(query)
     .then(count => {
-      const pages = Math.ceil(count / ORG_PAGE_LIMIT);
+      const pages = Math.ceil(count / ITEM_PAGE_LIMIT);
 
       return res.json({count, pages});
     })
@@ -94,11 +100,14 @@ export const serviceDelete = async (req, res) => {
 
   await Organization.findById(orgId)
     .then(organization => {
+      if (!organization) {
+        return handleNotFound(res);
+      }
+
       return organization.services
         .id(serviceId)
         .remove()
         .then(() => {
-          // TODO: check and send 404
           return res.json({deleted: true});
         })
         .catch(err => handleErr(err, res));
@@ -110,17 +119,25 @@ export const serviceGet = async (req, res) => {
   const {orgId, serviceId} = req?.params;
 
   await Organization.findById(orgId)
-    .then(orgDocument => {
-      const serviceDocument = orgDocument.services.id(serviceId);
+    .then(orgDoc => {
+      if (!orgDoc) {
+        return handleNotFound(res);
+      }
+
+      const serviceDoc = orgDoc.services.id(serviceId);
+
+      if (!serviceDoc) {
+        return handleNotFound(res);
+      }
+
       const service = {
-        ...(serviceDocument?.toJSON() || {}),
+        ...(serviceDoc?.toJSON() || {}),
         organization: {
-          ...(orgDocument?.toJSON() || {}),
+          ...(orgDoc?.toJSON() || {}),
           services: undefined
         }
       };
 
-      // TODO: check and send 404
       return res.json(service);
     })
     .catch(err => handleErr(err, res));
@@ -139,8 +156,11 @@ export const serviceUpdate = async (req, res) => {
     {_id: orgId, 'services._id': serviceId},
     {$set: {'services.$': {...body, _id: serviceId, updated_at}}}
   )
-    .then(() => {
-      // TODO: check and send 404
+    .then(orgDoc => {
+      if (!orgDoc) {
+        return handleNotFound(res);
+      }
+
       return res.json({updated: true});
     })
     .catch(err => handleErr(err, res));
@@ -156,6 +176,10 @@ export const servicesCreate = async (req, res) => {
 
   await Organization.findById(orgId)
     .then(organization => {
+      if (!organization) {
+        return handleNotFound(res);
+      }
+
       organization.services.push(body);
 
       return organization
@@ -172,8 +196,13 @@ export const servicesGet = async (req, res) => {
   const {orgId} = req?.params;
 
   await Organization.findById(orgId)
-    .then(({services = []}) => {
-      // TODO: check and send 404
+    .then(orgDoc => {
+      if (!orgDoc) {
+        return handleNotFound(res);
+      }
+
+      const services = orgDoc?.services || [];
+
       return res.json({services});
     })
     .catch(err => handleErr(err, res));

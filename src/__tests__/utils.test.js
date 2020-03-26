@@ -2,7 +2,10 @@ import {
   getEntityQuery,
   getOrganizationQuery,
   handleBadRequest,
-  handleErr
+  handleErr,
+  handleNotFound,
+  parsePageQuery,
+  removeUserInfo
 } from '../utils';
 
 const testResponse = {
@@ -50,7 +53,7 @@ describe('getOrganizationQuery', () => {
     const result = getOrganizationQuery({
       name: test,
       page: '10',
-      properties: 'hello,world'
+      properties: 'hello=true,world=true'
     });
 
     expect(result).toMatchSnapshot();
@@ -70,5 +73,41 @@ describe('handleErr', () => {
     const result = handleErr(new Error('test error'), testResponse);
 
     expect(result).toEqual({json: {error: true}, status: 500});
+  });
+});
+
+describe('handleNotFound', () => {
+  it('should pass', () => {
+    const result = handleNotFound(testResponse);
+
+    expect(result).toEqual({json: {notFound: true}, status: 404});
+  });
+});
+
+describe('parsePageQuery', () => {
+  it('should generate a correct limit and offset', () => {
+    const result = parsePageQuery('2');
+
+    expect(result).toEqual({limit: 20, offset: 20});
+  });
+
+  it('should default to the first page', () => {
+    const result = parsePageQuery();
+
+    expect(result).toEqual({limit: 20, offset: 0});
+  });
+});
+
+describe('removeUserInfo', () => {
+  it('should remove sensitive user info', () => {
+    const user = {
+      name: 'foo bar',
+      hash: 'hash',
+      password: 'password',
+      salt: 'salt'
+    };
+    const result = removeUserInfo(user);
+
+    expect(result).toEqual({name: 'foo bar'});
   });
 });

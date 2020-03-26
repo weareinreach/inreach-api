@@ -16,8 +16,10 @@ import {
   serviceUpdate
 } from './organizations';
 import {
+  authUser,
+  checkUserToken,
   userDelete,
-  userFavoritesUpdate,
+  userPasswordUpdate,
   userGet,
   usersCreate,
   usersGet,
@@ -31,6 +33,10 @@ export const versionOneRouter = Router();
 baseRouter.get('/', (req, res) => res.json({ok: true}));
 baseRouter.use('/docs', swaggerUi.serve);
 baseRouter.get('/docs', swaggerUi.setup(swaggerDocument));
+
+// Auth
+versionOneRouter.post('/auth', authUser);
+versionOneRouter.post('/auth/check', checkUserToken);
 
 // Organizations
 versionOneRouter.get('/organizations', organizationsGet);
@@ -83,4 +89,4 @@ versionOneRouter.post('/users', usersCreate);
 versionOneRouter.get('/users/:userId', userGet);
 versionOneRouter.patch('/users/:userId', userUpdate);
 versionOneRouter.delete('/users/:userId', userDelete);
-versionOneRouter.patch('/users/:userId/favorites', userFavoritesUpdate);
+versionOneRouter.patch('/users/:userId/password', userPasswordUpdate);

@@ -42,8 +42,8 @@
             "schema": {
               "type": "string"
             },
-            "description": "Comma delimited, list of properties",
-            "example": "community-lgbt,community-refugee"
+            "description": "Comma delimited, list of property names and values",
+            "example": "community-asylum-seeker=true,service-county-california-san-francisco=true"
           }
         ],
         "responses": {
@@ -752,15 +752,21 @@
         }
       }
     },
-    "/users/:userId/favorites": {
+    "/users/:userId/password": {
       "patch": {
-        "summary": "Update the user's favorites",
+        "summary": "Update the user's password",
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Favorite"
+                "type": "object",
+                "properties": {
+                  "password": {
+                    "type": "string",
+                    "example": true
+                  }
+                }
               }
             }
           }
@@ -774,6 +780,88 @@
                   "type": "object",
                   "properties": {
                     "updated": {
+                      "type": "boolean",
+                      "example": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth": {
+      "post": {
+        "summary": "Create a token for the user",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "example": true
+                  },
+                  "password": {
+                    "type": "string",
+                    "example": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "token": {
+                      "type": "string",
+                      "example": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/check": {
+      "post": {
+        "summary": "Check the user's token",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "token": {
+                    "type": "string",
+                    "example": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "valid": {
                       "type": "boolean",
                       "example": true
                     }
@@ -819,17 +907,6 @@
           }
         }
       },
-      "Favorite": {
-        "type": "object",
-        "properties": {
-          "foo": {
-            "type": "string"
-          },
-          "bar": {
-            "type": "string"
-          }
-        }
-      },
       "Organizations": {
         "type": "object",
         "properties": {
@@ -869,7 +946,7 @@
             "type": "string"
           },
           "is_published": {
-            "type": "string"
+            "type": "boolean"
           },
           "locations": {
             "type": "array",
@@ -885,9 +962,6 @@
           },
           "properties": {
             "type": "object"
-          },
-          "region": {
-            "type": "string"
           },
           "schedules": {
             "type": "array",
@@ -947,40 +1021,54 @@
           "description": {
             "type": "string"
           },
-          "emailId": {
+          "email_id": {
             "type": "string"
-          },
-          "is_appointment": {
-            "type": "boolean"
           },
           "is_published": {
             "type": "boolean"
           },
-          "locationId": {
+          "location_id": {
+            "type": "string"
+          },
+          "name": {
             "type": "string"
           },
           "organization": {
             "type": "object"
           },
+          "phone_id": {
+            "type": "string"
+          },
           "properties": {
             "type": "object"
           },
-          "name": {
-            "type": "string"
-          },
-          "phoneId": {
-            "type": "string"
-          },
-          "scheduleId": {
+          "schedule_id": {
             "type": "string"
           },
           "slug": {
             "type": "string"
           },
           "tags": {
-            "type": "array",
-            "items": {
-              "type": "string"
+            "type": "object",
+            "properties": {
+              "canada": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "mexico": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "united_states": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
             }
           }
         }
@@ -1036,20 +1124,26 @@
           "_id": {
             "type": "string"
           },
+          "catalogType": {
+            "type": "string"
+          },
           "email": {
             "type": "string"
           },
-          "password": {
-            "type": "string"
-          },
-          "type": {
-            "type": "string"
+          "favorites": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           },
           "isDataManager": {
             "type": "boolean"
           },
           "isAdminDataManager": {
             "type": "boolean"
+          },
+          "name": {
+            "type": "string"
           }
         }
       }

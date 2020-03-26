@@ -1,3 +1,8 @@
+import jwt from 'jsonwebtoken';
+import _omit from 'lodash/omit';
+
+const TOKEN_SIGNATURE = process.env.TOKEN_SIGNATURE || 'ssshhh';
+
 /**
  * Uses object shorthand to create a query based on if the values exist
  * @param  {String} organizationId id of the organization
@@ -18,7 +23,15 @@ export const getEntityQuery = ({organizationId, serviceId} = {}) => {
   return query;
 };
 
-export const ORG_PAGE_LIMIT = 20;
+export const ITEM_PAGE_LIMIT = 20;
+
+export const parsePageQuery = (page = '1') => {
+  const parsedPage = parseInt(page);
+  const limit = ITEM_PAGE_LIMIT;
+  const offset = limit * (parsedPage - 1);
+
+  return {limit, offset};
+};
 
 /**
  * Format a query to retrieve organizations
@@ -28,10 +41,7 @@ export const ORG_PAGE_LIMIT = 20;
  * @return {Object} A mongo query for organizations
  */
 export const getOrganizationQuery = ({name, page = '1', properties} = {}) => {
-  const parsedPage = parseInt(page);
-  const limit = ORG_PAGE_LIMIT;
-  const offset = limit * (parsedPage - 1);
-
+  const {limit, offset} = parsePageQuery(page);
   let query = {};
 
   if (name) {
@@ -40,7 +50,9 @@ export const getOrganizationQuery = ({name, page = '1', properties} = {}) => {
 
   if (properties) {
     const props = properties.split(',').reduce((result, prop) => {
-      result[`properties.${prop}`] = 'true';
+      const [name, value] = prop.split('=');
+
+      result[`properties.${name}`] = value;
 
       return result;
     }, {});
@@ -61,6 +73,15 @@ export const handleBadRequest = res => {
 };
 
 /**
+ * Returns a 404 status
+ * @param  {Object} res express response object
+ * @return {???} Returns the express function
+ */
+export const handleNotFound = res => {
+  return res.status(404).json({notFound: true});
+};
+
+/**
  * Logs the error and then return a 500 status
  * @param  {Object} err an error object
  * @param  {Object} res express response object
@@ -71,4 +92,50 @@ export const handleErr = (err, res) => {
   console.error(err);
 
   return res.status(500).json({error: true});
+};
+
+/**
+ * Remove sensitive user information
+ * @param  {Object} user User info
+ * @return {Object} Sanitized user info
+ */
+export const removeUserInfo = user => {
+  return _omit(user, ['hash', 'password', 'salt']);
+};
+
+/**
+ * Generate a JWT with user information
+ * @param  {Object} user
+ * @return {String} jwt
+ */
+export const generateJWT = user => {
+  const today = new Date();
+  const expDate = new Date(today);
+
+  expDate.setDate(today.getDate() + 14);
+
+  return jwt.sign(
+    {
+      ...user,
+      exp: parseInt(expDate.getTime() / 1000)
+    },
+    TOKEN_SIGNATURE
+  );
+};
+
+/**
+ * Verify JWT
+ * @param  {String} token Token to verify
+ * @return {Promise} Returns a promise since jwt.verify is async
+ */
+export const verifyJWT = token => {
+  return new Promise(resolve => {
+    jwt.verify(token, TOKEN_SIGNATURE, (err, decoded) => {
+      if (err) {
+        resolve({valid: false});
+      }
+
+      resolve({user: decoded, valid: true});
+    });
+  });
 };
