@@ -52,7 +52,6 @@ const schedule = {
 };
 
 // TODO: validate schemas & update updated_at to now()
-// TODO: generate/update slugs on save on org and services
 const organizationSchema = new Schema({
   created_at,
   updated_at,
@@ -152,8 +151,8 @@ const userSchema = new Schema({
   },
   favorites: [],
   hash: String,
-  isAdminDataManager: Boolean,
-  isDataManager: Boolean,
+  isAdminDataManager: {type: Boolean, default: false},
+  isDataManager: {type: Boolean, default: false},
   name: String,
   salt: String
 });
