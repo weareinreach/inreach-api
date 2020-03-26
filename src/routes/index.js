@@ -1,29 +1,31 @@
 import {Router} from 'express';
 import swaggerUi from 'swagger-ui-express';
 
-import {commentsGet, commentsUpdate, ratingsGet, ratingsUpdate} from './entity';
+import {getComments, getRatings, updateComments, updateRatings} from './entity';
 import {
-  organizationDelete,
-  organizationGet,
-  organizationsGetCount,
-  organizationsCreate,
-  organizationsGet,
-  organizationUpdate,
-  serviceDelete,
-  serviceGet,
-  servicesCreate,
-  servicesGet,
-  serviceUpdate
+  createOrg,
+  deleteOrg,
+  getOrg,
+  getOrgs,
+  getOrgsCount,
+  updateOrg
 } from './organizations';
+import {
+  createService,
+  deleteService,
+  getService,
+  getServices,
+  updateService
+} from './services';
 import {
   authUser,
   checkUserToken,
-  userDelete,
-  userPasswordUpdate,
-  userGet,
-  usersCreate,
-  usersGet,
-  userUpdate
+  createUser,
+  deleteUser,
+  getUser,
+  getUsers,
+  updateUser,
+  updateUserPassword
 } from './users';
 import swaggerDocument from '../swagger.json';
 
@@ -39,54 +41,54 @@ versionOneRouter.post('/auth', authUser);
 versionOneRouter.post('/auth/check', checkUserToken);
 
 // Organizations
-versionOneRouter.get('/organizations', organizationsGet);
-versionOneRouter.post('/organizations', organizationsCreate);
-versionOneRouter.get('/organizations/count', organizationsGetCount);
-versionOneRouter.get('/organizations/:orgId', organizationGet);
-versionOneRouter.patch('/organizations/:orgId', organizationUpdate);
-versionOneRouter.delete('/organizations/:orgId', organizationDelete);
+versionOneRouter.get('/organizations', getOrgs);
+versionOneRouter.post('/organizations', createOrg);
+versionOneRouter.get('/organizations/count', getOrgsCount);
+versionOneRouter.get('/organizations/:orgId', getOrg);
+versionOneRouter.patch('/organizations/:orgId', updateOrg);
+versionOneRouter.delete('/organizations/:orgId', deleteOrg);
 
 // Services
-versionOneRouter.get('/organizations/:orgId/services', servicesGet);
-versionOneRouter.post('/organizations/:orgId/services', servicesCreate);
-versionOneRouter.get('/organizations/:orgId/services/:serviceId', serviceGet);
+versionOneRouter.get('/organizations/:orgId/services', getServices);
+versionOneRouter.post('/organizations/:orgId/services', createService);
+versionOneRouter.get('/organizations/:orgId/services/:serviceId', getService);
 versionOneRouter.patch(
   '/organizations/:orgId/services/:serviceId',
-  serviceUpdate
+  updateService
 );
 versionOneRouter.delete(
   '/organizations/:orgId/services/:serviceId',
-  serviceDelete
+  deleteService
 );
 
 // Comments
-versionOneRouter.get('/organizations/:orgId/comments', commentsGet);
-versionOneRouter.patch('/organizations/:orgId/comments', commentsUpdate);
+versionOneRouter.get('/organizations/:orgId/comments', getComments);
+versionOneRouter.patch('/organizations/:orgId/comments', updateComments);
 versionOneRouter.get(
   '/organizations/:orgId/services/:serviceId/comments',
-  commentsGet
+  getComments
 );
 versionOneRouter.patch(
   '/organizations/:orgId/services/:serviceId/comments',
-  commentsUpdate
+  updateComments
 );
 
 // Ratings
-versionOneRouter.get('/organizations/:orgId/ratings', ratingsGet);
-versionOneRouter.patch('/organizations/:orgId/ratings', ratingsUpdate);
+versionOneRouter.get('/organizations/:orgId/ratings', getRatings);
+versionOneRouter.patch('/organizations/:orgId/ratings', updateRatings);
 versionOneRouter.get(
   '/organizations/:orgId/services/:serviceId/ratings',
-  ratingsGet
+  getRatings
 );
 versionOneRouter.patch(
   '/organizations/:orgId/services/:serviceId/ratings',
-  ratingsUpdate
+  updateRatings
 );
 
 // Users
-versionOneRouter.get('/users', usersGet);
-versionOneRouter.post('/users', usersCreate);
-versionOneRouter.get('/users/:userId', userGet);
-versionOneRouter.patch('/users/:userId', userUpdate);
-versionOneRouter.delete('/users/:userId', userDelete);
-versionOneRouter.patch('/users/:userId/password', userPasswordUpdate);
+versionOneRouter.get('/users', getUsers);
+versionOneRouter.post('/users', createUser);
+versionOneRouter.get('/users/:userId', getUser);
+versionOneRouter.patch('/users/:userId', updateUser);
+versionOneRouter.delete('/users/:userId', deleteUser);
+versionOneRouter.patch('/users/:userId/password', updateUserPassword);

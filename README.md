@@ -12,11 +12,11 @@ $ npm i
 $ npm start
 ```
 
-In order to run the app you need a [.env][https://www.npmjs.com/package/dotenv] file with a valid mongodb connection string
+In order to run the app you need a [.env][https://www.npmjs.com/package/dotenv] file with a valid mongodb connection string.
 
 ## Codebase
 
-Our routes documentation can be found at /docs on staging and production.
+Our routes documentation can be found at `/docs` on staging and production.
 
 Folder structure
 

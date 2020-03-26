@@ -1,8 +1,8 @@
 import {
   generateJWT,
   handleBadRequest,
-  handleNotFound,
   handleErr,
+  handleNotFound,
   parsePageQuery,
   removeUserInfo,
   verifyJWT
@@ -13,18 +13,19 @@ export const authUser = async (req, res) => {
   const {email, password} = req?.body;
 
   await User.findOne({email})
-    .then(user => {
-      if (!user) {
+    .then(userDoc => {
+      if (!userDoc) {
         return handleNotFound(res);
       }
 
-      const valid = user.validPassword(password);
-      const userDoc = removeUserInfo(user.toJSON());
-      let token = '';
+      const valid = userDoc.validPassword(password);
 
-      if (valid) {
-        token = generateJWT(userDoc);
+      if (!valid) {
+        return handleBadRequest(res);
       }
+
+      const user = removeUserInfo(userDoc.toJSON());
+      const token = generateJWT(user);
 
       return res.json({valid, token});
     })
@@ -42,79 +43,28 @@ export const checkUserToken = async (req, res) => {
   return handleBadRequest(res);
 };
 
-export const userDelete = async (req, res) => {
-  const {userId} = req?.params;
+export const getUsers = async (req, res) => {
+  const {isDataManager, page} = req?.query;
+  const {limit, offset} = parsePageQuery(page);
+  const query = {};
 
-  await User.findByIdAndDelete(userId)
-    .then(() => {
-      return res.json({deleted: true});
-    })
-    .catch(err => handleErr(err, res));
-};
-
-export const userGet = async (req, res) => {
-  const {userId} = req?.params;
-
-  await User.findById(userId)
-    .then(userDoc => {
-      if (!userDoc) {
-        return handleNotFound(res);
-      }
-
-      const user = removeUserInfo(userDoc.toJSON());
-
-      return res.json(user);
-    })
-    .catch(err => handleErr(err, res));
-};
-
-export const userUpdate = async (req, res) => {
-  const {userId} = req?.params;
-  const body = req?.body;
-  const updated_at = Date.now();
-
-  if (!body) {
-    return handleBadRequest(res);
+  if (isDataManager) {
+    query.isDataManager = true;
   }
 
-  await User.findOneAndUpdate({_id: userId}, {$set: {...body, updated_at}})
-    .then(userDoc => {
-      if (!userDoc) {
-        return handleNotFound(res);
-      }
+  await User.find(query)
+    .sort({updated_at: -1})
+    .skip(offset)
+    .limit(limit)
+    .then(userList => {
+      const users = userList.map(user => removeUserInfo(user.toJSON()));
 
-      return res.json({updated: true});
+      return res.json({users});
     })
     .catch(err => handleErr(err, res));
 };
 
-export const userPasswordUpdate = async (req, res) => {
-  const {userId} = req?.params;
-  const {password} = req?.body;
-
-  if (!password) {
-    return handleBadRequest(res);
-  }
-
-  await User.findById(userId)
-    .then(async user => {
-      if (!user) {
-        return handleNotFound(res);
-      }
-
-      user.setPassword(password);
-
-      await user
-        .save()
-        .then(() => {
-          return res.json({updated: true});
-        })
-        .catch(err => handleErr(err, res));
-    })
-    .catch(err => handleErr(err, res));
-};
-
-export const usersCreate = async (req, res) => {
+export const createUser = async (req, res) => {
   const {password, ...body} = req?.body;
 
   if (!body) {
@@ -135,23 +85,72 @@ export const usersCreate = async (req, res) => {
     .catch(err => handleErr(err, res));
 };
 
-export const usersGet = async (req, res) => {
-  const {isDataManager, page} = req?.query;
-  const {limit, offset} = parsePageQuery(page);
-  const query = {};
+export const deleteUser = async (req, res) => {
+  const {userId} = req?.params;
 
-  if (isDataManager) {
-    query.isDataManager = true;
+  await User.findByIdAndDelete(userId)
+    .then(() => {
+      return res.json({deleted: true});
+    })
+    .catch(err => handleErr(err, res));
+};
+
+export const getUser = async (req, res) => {
+  const {userId} = req?.params;
+
+  await User.findById(userId)
+    .then(userDoc => {
+      if (!userDoc) {
+        return handleNotFound(res);
+      }
+
+      const user = removeUserInfo(userDoc.toJSON());
+
+      return res.json(user);
+    })
+    .catch(err => handleErr(err, res));
+};
+
+export const updateUser = async (req, res) => {
+  const {userId} = req?.params;
+  const body = req?.body;
+  const updated_at = Date.now();
+
+  if (!body) {
+    return handleBadRequest(res);
   }
 
-  await User.find(query)
-    .sort({updated_at: -1})
-    .skip(offset)
-    .limit(limit)
-    .then(userList => {
-      const users = userList.map(user => removeUserInfo(user.toJSON()));
+  await User.findOneAndUpdate({_id: userId}, {$set: {...body, updated_at}})
+    .then(userDoc => {
+      if (!userDoc) {
+        return handleNotFound(res);
+      }
 
-      return res.json({users});
+      return res.json({updated: true});
+    })
+    .catch(err => handleErr(err, res));
+};
+
+export const updateUserPassword = async (req, res) => {
+  const {userId} = req?.params;
+  const {password} = req?.body;
+
+  if (!password) {
+    return handleBadRequest(res);
+  }
+
+  await User.findById(userId)
+    .then(async user => {
+      if (!user) {
+        return handleNotFound(res);
+      }
+
+      user.setPassword(password);
+
+      await user
+        .save()
+        .then(() => res.json({updated: true}))
+        .catch(err => handleErr(err, res));
     })
     .catch(err => handleErr(err, res));
 };

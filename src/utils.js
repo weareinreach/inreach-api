@@ -64,6 +64,17 @@ export const getOrganizationQuery = ({name, page = '1', properties} = {}) => {
 };
 
 /**
+ * Generate the slug of an item from its name
+ * @param  {String} name
+ * @return {String} slug
+ */
+export const generateSlug = name =>
+  name
+    ?.split(' ')
+    ?.join('-')
+    ?.toLowerCase() || '';
+
+/**
  * Returns a 400 status
  * @param  {Object} res express response object
  * @return {???} Returns the express function

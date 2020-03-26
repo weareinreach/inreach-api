@@ -1,73 +1,77 @@
 import crypto from 'crypto';
 
 import {model, Schema} from 'mongoose';
+import {generateSlug} from './utils';
 
+const saveEvents = ['findOneAndUpdate', 'save', 'updateOne'];
 const created_at = {type: Date, default: Date.now};
-const updated_at = Date;
 const is_published = {type: Boolean, default: true};
-const email = {
-  email: String,
-  first_name: String,
-  is_primary: Boolean,
-  last_name: String,
-  show_on_organization: Boolean,
-  title: String
-};
-const location = {
-  address: String,
-  city: String,
-  country: String,
-  is_primary: Boolean,
-  lat: String,
-  long: String,
-  name: String,
-  show_on_organization: Boolean,
-  state: String,
-  unit: String,
-  zip_code: String
-};
-const phone = {
-  digits: String,
-  is_primary: Boolean,
-  phone_type: String,
-  show_on_organization: Boolean
-};
-const schedule = {
-  monday_start: String,
-  monday_end: String,
-  tuesday_start: String,
-  tuesday_end: String,
-  wednesday_start: String,
-  wednesday_end: String,
-  thursday_start: String,
-  thursday_end: String,
-  friday_start: String,
-  friday_end: String,
-  saturday_start: String,
-  saturday_end: String,
-  sunday_start: String,
-  sunday_end: String,
-  note: String,
-  timezone: String
-};
 
-// TODO: validate schemas & update updated_at to now()
-const organizationSchema = new Schema({
+const OrganizationSchema = new Schema({
   created_at,
-  updated_at,
+  updated_at: Date,
   alert_message: String,
   description: String,
-  emails: [email],
+  emails: [
+    {
+      email: String,
+      first_name: String,
+      is_primary: Boolean,
+      last_name: String,
+      show_on_organization: Boolean,
+      title: String
+    }
+  ],
   name: String,
   is_published,
-  locations: [location],
-  phones: [phone],
+  locations: [
+    {
+      address: String,
+      city: String,
+      country: String,
+      is_primary: Boolean,
+      lat: String,
+      long: String,
+      name: String,
+      show_on_organization: Boolean,
+      state: String,
+      unit: String,
+      zip_code: String
+    }
+  ],
+  phones: [
+    {
+      digits: String,
+      is_primary: Boolean,
+      phone_type: String,
+      show_on_organization: Boolean
+    }
+  ],
   properties: {},
-  schedules: [schedule],
+  schedules: [
+    {
+      monday_start: String,
+      monday_end: String,
+      tuesday_start: String,
+      tuesday_end: String,
+      wednesday_start: String,
+      wednesday_end: String,
+      thursday_start: String,
+      thursday_end: String,
+      friday_start: String,
+      friday_end: String,
+      saturday_start: String,
+      saturday_end: String,
+      sunday_start: String,
+      sunday_end: String,
+      note: String,
+      timezone: String
+    }
+  ],
   services: [
     {
       created_at,
-      updated_at,
+      updated_at: Date,
       access_instructions: [
         {
           access_value: String,
@@ -85,9 +89,9 @@ const organizationSchema = new Schema({
       schedule_id: String,
       slug: String,
       tags: {
-        united_states: [String],
         canada: [String],
-        mexico: [String]
+        mexico: [String],
+        united_states: [String]
       }
     }
   ],
@@ -97,17 +101,20 @@ const organizationSchema = new Schema({
   website: String
 });
 
-organizationSchema.pre(['findOneAndUpdate', 'save', 'updateOne'], next => {
+OrganizationSchema.pre(saveEvents, next => {
   if (this) {
     this.updated_at = Date.now();
+
+    if (!this.slug) {
+      this.slug = generateSlug(this.name);
+    }
   }
   next();
 });
 
-export const Organization = model('Organization', organizationSchema);
+export const Organization = model('Organization', OrganizationSchema);
 
-// TODO: validate schemas & update updated_at to now()
-const commentSchema = new Schema({
+const CommentSchema = new Schema({
   organizationId: String,
   serviceId: String,
   comments: [
@@ -120,10 +127,9 @@ const commentSchema = new Schema({
   ]
 });
 
-export const Comment = model('Comment', commentSchema);
+export const Comment = model('Comment', CommentSchema);
 
-// TODO: validate schemas & update updated_at to now()
-const ratingSchema = new Schema({
+const RatingSchema = new Schema({
   organizationId: String,
   serviceId: String,
   ratings: [
@@ -136,12 +142,11 @@ const ratingSchema = new Schema({
   ]
 });
 
-export const Rating = model('Rating', ratingSchema);
+export const Rating = model('Rating', RatingSchema);
 
-// TODO: validate schemas & update updated_at to now()
-const userSchema = new Schema({
+const UserSchema = new Schema({
   created_at,
-  updated_at,
+  updated_at: Date,
   catalogType: String,
   email: {
     type: String,
@@ -157,25 +162,25 @@ const userSchema = new Schema({
   salt: String
 });
 
-userSchema.pre(['findOneAndUpdate', 'save', 'updateOne'], next => {
+UserSchema.pre(saveEvents, next => {
   if (this) {
     this.updated_at = Date.now();
   }
   next();
 });
 
-userSchema.methods.setPassword = function(password) {
+UserSchema.methods.setPassword = function(password) {
   this.salt = crypto.randomBytes(16).toString('hex');
   this.hash = crypto
     .pbkdf2Sync(password, this.salt, 10000, 512, 'sha512')
     .toString('hex');
 };
 
-userSchema.methods.validPassword = function(password) {
+UserSchema.methods.validPassword = function(password) {
   const hash = crypto
     .pbkdf2Sync(password, this.salt, 10000, 512, 'sha512')
     .toString('hex');
   return this.hash === hash;
 };
 
-export const User = model('User', userSchema);
+export const User = model('User', UserSchema);
