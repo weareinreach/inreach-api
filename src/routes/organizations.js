@@ -3,7 +3,7 @@ import {
   getOrganizationQuery,
   handleBadRequest,
   handleErr,
-  handleNotFound
+  handleNotFound,
 } from '../utils';
 import {Organization} from '../mongoose';
 
@@ -14,22 +14,22 @@ export const getOrgs = async (req, res) => {
     .sort({updated_at: -1})
     .skip(params.offset)
     .limit(params.limit)
-    .then(organizations => {
+    .then((organizations) => {
       return res.json({organizations});
     })
-    .catch(err => handleErr(err, res));
+    .catch((err) => handleErr(err, res));
 };
 
 export const getOrgsCount = async (req, res) => {
   const {query} = getOrganizationQuery(req?.query);
 
   await Organization.countDocuments(query)
-    .then(count => {
+    .then((count) => {
       const pages = Math.ceil(count / ITEM_PAGE_LIMIT);
 
       return res.json({count, pages});
     })
-    .catch(err => handleErr(err, res));
+    .catch((err) => handleErr(err, res));
 };
 
 export const createOrg = async (req, res) => {
@@ -42,10 +42,10 @@ export const createOrg = async (req, res) => {
 
   await org
     .save()
-    .then(organization => {
+    .then((organization) => {
       return res.json({created: true, organization});
     })
-    .catch(err => handleErr(err, res));
+    .catch((err) => handleErr(err, res));
 };
 
 export const deleteOrg = async (req, res) => {
@@ -55,21 +55,21 @@ export const deleteOrg = async (req, res) => {
     .then(() => {
       return res.json({deleted: true});
     })
-    .catch(err => handleErr(err, res));
+    .catch((err) => handleErr(err, res));
 };
 
 export const getOrg = async (req, res) => {
   const {orgId} = req?.params;
 
   await Organization.findById(orgId)
-    .then(organization => {
+    .then((organization) => {
       if (!organization) {
         return handleNotFound(res);
       }
 
       return res.json(organization);
     })
-    .catch(err => handleErr(err, res));
+    .catch((err) => handleErr(err, res));
 };
 
 export const updateOrg = async (req, res) => {
@@ -85,12 +85,12 @@ export const updateOrg = async (req, res) => {
     {_id: orgId},
     {$set: {...body, updated_at}}
   )
-    .then(doc => {
+    .then((doc) => {
       if (!doc) {
         return handleNotFound(res);
       }
 
       return res.json({updated: true});
     })
-    .catch(err => handleErr(err, res));
+    .catch((err) => handleErr(err, res));
 };

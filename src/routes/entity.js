@@ -3,7 +3,7 @@ import {
   getEntityQuery,
   handleBadRequest,
   handleErr,
-  handleNotFound
+  handleNotFound,
 } from '../utils';
 
 export const getComments = async (req, res) => {
@@ -11,7 +11,7 @@ export const getComments = async (req, res) => {
   const query = getEntityQuery({organizationId: orgId, serviceId});
 
   await Comment.findOne(query)
-    .then(doc => {
+    .then((doc) => {
       if (!doc) {
         return handleNotFound(res);
       }
@@ -23,7 +23,7 @@ export const getComments = async (req, res) => {
       }
       return res.json({comments});
     })
-    .catch(err => handleErr(err, res));
+    .catch((err) => handleErr(err, res));
 };
 
 export const updateComments = async (req, res) => {
@@ -40,14 +40,14 @@ export const updateComments = async (req, res) => {
     {$push: {comments: {comment, source, userId}}},
     {upsert: true}
   )
-    .then(doc => {
+    .then((doc) => {
       if (!doc) {
         return handleNotFound(res);
       }
 
       return res.json({updated: true});
     })
-    .catch(err => handleErr(err, res));
+    .catch((err) => handleErr(err, res));
 };
 
 export const getRatings = async (req, res) => {
@@ -55,7 +55,7 @@ export const getRatings = async (req, res) => {
   const query = getEntityQuery({organizationId: orgId, serviceId});
 
   await Rating.findOne(query)
-    .then(doc => {
+    .then((doc) => {
       if (!doc) {
         return handleNotFound(res);
       }
@@ -65,7 +65,7 @@ export const getRatings = async (req, res) => {
 
       return res.json({average_rating: average, ratings});
     })
-    .catch(err => handleErr(err, res));
+    .catch((err) => handleErr(err, res));
 };
 
 export const updateRatings = async (req, res) => {
@@ -82,12 +82,12 @@ export const updateRatings = async (req, res) => {
     {$push: {ratings: {rating, source, userId}}},
     {upsert: true}
   )
-    .then(doc => {
+    .then((doc) => {
       if (!doc) {
         return handleNotFound(res);
       }
 
       return res.json({updated: true});
     })
-    .catch(err => handleErr(err, res));
+    .catch((err) => handleErr(err, res));
 };

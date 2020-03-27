@@ -8,14 +8,15 @@ import {
   getOrg,
   getOrgs,
   getOrgsCount,
-  updateOrg
+  updateOrg,
 } from './organizations';
+import {getReviews, createReview} from './reviews';
 import {
   createService,
   deleteService,
   getService,
   getServices,
-  updateService
+  updateService,
 } from './services';
 import {
   authUser,
@@ -25,7 +26,7 @@ import {
   getUser,
   getUsers,
   updateUser,
-  updateUserPassword
+  updateUserPassword,
 } from './users';
 import swaggerDocument from '../swagger.json';
 
@@ -92,3 +93,7 @@ versionOneRouter.get('/users/:userId', getUser);
 versionOneRouter.patch('/users/:userId', updateUser);
 versionOneRouter.delete('/users/:userId', deleteUser);
 versionOneRouter.patch('/users/:userId/password', updateUserPassword);
+
+// Ratings
+versionOneRouter.get('/reviews', getReviews);
+versionOneRouter.post('/reviews', createReview);

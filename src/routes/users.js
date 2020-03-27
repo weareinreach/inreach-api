@@ -5,7 +5,7 @@ import {
   handleNotFound,
   parsePageQuery,
   removeUserInfo,
-  verifyJWT
+  verifyJWT,
 } from '../utils';
 import {User} from '../mongoose';
 
@@ -13,7 +13,7 @@ export const authUser = async (req, res) => {
   const {email, password} = req?.body;
 
   await User.findOne({email})
-    .then(userDoc => {
+    .then((userDoc) => {
       if (!userDoc) {
         return handleNotFound(res);
       }
@@ -29,7 +29,7 @@ export const authUser = async (req, res) => {
 
       return res.json({valid, token});
     })
-    .catch(err => handleErr(err, res));
+    .catch((err) => handleErr(err, res));
 };
 
 export const checkUserToken = async (req, res) => {
@@ -56,12 +56,12 @@ export const getUsers = async (req, res) => {
     .sort({updated_at: -1})
     .skip(offset)
     .limit(limit)
-    .then(userList => {
-      const users = userList.map(user => removeUserInfo(user.toJSON()));
+    .then((userList) => {
+      const users = userList.map((user) => removeUserInfo(user.toJSON()));
 
       return res.json({users});
     })
-    .catch(err => handleErr(err, res));
+    .catch((err) => handleErr(err, res));
 };
 
 export const createUser = async (req, res) => {
@@ -77,12 +77,12 @@ export const createUser = async (req, res) => {
 
   await user
     .save()
-    .then(userDoc => {
+    .then((userDoc) => {
       const user = removeUserInfo(userDoc.toJSON());
 
       return res.json({created: true, user});
     })
-    .catch(err => handleErr(err, res));
+    .catch((err) => handleErr(err, res));
 };
 
 export const deleteUser = async (req, res) => {
@@ -92,14 +92,14 @@ export const deleteUser = async (req, res) => {
     .then(() => {
       return res.json({deleted: true});
     })
-    .catch(err => handleErr(err, res));
+    .catch((err) => handleErr(err, res));
 };
 
 export const getUser = async (req, res) => {
   const {userId} = req?.params;
 
   await User.findById(userId)
-    .then(userDoc => {
+    .then((userDoc) => {
       if (!userDoc) {
         return handleNotFound(res);
       }
@@ -108,7 +108,7 @@ export const getUser = async (req, res) => {
 
       return res.json(user);
     })
-    .catch(err => handleErr(err, res));
+    .catch((err) => handleErr(err, res));
 };
 
 export const updateUser = async (req, res) => {
@@ -121,14 +121,14 @@ export const updateUser = async (req, res) => {
   }
 
   await User.findOneAndUpdate({_id: userId}, {$set: {...body, updated_at}})
-    .then(userDoc => {
+    .then((userDoc) => {
       if (!userDoc) {
         return handleNotFound(res);
       }
 
       return res.json({updated: true});
     })
-    .catch(err => handleErr(err, res));
+    .catch((err) => handleErr(err, res));
 };
 
 export const updateUserPassword = async (req, res) => {
@@ -140,7 +140,7 @@ export const updateUserPassword = async (req, res) => {
   }
 
   await User.findById(userId)
-    .then(async user => {
+    .then(async (user) => {
       if (!user) {
         return handleNotFound(res);
       }
@@ -150,7 +150,7 @@ export const updateUserPassword = async (req, res) => {
       await user
         .save()
         .then(() => res.json({updated: true}))
-        .catch(err => handleErr(err, res));
+        .catch((err) => handleErr(err, res));
     })
-    .catch(err => handleErr(err, res));
+    .catch((err) => handleErr(err, res));
 };

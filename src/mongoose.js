@@ -19,8 +19,8 @@ const OrganizationSchema = new Schema({
       is_primary: Boolean,
       last_name: String,
       show_on_organization: Boolean,
-      title: String
-    }
+      title: String,
+    },
   ],
   name: String,
   is_published,
@@ -36,16 +36,16 @@ const OrganizationSchema = new Schema({
       show_on_organization: Boolean,
       state: String,
       unit: String,
-      zip_code: String
-    }
+      zip_code: String,
+    },
   ],
   phones: [
     {
       digits: String,
       is_primary: Boolean,
       phone_type: String,
-      show_on_organization: Boolean
-    }
+      show_on_organization: Boolean,
+    },
   ],
   properties: {},
   schedules: [
@@ -65,8 +65,8 @@ const OrganizationSchema = new Schema({
       sunday_start: String,
       sunday_end: String,
       note: String,
-      timezone: String
-    }
+      timezone: String,
+    },
   ],
   services: [
     {
@@ -76,8 +76,8 @@ const OrganizationSchema = new Schema({
         {
           access_value: String,
           access_type: String,
-          instructions: String
-        }
+          instructions: String,
+        },
       ],
       description: String,
       email_id: String,
@@ -91,17 +91,17 @@ const OrganizationSchema = new Schema({
       tags: {
         canada: [String],
         mexico: [String],
-        united_states: [String]
-      }
-    }
+        united_states: [String],
+      },
+    },
   ],
   slug: String,
   source: String,
   verified_at: Date,
-  website: String
+  website: String,
 });
 
-OrganizationSchema.pre(saveEvents, next => {
+OrganizationSchema.pre(saveEvents, (next) => {
   if (this) {
     this.updated_at = Date.now();
 
@@ -122,9 +122,9 @@ const CommentSchema = new Schema({
       created_at,
       comment: String,
       source: String,
-      userId: String
-    }
-  ]
+      userId: String,
+    },
+  ],
 });
 
 export const Comment = model('Comment', CommentSchema);
@@ -137,12 +137,24 @@ const RatingSchema = new Schema({
       created_at,
       rating: Number,
       source: String,
-      userId: String
-    }
-  ]
+      userId: String,
+    },
+  ],
 });
 
 export const Rating = model('Rating', RatingSchema);
+
+const ReviewSchema = new Schema({
+  created_at,
+  comment: String,
+  hasAccount: Boolean,
+  hasLeftFeedbackBefore: Boolean,
+  negativeReasons: [String],
+  rating: Number,
+  source: {type: String, default: 'catalog'},
+});
+
+export const Review = model('Review', ReviewSchema);
 
 const UserSchema = new Schema({
   created_at,
@@ -152,31 +164,31 @@ const UserSchema = new Schema({
     type: String,
     lowercase: true,
     required: [true, "can't be blank"],
-    match: [/\S+@\S+\.\S+/, 'is invalid']
+    match: [/\S+@\S+\.\S+/, 'is invalid'],
   },
   favorites: [],
   hash: String,
   isAdminDataManager: {type: Boolean, default: false},
   isDataManager: {type: Boolean, default: false},
   name: String,
-  salt: String
+  salt: String,
 });
 
-UserSchema.pre(saveEvents, next => {
+UserSchema.pre(saveEvents, (next) => {
   if (this) {
     this.updated_at = Date.now();
   }
   next();
 });
 
-UserSchema.methods.setPassword = function(password) {
+UserSchema.methods.setPassword = function (password) {
   this.salt = crypto.randomBytes(16).toString('hex');
   this.hash = crypto
     .pbkdf2Sync(password, this.salt, 10000, 512, 'sha512')
     .toString('hex');
 };
 
-UserSchema.methods.validPassword = function(password) {
+UserSchema.methods.validPassword = function (password) {
   const hash = crypto
     .pbkdf2Sync(password, this.salt, 10000, 512, 'sha512')
     .toString('hex');

@@ -68,18 +68,15 @@ export const getOrganizationQuery = ({name, page = '1', properties} = {}) => {
  * @param  {String} name
  * @return {String} slug
  */
-export const generateSlug = name =>
-  name
-    ?.split(' ')
-    ?.join('-')
-    ?.toLowerCase() || '';
+export const generateSlug = (name) =>
+  name?.split(' ')?.join('-')?.toLowerCase() || '';
 
 /**
  * Returns a 400 status
  * @param  {Object} res express response object
  * @return {???} Returns the express function
  */
-export const handleBadRequest = res => {
+export const handleBadRequest = (res) => {
   return res.status(400).json({error: true});
 };
 
@@ -88,7 +85,7 @@ export const handleBadRequest = res => {
  * @param  {Object} res express response object
  * @return {???} Returns the express function
  */
-export const handleNotFound = res => {
+export const handleNotFound = (res) => {
   return res.status(404).json({notFound: true});
 };
 
@@ -110,7 +107,7 @@ export const handleErr = (err, res) => {
  * @param  {Object} user User info
  * @return {Object} Sanitized user info
  */
-export const removeUserInfo = user => {
+export const removeUserInfo = (user) => {
   return _omit(user, ['hash', 'password', 'salt']);
 };
 
@@ -119,7 +116,7 @@ export const removeUserInfo = user => {
  * @param  {Object} user
  * @return {String} jwt
  */
-export const generateJWT = user => {
+export const generateJWT = (user) => {
   const today = new Date();
   const expDate = new Date(today);
 
@@ -128,7 +125,7 @@ export const generateJWT = user => {
   return jwt.sign(
     {
       ...user,
-      exp: parseInt(expDate.getTime() / 1000)
+      exp: parseInt(expDate.getTime() / 1000),
     },
     TOKEN_SIGNATURE
   );
@@ -139,8 +136,8 @@ export const generateJWT = user => {
  * @param  {String} token Token to verify
  * @return {Promise} Returns a promise since jwt.verify is async
  */
-export const verifyJWT = token => {
-  return new Promise(resolve => {
+export const verifyJWT = (token) => {
+  return new Promise((resolve) => {
     jwt.verify(token, TOKEN_SIGNATURE, (err, decoded) => {
       if (err) {
         resolve({valid: false});
