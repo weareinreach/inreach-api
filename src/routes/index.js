@@ -18,6 +18,7 @@ import {
   getServices,
   updateService,
 } from './services';
+import {getStaticPage} from './static';
 import {
   authUser,
   checkUserToken,
@@ -97,3 +98,6 @@ versionOneRouter.patch('/users/:userId/password', updateUserPassword);
 // Ratings
 versionOneRouter.get('/reviews', getReviews);
 versionOneRouter.post('/reviews', createReview);
+
+// Static
+versionOneRouter.get('/static/:pageId', getStaticPage);
