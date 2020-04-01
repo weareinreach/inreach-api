@@ -12,15 +12,8 @@ export const getComments = async (req, res) => {
 
   await Comment.findOne(query)
     .then((doc) => {
-      if (!doc) {
-        return handleNotFound(res);
-      }
+      const {comments = []} = doc || {};
 
-      const {comments = []} = doc;
-
-      if (!doc) {
-        return handleNotFound(res);
-      }
       return res.json({comments});
     })
     .catch((err) => handleErr(err, res));
@@ -56,12 +49,8 @@ export const getRatings = async (req, res) => {
 
   await Rating.findOne(query)
     .then((doc) => {
-      if (!doc) {
-        return handleNotFound(res);
-      }
-
       const average = 0;
-      const {ratings = []} = doc;
+      const {ratings = []} = doc || {};
 
       return res.json({average_rating: average, ratings});
     })
