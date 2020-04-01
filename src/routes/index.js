@@ -16,6 +16,7 @@ import {
   createService,
   deleteService,
   getService,
+  getServiceBySlug,
   getServices,
   updateService,
 } from './services';
@@ -47,7 +48,7 @@ versionOneRouter.post('/auth/check', checkUserToken);
 versionOneRouter.get('/organizations', getOrgs);
 versionOneRouter.post('/organizations', createOrg);
 versionOneRouter.get('/organizations/count', getOrgsCount);
-versionOneRouter.get('/organizations/slug/:orgSlug', getOrgBySlug);
+
 versionOneRouter.get('/organizations/:orgId', getOrg);
 versionOneRouter.patch('/organizations/:orgId', updateOrg);
 versionOneRouter.delete('/organizations/:orgId', deleteOrg);
@@ -63,6 +64,13 @@ versionOneRouter.patch(
 versionOneRouter.delete(
   '/organizations/:orgId/services/:serviceId',
   deleteService
+);
+
+// Slug
+versionOneRouter.get('/slug/organizations/:orgSlug', getOrgBySlug);
+versionOneRouter.get(
+  '/slug/organizations/:orgSlug/services/:serviceSlug',
+  getServiceBySlug
 );
 
 // Comments

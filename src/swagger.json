@@ -230,34 +230,6 @@
         }
       }
     },
-    "/organizations/slug/:orgSlug": {
-      "parameters": [
-        {
-          "in": "path",
-          "name": "orgSlug",
-          "schema": {
-            "type": "string"
-          },
-          "required": true,
-          "description": "Slug of the organization"
-        }
-      ],
-      "get": {
-        "summary": "Get an organization by its slug",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Organization"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/organizations/:orgId/services": {
       "parameters": [
         {
@@ -653,6 +625,71 @@
                       "example": true
                     }
                   }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/slug/organizations/:orgSlug": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "orgSlug",
+          "schema": {
+            "type": "string"
+          },
+          "required": true,
+          "description": "Slug of the organization"
+        }
+      ],
+      "get": {
+        "summary": "Get an organization by its slug",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Organization"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/slug/organizations/:orgSlug/services/:serviceSlug": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "orgSlug",
+          "schema": {
+            "type": "string"
+          },
+          "required": true,
+          "description": "Slug of the organization"
+        },
+        {
+          "in": "path",
+          "name": "serviceSlug",
+          "schema": {
+            "type": "string"
+          },
+          "required": true,
+          "description": "Slug of the service"
+        }
+      ],
+      "get": {
+        "summary": "Get a service by its and its org's slug",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Organization"
                 }
               }
             }

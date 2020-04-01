@@ -72,20 +72,6 @@ export const getOrg = async (req, res) => {
     .catch((err) => handleErr(err, res));
 };
 
-export const getOrgBySlug = async (req, res) => {
-  const {orgSlug} = req?.params;
-
-  await Organization.findOne({slug: orgSlug})
-    .then((organization) => {
-      if (!organization) {
-        return handleNotFound(res);
-      }
-
-      return res.json(organization);
-    })
-    .catch((err) => handleErr(err, res));
-};
-
 export const updateOrg = async (req, res) => {
   const {orgId} = req?.params;
   const body = req?.body;
@@ -105,6 +91,20 @@ export const updateOrg = async (req, res) => {
       }
 
       return res.json({updated: true});
+    })
+    .catch((err) => handleErr(err, res));
+};
+
+export const getOrgBySlug = async (req, res) => {
+  const {orgSlug} = req?.params;
+
+  await Organization.findOne({slug: orgSlug})
+    .then((organization) => {
+      if (!organization) {
+        return handleNotFound(res);
+      }
+
+      return res.json(organization);
     })
     .catch((err) => handleErr(err, res));
 };

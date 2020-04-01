@@ -113,3 +113,33 @@ export const updateService = async (req, res) => {
     })
     .catch((err) => handleErr(err, res));
 };
+
+export const getServiceBySlug = async (req, res) => {
+  const {orgSlug, serviceSlug} = req?.params;
+
+  await Organization.findOne({slug: orgSlug})
+    .then((orgDoc) => {
+      if (!orgDoc) {
+        return handleNotFound(res);
+      }
+
+      const serviceDoc = orgDoc.services.find(
+        (service) => service.slug === serviceSlug
+      );
+
+      if (!serviceDoc) {
+        return handleNotFound(res);
+      }
+
+      const service = {
+        ...(serviceDoc?.toJSON() || {}),
+        organization: {
+          ...(orgDoc?.toJSON() || {}),
+          services: undefined,
+        },
+      };
+
+      return res.json(service);
+    })
+    .catch((err) => handleErr(err, res));
+};
