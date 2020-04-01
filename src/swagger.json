@@ -230,6 +230,34 @@
         }
       }
     },
+    "/organizations/slug/:orgSlug": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "orgSlug",
+          "schema": {
+            "type": "string"
+          },
+          "required": true,
+          "description": "Slug of the organization"
+        }
+      ],
+      "get": {
+        "summary": "Get an organization by its slug",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Organization"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/organizations/:orgId/services": {
       "parameters": [
         {

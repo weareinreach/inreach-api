@@ -6,6 +6,7 @@ import {
   createOrg,
   deleteOrg,
   getOrg,
+  getOrgBySlug,
   getOrgs,
   getOrgsCount,
   updateOrg,
@@ -46,6 +47,7 @@ versionOneRouter.post('/auth/check', checkUserToken);
 versionOneRouter.get('/organizations', getOrgs);
 versionOneRouter.post('/organizations', createOrg);
 versionOneRouter.get('/organizations/count', getOrgsCount);
+versionOneRouter.get('/organizations/slug/:orgSlug', getOrgBySlug);
 versionOneRouter.get('/organizations/:orgId', getOrg);
 versionOneRouter.patch('/organizations/:orgId', updateOrg);
 versionOneRouter.delete('/organizations/:orgId', deleteOrg);
