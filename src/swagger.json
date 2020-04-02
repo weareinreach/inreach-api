@@ -1080,6 +1080,12 @@
           "description": {
             "type": "string"
           },
+          "adminEmails": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
           "emails": {
             "type": "array",
             "items": {
@@ -1314,14 +1320,8 @@
           "catalogType": {
             "type": "string"
           },
-          "email": {
-            "type": "string"
-          },
-          "favorites": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
+          "isProfessional": {
+            "type": "boolean"
           },
           "isDataManager": {
             "type": "boolean"

@@ -12,6 +12,12 @@ const OrganizationSchema = new Schema({
   updated_at: Date,
   alert_message: String,
   description: String,
+  adminEmails: [
+    {
+      isApproved: Boolean,
+      userId: String,
+    },
+  ],
   emails: [
     {
       email: String,
@@ -22,7 +28,7 @@ const OrganizationSchema = new Schema({
       title: String,
     },
   ],
-  name: String,
+  name: {type: String, required: true},
   is_published,
   locations: [
     {
@@ -83,7 +89,7 @@ const OrganizationSchema = new Schema({
       email_id: String,
       is_published: Boolean,
       location_id: String,
-      name: String,
+      name: {type: String, required: true},
       phone_id: String,
       properties: {},
       schedule_id: String,
@@ -159,19 +165,30 @@ export const Review = model('Review', ReviewSchema);
 const UserSchema = new Schema({
   created_at,
   updated_at: Date,
-  catalogType: String,
+  age: String,
+  catalogType: {type: String, enum: ['lawyer', 'provider', 'seeker']},
+  currentLocation: String,
   email: {
     type: String,
     lowercase: true,
     required: [true, "can't be blank"],
     match: [/\S+@\S+\.\S+/, 'is invalid'],
   },
+  ethnicityRace: [String],
   favorites: [],
-  hash: String,
+  hash: {type: String, required: true},
+  homeLocation: String,
+  identityPrimary: String,
+  identitySupplimental: [String],
   isAdminDataManager: {type: Boolean, default: false},
   isDataManager: {type: Boolean, default: false},
-  name: String,
-  salt: String,
+  isProfessional: {type: Boolean, default: false},
+  name: {type: String, required: true},
+  orgAreaOfWork: String,
+  orgId: String,
+  orgPositionTitle: String,
+  reasonForJoining: String,
+  salt: {type: String, required: true},
 });
 
 UserSchema.pre(saveEvents, (next) => {
