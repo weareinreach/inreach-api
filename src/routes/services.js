@@ -1,4 +1,9 @@
-import {handleBadRequest, handleErr, handleNotFound} from '../utils';
+import {
+  formatService,
+  handleBadRequest,
+  handleErr,
+  handleNotFound,
+} from '../utils';
 import {Organization} from '../mongoose';
 
 export const getServices = async (req, res) => {
@@ -78,13 +83,10 @@ export const getService = async (req, res) => {
         return handleNotFound(res);
       }
 
-      const service = {
-        ...(serviceDoc?.toJSON() || {}),
-        organization: {
-          ...(orgDoc?.toJSON() || {}),
-          services: undefined,
-        },
-      };
+      const service = formatService(
+        serviceDoc?.toJSON() || {},
+        orgDoc?.toJSON() || {}
+      );
 
       return res.json(service);
     })

@@ -5,6 +5,29 @@ import _set from 'lodash/set';
 
 const TOKEN_SIGNATURE = process.env.TOKEN_SIGNATURE || 'ssshhh';
 
+export const formatService = (service, org) => {
+  const {
+    email_id,
+    location_id,
+    phone_id,
+    schedule_id,
+    ...restService
+  } = service;
+  // eslint-disable-next-line no-unused-vars
+  const {services, ...restOrg} = org;
+  const findItem = (id, list) => list.find(({_id}) => _id === id);
+  const formattedService = {
+    ...restService,
+    email_id: findItem(email_id, org.emails),
+    location_id: findItem(location_id, org.locations),
+    phone_id: findItem(phone_id, org.phones),
+    schedule_id: findItem(schedule_id, org.schedules),
+    organization: {...restOrg},
+  };
+
+  return formattedService;
+};
+
 /**
  * Uses object shorthand to create a query based on if the values exist
  * @param  {String} organizationId id of the organization
