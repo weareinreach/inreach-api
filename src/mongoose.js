@@ -70,6 +70,7 @@ const OrganizationSchema = new Schema({
       saturday_end: String,
       sunday_start: String,
       sunday_end: String,
+      name: String,
       note: String,
       timezone: String,
     },
