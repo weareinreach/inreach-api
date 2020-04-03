@@ -57,9 +57,10 @@ export const deleteService = async (req, res) => {
         return handleNotFound(res);
       }
 
-      return organization.services
-        .id(serviceId)
-        .remove()
+      organization.services.id(serviceId).remove();
+
+      organization
+        .save()
         .then(() => {
           return res.json({deleted: true});
         })
