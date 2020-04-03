@@ -44,6 +44,24 @@
             },
             "description": "Comma delimited, list of property names and values",
             "example": "community-asylum-seeker=true,service-county-california-san-francisco=true"
+          },
+          {
+            "in": "query",
+            "name": "tagLocale",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Required if using tags. The locale to query for tags",
+            "example": "united_states"
+          },
+          {
+            "in": "query",
+            "name": "tags",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Required if using tagLocale. Comma delimited, list of tags",
+            "example": "Medical,Food"
           }
         ],
         "responses": {

@@ -42,7 +42,8 @@ export const parsePageQuery = (page = '1') => {
  * @param  {Object} properties Properties to search on
  * @return {Object} A mongo query for organizations
  */
-export const getOrganizationQuery = ({name, page = '1', properties} = {}) => {
+export const getOrganizationQuery = (params = {}) => {
+  const {name, page = '1', properties, tagLocale, tags} = params;
   const {limit, offset} = parsePageQuery(page);
   let query = {};
 
@@ -50,14 +51,28 @@ export const getOrganizationQuery = ({name, page = '1', properties} = {}) => {
     query.$text = {$search: name};
   }
 
-  if (properties) {
-    const props = properties.split(',').reduce((result, prop) => {
-      const [name, value] = prop.split('=');
+  const queryOnProperties = properties;
+  const queryOnTags = tagLocale && tags;
 
-      result[`properties.${name}`] = value;
+  // For querying on an organizations services
+  if (queryOnProperties || queryOnTags) {
+    let props = {};
 
-      return result;
-    }, {});
+    if (queryOnProperties) {
+      props = properties.split(',').reduce((result, prop) => {
+        const [name, value] = prop.split('=');
+
+        result[`properties.${name}`] = value;
+
+        return result;
+      }, props);
+    }
+
+    if (tagLocale && tags) {
+      const tagList = tags.split(',');
+
+      props[`tags.${tagLocale}`] = {$in: tagList};
+    }
 
     query.services = {$elemMatch: props};
   }

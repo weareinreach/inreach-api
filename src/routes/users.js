@@ -78,9 +78,11 @@ export const createUser = async (req, res) => {
   await user
     .save()
     .then((userDoc) => {
-      const user = removeUserInfo(userDoc.toJSON());
+      const userJSON = userDoc.toJSON();
+      const token = userJSON.hash;
+      const user = removeUserInfo(userJSON);
 
-      return res.json({created: true, user});
+      return res.json({created: true, token, user});
     })
     .catch((err) => handleErr(err, res));
 };

@@ -49,8 +49,14 @@ export const getRatings = async (req, res) => {
 
   await Rating.findOne(query)
     .then((doc) => {
-      const average = 0;
       const {ratings = []} = doc || {};
+      let average = ratings.reduce((result, {rating}) => {
+        result += rating;
+
+        return result;
+      }, 0);
+
+      average = Math.ceil(average / ratings.length);
 
       return res.json({average_rating: average, ratings});
     })
