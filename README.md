@@ -12,7 +12,7 @@ $ npm i
 $ npm start
 ```
 
-In order to run the app you need a [.env][https://www.npmjs.com/package/dotenv] file with a valid mongodb connection string.
+In order to run the app you need a [.env][https://www.npmjs.com/package/dotenv] file with a valid `MONGODB_URI` value for the mongodb connection string.
 
 ## Codebase
 

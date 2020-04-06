@@ -105,7 +105,7 @@ versionOneRouter.patch('/users/:userId', updateUser);
 versionOneRouter.delete('/users/:userId', deleteUser);
 versionOneRouter.patch('/users/:userId/password', updateUserPassword);
 
-// Ratings
+// Reviews
 versionOneRouter.get('/reviews', getReviews);
 versionOneRouter.post('/reviews', createReview);
 
