@@ -88,7 +88,7 @@ const OrganizationSchema = new Schema({
       ],
       description: String,
       email_id: String,
-      is_published: Boolean,
+      is_published,
       location_id: String,
       name: {type: String, required: true},
       phone_id: String,

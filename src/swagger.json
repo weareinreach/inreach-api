@@ -38,6 +38,15 @@
           },
           {
             "in": "query",
+            "name": "pending",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filter organizatiosn that are unpublished.",
+            "example": "true"
+          },
+          {
+            "in": "query",
             "name": "properties",
             "schema": {
               "type": "string"

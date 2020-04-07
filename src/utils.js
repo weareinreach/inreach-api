@@ -66,12 +66,18 @@ export const parsePageQuery = (page = '1') => {
  * @return {Object} A mongo query for organizations
  */
 export const getOrganizationQuery = (params = {}) => {
-  const {name, page = '1', properties, tagLocale, tags} = params;
+  const {name, page = '1', pending, properties, tagLocale, tags} = params;
   const {limit, offset} = parsePageQuery(page);
   let query = {};
 
   if (name) {
     query.$text = {$search: name};
+  }
+
+  if (pending) {
+    query.is_published = false;
+  } else {
+    query.is_published = true;
   }
 
   const queryOnProperties = properties;
