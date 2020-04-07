@@ -6,13 +6,13 @@ import {
   handleErr,
   handleNotFound,
   parsePageQuery,
-  removeUserInfo
+  removeUserInfo,
 } from '../utils';
 
 const testResponse = {
-  status: status => ({
-    json: resJSON => ({json: resJSON, status})
-  })
+  status: (status) => ({
+    json: (resJSON) => ({json: resJSON, status}),
+  }),
 };
 
 describe('generateSlug', () => {
@@ -65,14 +65,23 @@ describe('getOrganizationQuery', () => {
 
     expect(params.limit).toEqual(20);
     expect(params.offset).toEqual(0);
-    expect(query).toEqual({});
+    expect(query).toEqual({is_published: true});
+  });
+
+  it('should apply params and match snapshot', () => {
+    const {query} = getOrganizationQuery({
+      name: test,
+      pending: 'true',
+    });
+
+    expect(query.is_published).toEqual(false);
   });
 
   it('should apply params and match snapshot', () => {
     const result = getOrganizationQuery({
       name: test,
       page: '10',
-      properties: 'hello=true,world=true'
+      properties: 'hello=true,world=true',
     });
 
     expect(result).toMatchSnapshot();
@@ -123,7 +132,7 @@ describe('removeUserInfo', () => {
       name: 'foo bar',
       hash: 'hash',
       password: 'password',
-      salt: 'salt'
+      salt: 'salt',
     };
     const result = removeUserInfo(user);
 
