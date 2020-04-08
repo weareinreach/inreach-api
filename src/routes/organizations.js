@@ -4,6 +4,7 @@ import {
   handleBadRequest,
   handleErr,
   handleNotFound,
+  orderServices,
 } from '../utils';
 import {Organization} from '../mongoose';
 
@@ -66,6 +67,8 @@ export const getOrg = async (req, res) => {
       if (!organization) {
         return handleNotFound(res);
       }
+
+      organization.services = orderServices(organization.services);
 
       return res.json(organization);
     })
