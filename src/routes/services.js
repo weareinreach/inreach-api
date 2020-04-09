@@ -1,3 +1,5 @@
+import _reduce from 'lodash/reduce';
+
 import {
   formatService,
   handleBadRequest,
@@ -106,9 +108,22 @@ export const updateService = async (req, res) => {
     return handleBadRequest(res);
   }
 
+  const updates = _reduce(
+    body,
+    (result, value, key) => {
+      result[`services.$.${key}`] = value;
+
+      return result;
+    },
+    {
+      'services.$._id': serviceId,
+      'services.$.updated_at': updated_at,
+    }
+  );
+
   await Organization.findOneAndUpdate(
     {_id: orgId, 'services._id': serviceId},
-    {$set: {'services.$': {...body, _id: serviceId, updated_at}}}
+    {$set: updates}
   )
     .then((orgDoc) => {
       if (!orgDoc) {
