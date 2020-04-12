@@ -156,3 +156,94 @@ export const updateUserPassword = async (req, res) => {
     })
     .catch((err) => handleErr(err, res));
 };
+
+export const createUserList = async (req, res) => {
+  const {userId} = req?.params;
+  const {name} = req?.body;
+
+  if (!name) {
+    return handleBadRequest(res);
+  }
+
+  await User.findById(userId)
+    .then(async (user) => {
+      if (!user) {
+        return handleNotFound(res);
+      }
+
+      if (!user.lists) {
+        user.lists = [];
+      }
+
+      user.lists.push({name});
+
+      await user
+        .save()
+        .then(() => res.json({created: true}))
+        .catch((err) => handleErr(err, res));
+    })
+    .catch((err) => handleErr(err, res));
+};
+
+export const addUserListItem = async (req, res) => {
+  const {listId, userId} = req?.params;
+  const {itemId} = req?.body;
+
+  if (!itemId) {
+    return handleBadRequest(res);
+  }
+
+  await User.findById(userId)
+    .then(async (user) => {
+      if (!user) {
+        return handleNotFound(res);
+      }
+
+      const list = user.lists.id(listId);
+
+      if (!list) {
+        return handleNotFound(res);
+      }
+
+      list.items.push({fetchable_id: itemId});
+
+      await user
+        .save()
+        .then(() => res.json({updated: true}))
+        .catch((err) => handleErr(err, res));
+    })
+    .catch((err) => handleErr(err, res));
+};
+
+export const removeUserListItem = async (req, res) => {
+  const {itemId, listId, userId} = req?.params;
+
+  await User.findById(userId)
+    .then(async (user) => {
+      if (!user) {
+        return handleNotFound(res);
+      }
+
+      const list = user.lists.id(listId);
+
+      if (!list) {
+        return handleNotFound(res);
+      }
+
+      const itemIndex = list.items.findIndex(
+        (item) => item.fetchable_id === itemId
+      );
+
+      if (itemIndex === -1) {
+        return handleNotFound(res);
+      }
+
+      list.items[itemIndex].remove();
+
+      await user
+        .save()
+        .then(() => res.json({deleted: true}))
+        .catch((err) => handleErr(err, res));
+    })
+    .catch((err) => handleErr(err, res));
+};

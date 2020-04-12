@@ -937,6 +937,17 @@
       }
     },
     "/users/:userId": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "userId",
+          "schema": {
+            "type": "string"
+          },
+          "required": true,
+          "description": "ID of the user"
+        }
+      ],
       "get": {
         "summary": "Get a user",
         "responses": {
@@ -1033,6 +1044,167 @@
                   "type": "object",
                   "properties": {
                     "updated": {
+                      "type": "boolean",
+                      "example": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/:userId/lists": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "userId",
+          "schema": {
+            "type": "string"
+          },
+          "required": true,
+          "description": "ID of the user"
+        }
+      ],
+      "post": {
+        "summary": "Create a list for the user",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "example": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "updated": {
+                      "type": "boolean",
+                      "example": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/:userId/lists/:listId/items": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "userId",
+          "schema": {
+            "type": "string"
+          },
+          "required": true,
+          "description": "ID of the user"
+        },
+        {
+          "in": "path",
+          "name": "listId",
+          "schema": {
+            "type": "string"
+          },
+          "required": true,
+          "description": "ID of the list"
+        }
+      ],
+      "post": {
+        "summary": "Add an item to the user's list",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "itemId": {
+                    "type": "string",
+                    "example": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "updated": {
+                      "type": "boolean",
+                      "example": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/:userId/lists/:listId/items/:itemId": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "userId",
+          "schema": {
+            "type": "string"
+          },
+          "required": true,
+          "description": "ID of the user"
+        },
+        {
+          "in": "path",
+          "name": "listId",
+          "schema": {
+            "type": "string"
+          },
+          "required": true,
+          "description": "ID of the list"
+        },
+        {
+          "in": "path",
+          "name": "itemId",
+          "schema": {
+            "type": "string"
+          },
+          "required": true,
+          "description": "ID of the item"
+        }
+      ],
+      "delete": {
+        "summary": "Remove an item from the user's list",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "deleted": {
                       "type": "boolean",
                       "example": true
                     }

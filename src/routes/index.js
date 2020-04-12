@@ -22,12 +22,15 @@ import {
 } from './services';
 import {getStaticPage} from './static';
 import {
+  addUserListItem,
   authUser,
   checkUserToken,
   createUser,
+  createUserList,
   deleteUser,
   getUser,
   getUsers,
+  removeUserListItem,
   updateUser,
   updateUserPassword,
 } from './users';
@@ -104,6 +107,12 @@ versionOneRouter.get('/users/:userId', getUser);
 versionOneRouter.patch('/users/:userId', updateUser);
 versionOneRouter.delete('/users/:userId', deleteUser);
 versionOneRouter.patch('/users/:userId/password', updateUserPassword);
+versionOneRouter.post('/users/:userId/lists', createUserList);
+versionOneRouter.post('/users/:userId/lists/:listId/items', addUserListItem);
+versionOneRouter.delete(
+  '/users/:userId/lists/:listId/items/:itemId',
+  removeUserListItem
+);
 
 // Reviews
 versionOneRouter.get('/reviews', getReviews);

@@ -3,7 +3,9 @@ import jwt from 'jsonwebtoken';
 import _omit from 'lodash/omit';
 import _orderBy from 'lodash/orderBy';
 import _set from 'lodash/set';
+import mongoose from 'mongoose';
 
+const ObjectId = mongoose.Types.ObjectId;
 const TOKEN_SIGNATURE = process.env.TOKEN_SIGNATURE || 'ssshhh';
 
 export const formatService = (service, org) => {
@@ -60,9 +62,15 @@ export const parsePageQuery = (page = '1') => {
  * @return {Object} A mongo query for organizations
  */
 export const getOrganizationQuery = (params = {}) => {
-  const {name, page = '1', pending, properties, tagLocale, tags} = params;
+  const {ids, name, page = '1', pending, properties, tagLocale, tags} = params;
   const {limit, offset} = parsePageQuery(page);
   let query = {};
+
+  if (ids) {
+    query._id = {
+      $in: ids.split(',').map((id) => new ObjectId(id)),
+    };
+  }
 
   if (name) {
     query.$text = {$search: name};

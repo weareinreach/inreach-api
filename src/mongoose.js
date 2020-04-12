@@ -174,7 +174,6 @@ const UserSchema = new Schema(
       match: [/\S+@\S+\.\S+/, 'is invalid'],
     },
     ethnicityRace: [String],
-    favorites: [],
     hash: {type: String, required: true},
     homeLocation: String,
     identityPrimary: String,
@@ -182,6 +181,12 @@ const UserSchema = new Schema(
     isAdminDataManager: {type: Boolean, default: false},
     isDataManager: {type: Boolean, default: false},
     isProfessional: {type: Boolean, default: false},
+    lists: [
+      {
+        name: String,
+        items: [{fetchable_id: String}],
+      },
+    ],
     name: {type: String, required: true},
     orgAreaOfWork: String,
     orgId: String,
