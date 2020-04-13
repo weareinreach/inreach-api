@@ -117,12 +117,9 @@ versionOneRouter.patch(
 );
 
 // Suggestions
-versionOneRouter.get('/organizations/:orgId/suggestions', getSuggestions);
-versionOneRouter.post('/organizations/:orgId/suggestions', createSuggestions);
-versionOneRouter.post(
-  '/organizations/:orgId/suggestions/:suggestionId',
-  deleteSuggestion
-);
+versionOneRouter.get('/suggestions', getSuggestions);
+versionOneRouter.post('/suggestions', createSuggestions);
+versionOneRouter.delete('/suggestions/:suggestionId', deleteSuggestion);
 
 // Users
 versionOneRouter.get('/users', getUsers);

@@ -88,24 +88,23 @@ export const updateRatings = async (req, res) => {
 };
 
 export const createSuggestions = async (req, res) => {
-  const {orgId, serviceId} = req?.params;
-  const {email, suggestions} = req?.body;
-  const query = getEntityQuery({organizationId: orgId, serviceId});
+  const {suggestions} = req?.body;
 
-  if (!email || !suggestions || suggestions?.length < 1) {
+  const invalidSuggestions =
+    suggestions?.length < 1 ||
+    suggestions?.some(
+      (suggestion) =>
+        !suggestion?.organizationId ||
+        !suggestion?.userEmail ||
+        !suggestion?.field ||
+        !suggestion?.value
+    );
+
+  if (!suggestions || invalidSuggestions) {
     return handleBadRequest(res);
   }
 
-  const newSuggestions = suggestions?.map((update) => ({
-    ...update,
-    userEmail: email,
-  }));
-
-  await Suggestion.updateOne(
-    query,
-    {$push: {suggestions: {$each: newSuggestions}}},
-    {upsert: true}
-  )
+  await Suggestion.create(suggestions)
     .then((doc) => {
       if (!doc) {
         return handleNotFound(res);
@@ -117,38 +116,19 @@ export const createSuggestions = async (req, res) => {
 };
 
 export const getSuggestions = async (req, res) => {
-  const {orgId, serviceId} = req?.params;
-  const query = getEntityQuery({organizationId: orgId, serviceId});
-
-  await Suggestion.findOne(query)
-    .then((doc) => {
-      const {suggestions = []} = doc || {};
-
+  await Suggestion.find({})
+    .then((suggestions) => {
       return res.json(suggestions);
     })
     .catch((err) => handleErr(err, res));
 };
 
 export const deleteSuggestion = async (req, res) => {
-  const {orgId, serviceId, suggestionId} = req?.params;
-  const query = getEntityQuery({organizationId: orgId, serviceId});
+  const {suggestionId} = req?.params;
 
-  await Suggestion.findOne(query)
-    .then(async (suggestion) => {
-      const suggestionIndex = suggestion.suggestions.findIndex(
-        (doc) => doc._id === suggestionId
-      );
-
-      if (suggestionIndex === -1) {
-        return handleNotFound(res);
-      }
-
-      suggestion.suggestions[suggestionIndex].remove();
-
-      await suggestion
-        .save()
-        .then(() => res.json({deleted: true}))
-        .catch((err) => handleErr(err, res));
+  await Suggestion.findByIdAndDelete(suggestionId)
+    .then(() => {
+      return res.json({deleted: true});
     })
     .catch((err) => handleErr(err, res));
 };

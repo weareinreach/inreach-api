@@ -51,7 +51,16 @@
             "schema": {
               "type": "string"
             },
-            "description": "Filter organizatiosn that are unpublished.",
+            "description": "Filter organizations that are unpublished.",
+            "example": "true"
+          },
+          {
+            "in": "query",
+            "name": "pendingOwnership",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filter organizations that have pending affiliates.",
             "example": "true"
           },
           {
@@ -167,7 +176,16 @@
             "schema": {
               "type": "string"
             },
-            "description": "Filter organizatiosn that are unpublished.",
+            "description": "Filter organizations that are unpublished.",
+            "example": "true"
+          },
+          {
+            "in": "query",
+            "name": "pendingOwnership",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filter organizations that have pending affiliates.",
             "example": "true"
           },
           {
@@ -704,128 +722,6 @@
         }
       }
     },
-    "/organizations/:orgId/suggestions": {
-      "parameters": [
-        {
-          "in": "path",
-          "name": "orgId",
-          "schema": {
-            "type": "string"
-          },
-          "required": true,
-          "description": "ID of the organization"
-        }
-      ],
-      "get": {
-        "summary": "Get all of the suggestions",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "suggestions": {
-                      "type": "array",
-                      "items": {
-                        "type": "object"
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "summary": "Create a new suggestion",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "email": {
-                    "type": "string",
-                    "example": true
-                  },
-                  "suggestions": {
-                    "type": "array",
-                    "items": {
-                      "type": "object"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "updated": {
-                      "type": "boolean",
-                      "example": true
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/organizations/:orgId/suggestions/:suggestionId": {
-      "parameters": [
-        {
-          "in": "path",
-          "name": "orgId",
-          "schema": {
-            "type": "string"
-          },
-          "required": true,
-          "description": "ID of the organization"
-        },
-        {
-          "in": "path",
-          "name": "suggestionId",
-          "schema": {
-            "type": "string"
-          },
-          "required": true,
-          "description": "ID of the suggestion"
-        }
-      ],
-      "delete": {
-        "summary": "Delete a suggestion",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "deleted": {
-                      "type": "boolean",
-                      "example": true
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/organizations/:orgId/owners": {
       "parameters": [
         {
@@ -1161,6 +1057,121 @@
                   "type": "object",
                   "properties": {
                     "created": {
+                      "type": "boolean",
+                      "example": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/suggestions": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "orgId",
+          "schema": {
+            "type": "string"
+          },
+          "required": true,
+          "description": "ID of the organization"
+        }
+      ],
+      "get": {
+        "summary": "Get all of the suggestions",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "suggestions": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a new suggestion",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "field": {
+                    "type": "string",
+                    "example": "name"
+                  },
+                  "value": {
+                    "type": "string",
+                    "example": "name"
+                  },
+                  "userId": {
+                    "type": "string",
+                    "example": "name"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "updated": {
+                      "type": "boolean",
+                      "example": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/suggestions/:suggestionId": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "suggestionId",
+          "schema": {
+            "type": "string"
+          },
+          "required": true,
+          "description": "ID of the suggestion"
+        }
+      ],
+      "delete": {
+        "summary": "Delete a suggestion",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "deleted": {
                       "type": "boolean",
                       "example": true
                     }

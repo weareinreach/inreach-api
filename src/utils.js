@@ -68,6 +68,7 @@ export const getOrganizationQuery = (params = {}) => {
     owner,
     page = '1',
     pending,
+    pendingOwnership,
     properties,
     tagLocale,
     tags,
@@ -83,6 +84,10 @@ export const getOrganizationQuery = (params = {}) => {
 
   if (owner) {
     query['owners.email'] = owner;
+  }
+
+  if (pendingOwnership) {
+    query['owners.isApproved'] = false;
   }
 
   if (name) {

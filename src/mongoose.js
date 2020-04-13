@@ -165,15 +165,11 @@ export const Review = model('Review', ReviewSchema);
 
 const SuggestionSchema = new Schema(
   {
+    field: String,
     organizationId: String,
     serviceId: String,
-    suggestions: [
-      {
-        suggestion: Number,
-        field: String,
-        userEmail: String,
-      },
-    ],
+    userEmail: String,
+    value: String,
   },
   schmeaOptions
 );
