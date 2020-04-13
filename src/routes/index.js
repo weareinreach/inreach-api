@@ -1,10 +1,21 @@
 import {Router} from 'express';
 import swaggerUi from 'swagger-ui-express';
 
-import {getComments, getRatings, updateComments, updateRatings} from './entity';
 import {
+  createSuggestions,
+  deleteSuggestion,
+  getComments,
+  getRatings,
+  getSuggestions,
+  updateComments,
+  updateRatings,
+} from './entity';
+import {
+  approveOrgOwner,
   createOrg,
+  createOrgOwner,
   deleteOrg,
+  deleteOrgOwner,
   getOrg,
   getOrgBySlug,
   getOrgs,
@@ -51,10 +62,15 @@ versionOneRouter.post('/auth/check', checkUserToken);
 versionOneRouter.get('/organizations', getOrgs);
 versionOneRouter.post('/organizations', createOrg);
 versionOneRouter.get('/organizations/count', getOrgsCount);
-
 versionOneRouter.get('/organizations/:orgId', getOrg);
 versionOneRouter.patch('/organizations/:orgId', updateOrg);
 versionOneRouter.delete('/organizations/:orgId', deleteOrg);
+versionOneRouter.post('/organizations/:orgId/owners', createOrgOwner);
+versionOneRouter.get(
+  '/organizations/:orgId/owners/:userId/approve',
+  approveOrgOwner
+);
+versionOneRouter.delete('/organizations/:orgId/owners/:userId', deleteOrgOwner);
 
 // Services
 versionOneRouter.get('/organizations/:orgId/services', getServices);
@@ -98,6 +114,14 @@ versionOneRouter.get(
 versionOneRouter.patch(
   '/organizations/:orgId/services/:serviceId/ratings',
   updateRatings
+);
+
+// Suggestions
+versionOneRouter.get('/organizations/:orgId/suggestions', getSuggestions);
+versionOneRouter.post('/organizations/:orgId/suggestions', createSuggestions);
+versionOneRouter.post(
+  '/organizations/:orgId/suggestions/:suggestionId',
+  deleteSuggestion
 );
 
 // Users

@@ -171,11 +171,13 @@ export const createUserList = async (req, res) => {
         return handleNotFound(res);
       }
 
-      if (!user.lists) {
-        user.lists = [];
-      }
+      const newList = {name};
 
-      user.lists.push({name});
+      if (user.lists) {
+        user.lists.push(newList);
+      } else {
+        user.lists = [newList];
+      }
 
       await user
         .save()
@@ -205,7 +207,13 @@ export const addUserListItem = async (req, res) => {
         return handleNotFound(res);
       }
 
-      list.items.push({fetchable_id: itemId});
+      const newItem = {fetchable_id: itemId};
+
+      if (list.items) {
+        list.items.push(newItem);
+      } else {
+        list.items = [newItem];
+      }
 
       await user
         .save()

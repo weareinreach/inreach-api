@@ -29,6 +29,15 @@
           },
           {
             "in": "query",
+            "name": "owner",
+            "schema": {
+              "type": "string"
+            },
+            "description": "The email of the organization owner",
+            "example": "1"
+          },
+          {
+            "in": "query",
             "name": "page",
             "schema": {
               "type": "string"
@@ -136,6 +145,15 @@
           },
           {
             "in": "query",
+            "name": "owner",
+            "schema": {
+              "type": "string"
+            },
+            "description": "The email of the organization owner",
+            "example": "1"
+          },
+          {
+            "in": "query",
             "name": "page",
             "schema": {
               "type": "string"
@@ -145,12 +163,39 @@
           },
           {
             "in": "query",
+            "name": "pending",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filter organizatiosn that are unpublished.",
+            "example": "true"
+          },
+          {
+            "in": "query",
             "name": "properties",
             "schema": {
               "type": "string"
             },
-            "description": "Comma delimited, list of properties",
-            "example": "community-lgbt,community-refugee"
+            "description": "Comma delimited, list of property names and values",
+            "example": "community-asylum-seeker=true,service-county-california-san-francisco=true"
+          },
+          {
+            "in": "query",
+            "name": "tagLocale",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Required if using tags. The locale to query for tags",
+            "example": "united_states"
+          },
+          {
+            "in": "query",
+            "name": "tags",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Required if using tagLocale. Comma delimited, list of tags",
+            "example": "Medical,Food"
           }
         ],
         "responses": {
@@ -648,6 +693,268 @@
                   "type": "object",
                   "properties": {
                     "updated": {
+                      "type": "boolean",
+                      "example": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/organizations/:orgId/suggestions": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "orgId",
+          "schema": {
+            "type": "string"
+          },
+          "required": true,
+          "description": "ID of the organization"
+        }
+      ],
+      "get": {
+        "summary": "Get all of the suggestions",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "suggestions": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a new suggestion",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "example": true
+                  },
+                  "suggestions": {
+                    "type": "array",
+                    "items": {
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "updated": {
+                      "type": "boolean",
+                      "example": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/organizations/:orgId/suggestions/:suggestionId": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "orgId",
+          "schema": {
+            "type": "string"
+          },
+          "required": true,
+          "description": "ID of the organization"
+        },
+        {
+          "in": "path",
+          "name": "suggestionId",
+          "schema": {
+            "type": "string"
+          },
+          "required": true,
+          "description": "ID of the suggestion"
+        }
+      ],
+      "delete": {
+        "summary": "Delete a suggestion",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "deleted": {
+                      "type": "boolean",
+                      "example": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/organizations/:orgId/owners": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "orgId",
+          "schema": {
+            "type": "string"
+          },
+          "required": true,
+          "description": "ID of the organization"
+        }
+      ],
+      "post": {
+        "summary": "Create a new organization owner",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "example": true
+                  },
+                  "userId": {
+                    "type": "string",
+                    "example": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "created": {
+                      "type": "boolean",
+                      "example": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/organizations/:orgId/owners/:userId/approve": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "orgId",
+          "schema": {
+            "type": "string"
+          },
+          "required": true,
+          "description": "ID of the organization"
+        },
+        {
+          "in": "path",
+          "name": "userId",
+          "schema": {
+            "type": "string"
+          },
+          "required": true,
+          "description": "ID of the user"
+        }
+      ],
+      "get": {
+        "summary": "Approve the user as an organzation owner",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "deleted": {
+                      "type": "boolean",
+                      "example": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/organizations/:orgId/owners/:userId": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "orgId",
+          "schema": {
+            "type": "string"
+          },
+          "required": true,
+          "description": "ID of the organization"
+        },
+        {
+          "in": "path",
+          "name": "userId",
+          "schema": {
+            "type": "string"
+          },
+          "required": true,
+          "description": "ID of the user"
+        }
+      ],
+      "delete": {
+        "summary": "Remove the owner from the organization",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "deleted": {
                       "type": "boolean",
                       "example": true
                     }

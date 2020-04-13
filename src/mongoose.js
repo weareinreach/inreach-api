@@ -38,12 +38,6 @@ const OrganizationSchema = new Schema(
   {
     alert_message: String,
     description: String,
-    adminEmails: [
-      {
-        isApproved: Boolean,
-        userId: String,
-      },
-    ],
     emails: [
       {
         email: String,
@@ -69,6 +63,13 @@ const OrganizationSchema = new Schema(
         state: String,
         unit: String,
         zip_code: String,
+      },
+    ],
+    owners: [
+      {
+        email: String,
+        isApproved: Boolean,
+        userId: String,
       },
     ],
     phones: [
@@ -161,6 +162,23 @@ const ReviewSchema = new Schema(
 );
 
 export const Review = model('Review', ReviewSchema);
+
+const SuggestionSchema = new Schema(
+  {
+    organizationId: String,
+    serviceId: String,
+    suggestions: [
+      {
+        suggestion: Number,
+        field: String,
+        userEmail: String,
+      },
+    ],
+  },
+  schmeaOptions
+);
+
+export const Suggestion = model('Suggestion', SuggestionSchema);
 
 const UserSchema = new Schema(
   {

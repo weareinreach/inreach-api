@@ -62,7 +62,16 @@ export const parsePageQuery = (page = '1') => {
  * @return {Object} A mongo query for organizations
  */
 export const getOrganizationQuery = (params = {}) => {
-  const {ids, name, page = '1', pending, properties, tagLocale, tags} = params;
+  const {
+    ids,
+    name,
+    owner,
+    page = '1',
+    pending,
+    properties,
+    tagLocale,
+    tags,
+  } = params;
   const {limit, offset} = parsePageQuery(page);
   let query = {};
 
@@ -70,6 +79,10 @@ export const getOrganizationQuery = (params = {}) => {
     query._id = {
       $in: ids.split(',').map((id) => new ObjectId(id)),
     };
+  }
+
+  if (owner) {
+    query['owners.email'] = owner;
   }
 
   if (name) {
