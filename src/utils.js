@@ -147,3 +147,17 @@ export const verifyJWT = (token) => {
     });
   });
 };
+
+/*
+Get JSON Web Token
+*/
+export const getToken = (req, res) => {
+  var secret = 'secretkey';
+  jwt.sign({id: req.id}, secret, {expiresIn: 86400}, (error, token) => { //jwt.sign(payload, secretOrPrivateKey, [options, callback])
+    if (error) {
+      res.status(500).send(error);
+    } else {
+      res.send(token);
+    };
+  });
+};

@@ -29,6 +29,8 @@ import {
   updateUserPassword,
 } from './users';
 import swaggerDocument from '../swagger.json';
+import verifyToken from '../services/verifyToken.js';
+import {getToken} from '../utils.js';
 
 export const baseRouter = Router();
 export const versionOneRouter = Router();
@@ -40,59 +42,60 @@ baseRouter.get('/docs', swaggerUi.setup(swaggerDocument));
 // Auth
 versionOneRouter.post('/auth', authUser);
 versionOneRouter.post('/auth/check', checkUserToken);
+versionOneRouter.get('/auth/token', getToken);
 
 // Organizations
 versionOneRouter.get('/organizations', getOrgs);
-versionOneRouter.post('/organizations', createOrg);
+versionOneRouter.post('/organizations', verifyToken, createOrg);
 versionOneRouter.get('/organizations/count', getOrgsCount);
 versionOneRouter.get('/organizations/:orgId', getOrg);
-versionOneRouter.patch('/organizations/:orgId', updateOrg);
-versionOneRouter.delete('/organizations/:orgId', deleteOrg);
+versionOneRouter.patch('/organizations/:orgId', verifyToken, updateOrg);
+versionOneRouter.delete('/organizations/:orgId', verifyToken, deleteOrg);
 
 // Services
 versionOneRouter.get('/organizations/:orgId/services', getServices);
-versionOneRouter.post('/organizations/:orgId/services', createService);
+versionOneRouter.post('/organizations/:orgId/services', verifyToken, createService);
 versionOneRouter.get('/organizations/:orgId/services/:serviceId', getService);
 versionOneRouter.patch(
   '/organizations/:orgId/services/:serviceId',
-  updateService
+   verifyToken, updateService
 );
 versionOneRouter.delete(
   '/organizations/:orgId/services/:serviceId',
-  deleteService
+  verifyToken, deleteService
 );
 
 // Comments
 versionOneRouter.get('/organizations/:orgId/comments', getComments);
-versionOneRouter.patch('/organizations/:orgId/comments', updateComments);
+versionOneRouter.patch('/organizations/:orgId/comments', verifyToken, updateComments);
 versionOneRouter.get(
   '/organizations/:orgId/services/:serviceId/comments',
   getComments
 );
 versionOneRouter.patch(
   '/organizations/:orgId/services/:serviceId/comments',
-  updateComments
+  verifyToken, updateComments
 );
 
 // Ratings
 versionOneRouter.get('/organizations/:orgId/ratings', getRatings);
-versionOneRouter.patch('/organizations/:orgId/ratings', updateRatings);
+versionOneRouter.patch('/organizations/:orgId/ratings', verifyToken, updateRatings);
 versionOneRouter.get(
   '/organizations/:orgId/services/:serviceId/ratings',
   getRatings
 );
 versionOneRouter.patch(
   '/organizations/:orgId/services/:serviceId/ratings',
-  updateRatings
+  verifyToken, updateRatings
 );
 
 // Users
 versionOneRouter.get('/users', getUsers);
-versionOneRouter.post('/users', createUser);
+versionOneRouter.post('/users', verifyToken, createUser);
 versionOneRouter.get('/users/:userId', getUser);
-versionOneRouter.patch('/users/:userId', updateUser);
-versionOneRouter.delete('/users/:userId', deleteUser);
-versionOneRouter.patch('/users/:userId/password', updateUserPassword);
+versionOneRouter.patch('/users/:userId', verifyToken, updateUser);
+versionOneRouter.delete('/users/:userId', verifyToken, deleteUser);
+versionOneRouter.patch('/users/:userId/password', verifyToken, updateUserPassword);
 
 // Ratings
 versionOneRouter.get('/reviews', getReviews);
