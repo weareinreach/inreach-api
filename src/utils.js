@@ -70,6 +70,9 @@ export const getOrganizationQuery = (params = {}) => {
     pending,
     pendingOwnership,
     properties,
+    serviceCounty,
+    serviceNational,
+    serviceState,
     tagLocale,
     tags,
   } = params;
@@ -102,9 +105,11 @@ export const getOrganizationQuery = (params = {}) => {
 
   const queryOnProperties = properties;
   const queryOnTags = tagLocale && tags;
+  const queryOnServiceAreaCoverage =
+    serviceNational || serviceState || serviceCounty;
 
   // For querying on an organizations services
-  if (queryOnProperties || queryOnTags) {
+  if (queryOnServiceAreaCoverage || queryOnProperties || queryOnTags) {
     let props = {};
 
     if (queryOnProperties) {
@@ -117,12 +122,26 @@ export const getOrganizationQuery = (params = {}) => {
       }, props);
     }
 
-    if (tagLocale && tags) {
+    if (queryOnTags) {
       const tagList = tags.split(',');
 
       tagList.forEach((tag) => {
         props[`tags.${tagLocale}.${tag}`] = 'true';
       });
+    }
+
+    if (queryOnServiceAreaCoverage) {
+      const locations = [];
+
+      [serviceNational, serviceState, serviceCounty].forEach((coverageArea) => {
+        if (coverageArea) {
+          locations.push({
+            [`properties.${coverageArea}`]: 'true',
+          });
+        }
+      });
+
+      props['$or'] = locations;
     }
 
     query.services = {$elemMatch: props};

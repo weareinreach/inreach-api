@@ -74,6 +74,33 @@
           },
           {
             "in": "query",
+            "name": "serviceCounty",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filter to include organizations with services in this county",
+            "example": "service-county-california-san-francisco"
+          },
+          {
+            "in": "query",
+            "name": "serviceState",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filter to include organizations with services in this state",
+            "example": "service-state-california"
+          },
+          {
+            "in": "query",
+            "name": "serviceNational",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filter to include organizations with services in this state",
+            "example": "service-national-united-states"
+          },
+          {
+            "in": "query",
             "name": "tagLocale",
             "schema": {
               "type": "string"
