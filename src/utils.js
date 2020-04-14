@@ -120,7 +120,9 @@ export const getOrganizationQuery = (params = {}) => {
     if (tagLocale && tags) {
       const tagList = tags.split(',');
 
-      props[`tags.${tagLocale}`] = {$in: tagList};
+      tagList.forEach((tag) => {
+        props[`tags.${tagLocale}.${tag}`] = 'true';
+      });
     }
 
     query.services = {$elemMatch: props};

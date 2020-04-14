@@ -198,7 +198,7 @@ const UserSchema = new Schema(
     lists: [
       {
         name: String,
-        items: [{fetchable_id: String}],
+        items: [{fetchable_id: String, orgId: String}],
       },
     ],
     name: {type: String, required: true},

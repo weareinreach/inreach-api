@@ -189,7 +189,7 @@ export const createUserList = async (req, res) => {
 
 export const addUserListItem = async (req, res) => {
   const {listId, userId} = req?.params;
-  const {itemId} = req?.body;
+  const {itemId, orgId} = req?.body;
 
   if (!itemId) {
     return handleBadRequest(res);
@@ -207,7 +207,7 @@ export const addUserListItem = async (req, res) => {
         return handleNotFound(res);
       }
 
-      const newItem = {fetchable_id: itemId};
+      const newItem = {fetchable_id: itemId, orgId};
 
       if (list.items) {
         list.items.push(newItem);
