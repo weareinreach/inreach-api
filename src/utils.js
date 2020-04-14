@@ -143,7 +143,7 @@ export const getOrganizationQuery = (params = {}) => {
           result[`properties.${name}`] = value;
 
           return result;
-        }, propertyQuery);
+        }, propertyQuery || {});
       }
 
       // Check that the required property keys don't exist
@@ -154,7 +154,7 @@ export const getOrganizationQuery = (params = {}) => {
           result[`properties.${name}`] = {$exists: false};
 
           return result;
-        }, propertyQuery);
+        }, propertyQuery || {});
       }
     }
 
