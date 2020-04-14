@@ -70,34 +70,16 @@
               "type": "string"
             },
             "description": "Comma delimited, list of property names and values",
-            "example": "community-asylum-seeker=true,service-county-california-san-francisco=true"
+            "example": "community-asylum-seeker=true,service-county-california-san-francisco=true. NOTE: req-* properties are treated differently and act as OR filters instead of AND"
           },
           {
             "in": "query",
-            "name": "serviceCounty",
+            "name": "serviceArea",
             "schema": {
               "type": "string"
             },
-            "description": "Filter to include organizations with services in this county",
-            "example": "service-county-california-san-francisco"
-          },
-          {
-            "in": "query",
-            "name": "serviceState",
-            "schema": {
-              "type": "string"
-            },
-            "description": "Filter to include organizations with services in this state",
-            "example": "service-state-california"
-          },
-          {
-            "in": "query",
-            "name": "serviceNational",
-            "schema": {
-              "type": "string"
-            },
-            "description": "Filter to include organizations with services in this state",
-            "example": "service-national-united-states"
+            "description": "Comma delimited, list of service areas to search for",
+            "example": "service-county-california-san-francisco,service-state-california,service-national-united-states"
           },
           {
             "in": "query",
@@ -222,7 +204,16 @@
               "type": "string"
             },
             "description": "Comma delimited, list of property names and values",
-            "example": "community-asylum-seeker=true,service-county-california-san-francisco=true"
+            "example": "community-asylum-seeker=true,service-county-california-san-francisco=true. NOTE: req-* properties are treated differently and act as OR filters instead of AND"
+          },
+          {
+            "in": "query",
+            "name": "serviceArea",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Comma delimited, list of service areas to search for",
+            "example": "service-county-california-san-francisco,service-state-california,service-national-united-states"
           },
           {
             "in": "query",

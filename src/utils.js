@@ -70,9 +70,7 @@ export const getOrganizationQuery = (params = {}) => {
     pending,
     pendingOwnership,
     properties,
-    serviceCounty,
-    serviceNational,
-    serviceState,
+    serviceArea,
     tagLocale,
     tags,
   } = params;
@@ -105,21 +103,62 @@ export const getOrganizationQuery = (params = {}) => {
 
   const queryOnProperties = properties;
   const queryOnTags = tagLocale && tags;
-  const queryOnServiceAreaCoverage =
-    serviceNational || serviceState || serviceCounty;
+  const queryOnServiceAreaCoverage = serviceArea;
 
   // For querying on an organizations services
   if (queryOnServiceAreaCoverage || queryOnProperties || queryOnTags) {
     let props = {};
 
     if (queryOnProperties) {
-      props = properties.split(',').reduce((result, prop) => {
-        const [name, value] = prop.split('=');
+      const {requiredProps, regularProps} = properties.split(',').reduce(
+        (result, prop) => {
+          if (prop.includes('req-')) {
+            result.requiredProps.push(prop);
+          } else {
+            result.regularProps.push(prop);
+          }
 
-        result[`properties.${name}`] = value;
+          return result;
+        },
+        {
+          requiredProps: [],
+          regularProps: [],
+        }
+      );
 
-        return result;
-      }, props);
+      if (regularProps && regularProps?.length > 0) {
+        props = regularProps.reduce((result, prop) => {
+          const [name, value] = prop.split('=');
+
+          result[`properties.${name}`] = value;
+
+          return result;
+        }, props);
+      }
+
+      if (requiredProps && requiredProps?.length > 0) {
+        props = requiredProps.reduce((result, prop) => {
+          const [name] = prop.split('=');
+
+          result[`properties.${name}`] = {$exists: false};
+
+          return result;
+        }, props);
+      }
+    }
+
+    if (queryOnServiceAreaCoverage) {
+      const locations = serviceArea
+        .split(',')
+        .reduce((result, coverageArea) => {
+          result.push({
+            [`properties.${coverageArea}`]: 'true',
+          });
+
+          return result;
+        }, []);
+
+      props['$or'] = locations;
     }
 
     if (queryOnTags) {
@@ -128,20 +167,6 @@ export const getOrganizationQuery = (params = {}) => {
       tagList.forEach((tag) => {
         props[`tags.${tagLocale}.${tag}`] = 'true';
       });
-    }
-
-    if (queryOnServiceAreaCoverage) {
-      const locations = [];
-
-      [serviceNational, serviceState, serviceCounty].forEach((coverageArea) => {
-        if (coverageArea) {
-          locations.push({
-            [`properties.${coverageArea}`]: 'true',
-          });
-        }
-      });
-
-      props['$or'] = locations;
     }
 
     query.services = {$elemMatch: props};
