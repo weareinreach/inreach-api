@@ -10,12 +10,15 @@ import {
 import {User} from '../mongoose';
 
 export const authUser = async (req, res) => {
-  const {email, password} = req?.body;
+  const {email, password} = req.body;
 
   await User.findOne({email})
     .then((userDoc) => {
       if (!userDoc) {
-        return handleNotFound(res);
+        handleNotFound(res);
+      }
+      if (!password) {
+        res.status(400).send('Please provide a valid password.');
       }
 
       const valid = userDoc.validPassword(password);
