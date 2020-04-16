@@ -1,4 +1,5 @@
-import {handleErr, handleNotFound, sheetMap, sheetReader} from '../utils';
+import {handleErr, handleNotFound} from '../utils';
+import {sheetMap, sheetReader} from '../utils/googleSheets';
 
 export const getStaticPage = async (req, res) => {
   const {pageId} = req?.params;

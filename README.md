@@ -24,10 +24,10 @@ Folder structure
 catalog-api/
 ├── src               # All of the source code for the server
 ├── src/routes        # Server's routes and router functions
+├── src/utils         # Shared utilities
 ├── src/db.js         # Initializes connection to database
 ├── src/mongoose.js   # Mongoose Schemas
 ├── src/swagger.json  # Swagger spec
-├── src/utils.js      # Shared utilities
 └── src/index.js      # Initializes the Express server
 ```
 

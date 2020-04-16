@@ -1,10 +1,6 @@
 import {Comment, Rating, Suggestion} from '../mongoose';
-import {
-  getEntityQuery,
-  handleBadRequest,
-  handleErr,
-  handleNotFound,
-} from '../utils';
+import {handleBadRequest, handleErr, handleNotFound} from '../utils';
+import {getEntityQuery} from '../utils/query';
 
 export const getComments = async (req, res) => {
   const {orgId, serviceId} = req?.params;

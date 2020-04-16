@@ -1,13 +1,13 @@
+import {User} from '../mongoose';
 import {
   generateJWT,
   handleBadRequest,
   handleErr,
   handleNotFound,
-  parsePageQuery,
   removeUserInfo,
   verifyJWT,
 } from '../utils';
-import {User} from '../mongoose';
+import {parsePageQuery} from '../utils/query';
 
 export const authUser = async (req, res) => {
   const {email, password} = req?.body;

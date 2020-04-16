@@ -1,11 +1,10 @@
 import {
-  ITEM_PAGE_LIMIT,
-  getOrganizationQuery,
   handleBadRequest,
   handleErr,
   handleNotFound,
   orderServices,
 } from '../utils';
+import {ITEM_PAGE_LIMIT, getOrganizationQuery} from '../utils/query';
 import {Organization} from '../mongoose';
 
 export const getOrgs = async (req, res) => {
