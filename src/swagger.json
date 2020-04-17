@@ -69,7 +69,7 @@
             "schema": {
               "type": "string"
             },
-            "description": "Comma delimited, list of property names and values",
+            "description": "Comma delimited, list of property names and values. The value '$existsFalse' checks that the value does not exist",
             "example": "community-asylum-seeker=true,service-county-california-san-francisco=true. NOTE: req-* properties are treated differently and act as OR filters instead of AND"
           },
           {

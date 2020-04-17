@@ -118,7 +118,11 @@ export const getOrganizationQuery = (params = {}) => {
         propertyQuery = regularProps.reduce((result, prop) => {
           const [name, value] = prop.split('=');
 
-          result[`properties.${name}`] = value;
+          if (value === '$existsFalse') {
+            result[`properties.${name}`] = {$exists: false};
+          } else {
+            result[`properties.${name}`] = value;
+          }
 
           return result;
         }, propertyQuery || {});
