@@ -4,16 +4,21 @@ import {
   handleNotFound,
   orderServices,
 } from '../utils';
-import {ITEM_PAGE_LIMIT, getOrganizationQuery} from '../utils/query';
+import {
+  ITEM_PAGE_LIMIT,
+  getOrganizationQuery,
+  parsePageQuery,
+} from '../utils/query';
 import {Organization} from '../mongoose';
 
 export const getOrgs = async (req, res) => {
-  const {params, query} = getOrganizationQuery(req?.query);
+  const {limit, offset} = parsePageQuery(req?.query?.page);
+  const query = getOrganizationQuery(req?.query);
 
   await Organization.find(query)
     .sort({updated_at: -1})
-    .skip(params.offset)
-    .limit(params.limit)
+    .skip(offset)
+    .limit(limit)
     .then((organizations) => {
       return res.json({organizations});
     })
@@ -21,7 +26,7 @@ export const getOrgs = async (req, res) => {
 };
 
 export const getOrgsCount = async (req, res) => {
-  const {query} = getOrganizationQuery(req?.query);
+  const query = getOrganizationQuery(req?.query);
 
   await Organization.countDocuments(query)
     .then((count) => {

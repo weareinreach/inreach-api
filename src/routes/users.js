@@ -7,7 +7,7 @@ import {
   removeUserInfo,
   verifyJWT,
 } from '../utils';
-import {parsePageQuery} from '../utils/query';
+import {ITEM_PAGE_LIMIT, getUserQuery, parsePageQuery} from '../utils/query';
 
 export const authUser = async (req, res) => {
   const {email, password} = req?.body;
@@ -44,13 +44,8 @@ export const checkUserToken = async (req, res) => {
 };
 
 export const getUsers = async (req, res) => {
-  const {isDataManager, page} = req?.query;
-  const {limit, offset} = parsePageQuery(page);
-  const query = {};
-
-  if (isDataManager) {
-    query.isDataManager = true;
-  }
+  const {limit, offset} = parsePageQuery(req?.query?.page);
+  const query = getUserQuery(req?.query);
 
   await User.find(query)
     .sort({updated_at: -1})
@@ -60,6 +55,18 @@ export const getUsers = async (req, res) => {
       const users = userList.map((user) => removeUserInfo(user.toJSON()));
 
       return res.json({users});
+    })
+    .catch((err) => handleErr(err, res));
+};
+
+export const getUsersCount = async (req, res) => {
+  const query = getUserQuery(req?.query);
+
+  await User.countDocuments(query)
+    .then((count) => {
+      const pages = Math.ceil(count / ITEM_PAGE_LIMIT);
+
+      return res.json({count, pages});
     })
     .catch((err) => handleErr(err, res));
 };

@@ -41,6 +41,7 @@ import {
   deleteUser,
   getUser,
   getUsers,
+  getUsersCount,
   removeUserListItem,
   updateUser,
   updateUserPassword,
@@ -124,6 +125,7 @@ versionOneRouter.delete('/suggestions/:suggestionId', deleteSuggestion);
 // Users
 versionOneRouter.get('/users', getUsers);
 versionOneRouter.post('/users', createUser);
+versionOneRouter.get('/users/count', getUsersCount);
 versionOneRouter.get('/users/:userId', getUser);
 versionOneRouter.patch('/users/:userId', updateUser);
 versionOneRouter.delete('/users/:userId', deleteUser);
