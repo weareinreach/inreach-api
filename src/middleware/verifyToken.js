@@ -13,6 +13,7 @@ export default function verifyToken (req, res, next) {
 // Verify if token exists
     jsonwebtoken.verify(token, SECRET_KEY, (error, decoded) => {
       if (error) {
+        console.log(SECRET_KEY);
         res.status(500).send('There was an error processing your request.');
       } else {
 // If token exists proceed to next action

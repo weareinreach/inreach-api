@@ -29,8 +29,8 @@ import {
   updateUserPassword,
 } from './users';
 import swaggerDocument from '../swagger.json';
-import verifyToken from '../services/verifyToken.js';
-import {getToken} from '../utils.js';
+import verifyToken from '../middleware/verifyToken.js';
+import {getToken} from './auth.js';
 
 export const baseRouter = Router();
 export const versionOneRouter = Router();

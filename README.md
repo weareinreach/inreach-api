@@ -23,6 +23,7 @@ Folder structure
 ```
 catalog-api/
 ├── src               # All of the source code for the server
+├── src/middleware    # Various middleware functions 
 ├── src/routes        # Server's routes and router functions
 ├── src/db.js         # Initializes connection to database
 ├── src/mongoose.js   # Mongoose Schemas
