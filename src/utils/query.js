@@ -6,7 +6,7 @@ const ObjectId = mongoose.Types.ObjectId;
  * Uses object shorthand to create a query based on if the values exist
  * @param  {String} organizationId id of the organization
  * @param  {String} serviceId id of the service
- * @return {Object} A mongo query for entity fields
+ * @return {Object} A mongo query
  */
 export const getEntityQuery = ({organizationId, serviceId} = {}) => {
   const query = {};
@@ -33,18 +33,15 @@ export const parsePageQuery = (page = '1') => {
 };
 
 /**
- * Format a query to retrieve organizations
- * @param  {Object} name Name of organation
- * @param  {Object} page Page to retrieve
- * @param  {Object} properties Properties to search on
- * @return {Object} A mongo query for organizations
+ * Format a query to retrieve organizations. Used for searching and count.
+ * @param  {Object} params Query param input
+ * @return {Object} A mongo query
  */
 export const getOrganizationQuery = (params = {}) => {
   const {
     ids,
     name,
     owner,
-    page = '1',
     pending,
     pendingOwnership,
     properties,
@@ -52,7 +49,6 @@ export const getOrganizationQuery = (params = {}) => {
     tagLocale,
     tags,
   } = params;
-  const {limit, offset} = parsePageQuery(page);
   let query = {};
 
   if (ids) {
@@ -182,5 +178,35 @@ export const getOrganizationQuery = (params = {}) => {
     query.services = {$elemMatch};
   }
 
-  return {params: {limit, offset}, query};
+  return query;
+};
+
+/**
+ * Format a query to retrieve iser. Used for searching and count.
+ * @param  {Object} params Query param input
+ * @return {Object} A mongo query
+ */
+export const getUserQuery = (params = {}) => {
+  const {type} = params;
+  let query = {};
+
+  switch (type) {
+    case 'adminDataManager':
+      query.isAdminDataManager = true;
+      break;
+    case 'dataManager':
+      query.isDataManager = true;
+      break;
+    case 'lawyer':
+      query.catalogType = 'lawyer';
+      break;
+    case 'provider':
+      query.catalogType = 'provider';
+      break;
+    case 'seeker':
+      query.catalogType = 'seeker';
+      break;
+  }
+
+  return query;
 };

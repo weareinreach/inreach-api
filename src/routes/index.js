@@ -42,6 +42,7 @@ import {
   deleteUser,
   getUser,
   getUsers,
+  getUsersCount,
   removeUserListItem,
   updateUser,
   updateUserPassword,
@@ -141,9 +142,10 @@ versionOneRouter.post('/suggestions', createSuggestions);
 versionOneRouter.delete('/suggestions/:suggestionId', deleteSuggestion);
 
 // Users
-versionOneRouter.get('/users', getUsers);
+versionOneRouter.get('/users', verifyToken, getUsers);
 versionOneRouter.post('/users', verifyToken, createUser);
-versionOneRouter.get('/users/:userId', getUser);
+versionOneRouter.get('/users/count', verifyToken, getUsersCount);
+versionOneRouter.get('/users/:userId', verifyToken, getUser);
 versionOneRouter.patch('/users/:userId', verifyToken, updateUser);
 versionOneRouter.delete('/users/:userId', verifyToken, deleteUser);
 versionOneRouter.patch(
@@ -151,10 +153,15 @@ versionOneRouter.patch(
   verifyToken,
   updateUserPassword
 );
-versionOneRouter.post('/users/:userId/lists', createUserList);
-versionOneRouter.post('/users/:userId/lists/:listId/items', addUserListItem);
+versionOneRouter.post('/users/:userId/lists', verifyToken, createUserList);
+versionOneRouter.post(
+  '/users/:userId/lists/:listId/items',
+  verifyToken,
+  addUserListItem
+);
 versionOneRouter.delete(
   '/users/:userId/lists/:listId/items/:itemId',
+  verifyToken,
   removeUserListItem
 );
 
