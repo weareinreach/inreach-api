@@ -12,6 +12,10 @@ import {ITEM_PAGE_LIMIT, getUserQuery, parsePageQuery} from '../utils/query';
 export const authUser = async (req, res) => {
   const {email, password} = req?.body;
 
+  if (!password) {
+    return res.status(400).send('Please provide a valid password.');
+  }
+
   await User.findOne({email})
     .then((userDoc) => {
       if (!userDoc) {

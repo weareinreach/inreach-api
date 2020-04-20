@@ -1,6 +1,7 @@
 import {Router} from 'express';
 import swaggerUi from 'swagger-ui-express';
 
+import {getToken} from './auth.js';
 import {
   createSuggestions,
   deleteSuggestion,
@@ -47,6 +48,7 @@ import {
   updateUserPassword,
 } from './users';
 import swaggerDocument from '../swagger.json';
+import verifyToken from '../middleware/verifyToken.js';
 
 export const baseRouter = Router();
 export const versionOneRouter = Router();
@@ -58,10 +60,11 @@ baseRouter.get('/docs', swaggerUi.setup(swaggerDocument));
 // Auth
 versionOneRouter.post('/auth', authUser);
 versionOneRouter.post('/auth/check', checkUserToken);
+versionOneRouter.get('/auth/token', getToken);
 
 // Organizations
 versionOneRouter.get('/organizations', getOrgs);
-versionOneRouter.post('/organizations', createOrg);
+versionOneRouter.post('/organizations', verifyToken, createOrg);
 versionOneRouter.get('/organizations/count', getOrgsCount);
 versionOneRouter.get('/organizations/:orgId', getOrg);
 versionOneRouter.patch('/organizations/:orgId', updateOrg);
@@ -75,14 +78,20 @@ versionOneRouter.delete('/organizations/:orgId/owners/:userId', deleteOrgOwner);
 
 // Services
 versionOneRouter.get('/organizations/:orgId/services', getServices);
-versionOneRouter.post('/organizations/:orgId/services', createService);
+versionOneRouter.post(
+  '/organizations/:orgId/services',
+  verifyToken,
+  createService
+);
 versionOneRouter.get('/organizations/:orgId/services/:serviceId', getService);
 versionOneRouter.patch(
   '/organizations/:orgId/services/:serviceId',
+  verifyToken,
   updateService
 );
 versionOneRouter.delete(
   '/organizations/:orgId/services/:serviceId',
+  verifyToken,
   deleteService
 );
 
@@ -95,25 +104,35 @@ versionOneRouter.get(
 
 // Comments
 versionOneRouter.get('/organizations/:orgId/comments', getComments);
-versionOneRouter.patch('/organizations/:orgId/comments', updateComments);
+versionOneRouter.patch(
+  '/organizations/:orgId/comments',
+  verifyToken,
+  updateComments
+);
 versionOneRouter.get(
   '/organizations/:orgId/services/:serviceId/comments',
   getComments
 );
 versionOneRouter.patch(
   '/organizations/:orgId/services/:serviceId/comments',
+  verifyToken,
   updateComments
 );
 
 // Ratings
 versionOneRouter.get('/organizations/:orgId/ratings', getRatings);
-versionOneRouter.patch('/organizations/:orgId/ratings', updateRatings);
+versionOneRouter.patch(
+  '/organizations/:orgId/ratings',
+  verifyToken,
+  updateRatings
+);
 versionOneRouter.get(
   '/organizations/:orgId/services/:serviceId/ratings',
   getRatings
 );
 versionOneRouter.patch(
   '/organizations/:orgId/services/:serviceId/ratings',
+  verifyToken,
   updateRatings
 );
 
@@ -123,17 +142,26 @@ versionOneRouter.post('/suggestions', createSuggestions);
 versionOneRouter.delete('/suggestions/:suggestionId', deleteSuggestion);
 
 // Users
-versionOneRouter.get('/users', getUsers);
-versionOneRouter.post('/users', createUser);
-versionOneRouter.get('/users/count', getUsersCount);
-versionOneRouter.get('/users/:userId', getUser);
-versionOneRouter.patch('/users/:userId', updateUser);
-versionOneRouter.delete('/users/:userId', deleteUser);
-versionOneRouter.patch('/users/:userId/password', updateUserPassword);
-versionOneRouter.post('/users/:userId/lists', createUserList);
-versionOneRouter.post('/users/:userId/lists/:listId/items', addUserListItem);
+versionOneRouter.get('/users', verifyToken, getUsers);
+versionOneRouter.post('/users', verifyToken, createUser);
+versionOneRouter.get('/users/count', verifyToken, getUsersCount);
+versionOneRouter.get('/users/:userId', verifyToken, getUser);
+versionOneRouter.patch('/users/:userId', verifyToken, updateUser);
+versionOneRouter.delete('/users/:userId', verifyToken, deleteUser);
+versionOneRouter.patch(
+  '/users/:userId/password',
+  verifyToken,
+  updateUserPassword
+);
+versionOneRouter.post('/users/:userId/lists', verifyToken, createUserList);
+versionOneRouter.post(
+  '/users/:userId/lists/:listId/items',
+  verifyToken,
+  addUserListItem
+);
 versionOneRouter.delete(
   '/users/:userId/lists/:listId/items/:itemId',
+  verifyToken,
   removeUserListItem
 );
 
