@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken';
+import config from '../utils/config';
 
-const TOKEN_SIGNATURE = process.env.TOKEN_SIGNATURE || 'ssshhh';
+const {tokenSignature} = config;
 
 /**
  * Generate a JWT with user information
@@ -18,7 +19,7 @@ export const generateJWT = (user) => {
       ...user,
       exp: parseInt(expDate.getTime() / 1000),
     },
-    TOKEN_SIGNATURE
+    tokenSignature
   );
 };
 
@@ -29,7 +30,7 @@ export const generateJWT = (user) => {
  */
 export const verifyJWT = (token) => {
   return new Promise((resolve) => {
-    jwt.verify(token, TOKEN_SIGNATURE, (err, decoded) => {
+    jwt.verify(token, tokenSignature, (err, decoded) => {
       if (err) {
         resolve({valid: false});
       }
@@ -43,8 +44,7 @@ export const verifyJWT = (token) => {
 Get JSON Web Token
 */
 export const getToken = (req, res) => {
-  const SECRET_KEY = process.env.TOKEN_SIGNATURE || 'ssshhh';
-  jwt.sign({id: req.id}, SECRET_KEY, {expiresIn: 86400}, (error, token) => { //jwt.sign(payload, secretOrPrivateKey, [options, callback])
+  jwt.sign({id: req.id}, tokenSignature, {expiresIn: 86400}, (error, token) => {
     if (error) {
       res.status(500).send(error);
     } else {

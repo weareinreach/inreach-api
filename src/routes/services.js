@@ -6,7 +6,7 @@ import {
   handleErr,
   handleNotFound,
   orderServices,
-} from '../utils';
+} from '../utils/index';
 import {Organization} from '../mongoose';
 
 export const getServices = async (req, res) => {

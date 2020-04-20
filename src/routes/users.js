@@ -3,21 +3,13 @@ import {
   handleBadRequest,
   handleErr,
   handleNotFound,
-<<<<<<< HEAD
-  parsePageQuery,
   removeUserInfo
-} from '../utils';
+} from '../utils/index';
 import {
-  generateJWT,
-  verifyJWT
-} from './auth.js'
-import {User} from '../mongoose';
-=======
-  removeUserInfo,
   verifyJWT,
-} from '../utils';
+  generateJWT
+} from './auth.js'
 import {parsePageQuery} from '../utils/query';
->>>>>>> master
 
 export const authUser = async (req, res) => {
   const {email, password} = req?.body;

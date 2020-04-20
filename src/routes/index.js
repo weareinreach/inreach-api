@@ -66,10 +66,6 @@ versionOneRouter.get('/organizations', getOrgs);
 versionOneRouter.post('/organizations', verifyToken, createOrg);
 versionOneRouter.get('/organizations/count', getOrgsCount);
 versionOneRouter.get('/organizations/:orgId', getOrg);
-<<<<<<< HEAD
-versionOneRouter.patch('/organizations/:orgId', verifyToken, updateOrg);
-versionOneRouter.delete('/organizations/:orgId', verifyToken, deleteOrg);
-=======
 versionOneRouter.patch('/organizations/:orgId', updateOrg);
 versionOneRouter.delete('/organizations/:orgId', deleteOrg);
 versionOneRouter.post('/organizations/:orgId/owners', createOrgOwner);
@@ -78,7 +74,6 @@ versionOneRouter.get(
   approveOrgOwner
 );
 versionOneRouter.delete('/organizations/:orgId/owners/:userId', deleteOrgOwner);
->>>>>>> master
 
 // Services
 versionOneRouter.get('/organizations/:orgId/services', getServices);
@@ -133,21 +128,15 @@ versionOneRouter.delete('/suggestions/:suggestionId', deleteSuggestion);
 versionOneRouter.get('/users', getUsers);
 versionOneRouter.post('/users', verifyToken, createUser);
 versionOneRouter.get('/users/:userId', getUser);
-<<<<<<< HEAD
 versionOneRouter.patch('/users/:userId', verifyToken, updateUser);
 versionOneRouter.delete('/users/:userId', verifyToken, deleteUser);
 versionOneRouter.patch('/users/:userId/password', verifyToken, updateUserPassword);
-=======
-versionOneRouter.patch('/users/:userId', updateUser);
-versionOneRouter.delete('/users/:userId', deleteUser);
-versionOneRouter.patch('/users/:userId/password', updateUserPassword);
 versionOneRouter.post('/users/:userId/lists', createUserList);
 versionOneRouter.post('/users/:userId/lists/:listId/items', addUserListItem);
 versionOneRouter.delete(
   '/users/:userId/lists/:listId/items/:itemId',
   removeUserListItem
 );
->>>>>>> master
 
 // Reviews
 versionOneRouter.get('/reviews', getReviews);
