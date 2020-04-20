@@ -23,7 +23,7 @@ Folder structure
 ```
 catalog-api/
 ├── src               # All of the source code for the server
-├── src/middleware    # Various middleware functions 
+├── src/middleware    # Middleware for intercepting & manipulating requests
 ├── src/routes        # Server's routes and router functions
 ├── src/utils         # Shared utilities
 ├── src/db.js         # Initializes connection to database
