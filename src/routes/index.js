@@ -1,11 +1,23 @@
 import {Router} from 'express';
 import swaggerUi from 'swagger-ui-express';
 
-import {getComments, getRatings, updateComments, updateRatings} from './entity';
 import {
+  createSuggestions,
+  deleteSuggestion,
+  getComments,
+  getRatings,
+  getSuggestions,
+  updateComments,
+  updateRatings,
+} from './entity';
+import {
+  approveOrgOwner,
   createOrg,
+  createOrgOwner,
   deleteOrg,
+  deleteOrgOwner,
   getOrg,
+  getOrgBySlug,
   getOrgs,
   getOrgsCount,
   updateOrg,
@@ -15,16 +27,21 @@ import {
   createService,
   deleteService,
   getService,
+  getServiceBySlug,
   getServices,
   updateService,
 } from './services';
+import {getStaticPage} from './static';
 import {
+  addUserListItem,
   authUser,
   checkUserToken,
   createUser,
+  createUserList,
   deleteUser,
   getUser,
   getUsers,
+  removeUserListItem,
   updateUser,
   updateUserPassword,
 } from './users';
@@ -49,8 +66,19 @@ versionOneRouter.get('/organizations', getOrgs);
 versionOneRouter.post('/organizations', verifyToken, createOrg);
 versionOneRouter.get('/organizations/count', getOrgsCount);
 versionOneRouter.get('/organizations/:orgId', getOrg);
+<<<<<<< HEAD
 versionOneRouter.patch('/organizations/:orgId', verifyToken, updateOrg);
 versionOneRouter.delete('/organizations/:orgId', verifyToken, deleteOrg);
+=======
+versionOneRouter.patch('/organizations/:orgId', updateOrg);
+versionOneRouter.delete('/organizations/:orgId', deleteOrg);
+versionOneRouter.post('/organizations/:orgId/owners', createOrgOwner);
+versionOneRouter.get(
+  '/organizations/:orgId/owners/:userId/approve',
+  approveOrgOwner
+);
+versionOneRouter.delete('/organizations/:orgId/owners/:userId', deleteOrgOwner);
+>>>>>>> master
 
 // Services
 versionOneRouter.get('/organizations/:orgId/services', getServices);
@@ -63,6 +91,13 @@ versionOneRouter.patch(
 versionOneRouter.delete(
   '/organizations/:orgId/services/:serviceId',
   verifyToken, deleteService
+);
+
+// Slug
+versionOneRouter.get('/slug/organizations/:orgSlug', getOrgBySlug);
+versionOneRouter.get(
+  '/slug/organizations/:orgSlug/services/:serviceSlug',
+  getServiceBySlug
 );
 
 // Comments
@@ -89,14 +124,34 @@ versionOneRouter.patch(
   verifyToken, updateRatings
 );
 
+// Suggestions
+versionOneRouter.get('/suggestions', getSuggestions);
+versionOneRouter.post('/suggestions', createSuggestions);
+versionOneRouter.delete('/suggestions/:suggestionId', deleteSuggestion);
+
 // Users
 versionOneRouter.get('/users', getUsers);
 versionOneRouter.post('/users', verifyToken, createUser);
 versionOneRouter.get('/users/:userId', getUser);
+<<<<<<< HEAD
 versionOneRouter.patch('/users/:userId', verifyToken, updateUser);
 versionOneRouter.delete('/users/:userId', verifyToken, deleteUser);
 versionOneRouter.patch('/users/:userId/password', verifyToken, updateUserPassword);
+=======
+versionOneRouter.patch('/users/:userId', updateUser);
+versionOneRouter.delete('/users/:userId', deleteUser);
+versionOneRouter.patch('/users/:userId/password', updateUserPassword);
+versionOneRouter.post('/users/:userId/lists', createUserList);
+versionOneRouter.post('/users/:userId/lists/:listId/items', addUserListItem);
+versionOneRouter.delete(
+  '/users/:userId/lists/:listId/items/:itemId',
+  removeUserListItem
+);
+>>>>>>> master
 
-// Ratings
+// Reviews
 versionOneRouter.get('/reviews', getReviews);
 versionOneRouter.post('/reviews', createReview);
+
+// Static
+versionOneRouter.get('/static/:pageId', getStaticPage);

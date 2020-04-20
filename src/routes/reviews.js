@@ -1,5 +1,6 @@
 import {Review} from '../mongoose';
-import {handleBadRequest, handleErr, parsePageQuery} from '../utils';
+import {handleBadRequest, handleErr} from '../utils';
+import {parsePageQuery} from '../utils/query';
 
 export const getReviews = async (req, res) => {
   const {page} = req?.query;

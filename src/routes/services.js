@@ -1,4 +1,12 @@
-import {handleBadRequest, handleErr, handleNotFound} from '../utils';
+import _reduce from 'lodash/reduce';
+
+import {
+  formatService,
+  handleBadRequest,
+  handleErr,
+  handleNotFound,
+  orderServices,
+} from '../utils';
 import {Organization} from '../mongoose';
 
 export const getServices = async (req, res) => {
@@ -10,7 +18,9 @@ export const getServices = async (req, res) => {
         return handleNotFound(res);
       }
 
-      const services = orgDoc?.services || [];
+      let services = orgDoc?.services || [];
+
+      services = orderServices(services);
 
       return res.json({services});
     })
@@ -52,9 +62,10 @@ export const deleteService = async (req, res) => {
         return handleNotFound(res);
       }
 
-      return organization.services
-        .id(serviceId)
-        .remove()
+      organization.services.id(serviceId).remove();
+
+      organization
+        .save()
         .then(() => {
           return res.json({deleted: true});
         })
@@ -78,13 +89,10 @@ export const getService = async (req, res) => {
         return handleNotFound(res);
       }
 
-      const service = {
-        ...(serviceDoc?.toJSON() || {}),
-        organization: {
-          ...(orgDoc?.toJSON() || {}),
-          services: undefined,
-        },
-      };
+      const service = formatService(
+        serviceDoc?.toJSON() || {},
+        orgDoc?.toJSON() || {}
+      );
 
       return res.json(service);
     })
@@ -100,9 +108,22 @@ export const updateService = async (req, res) => {
     return handleBadRequest(res);
   }
 
+  const updates = _reduce(
+    body,
+    (result, value, key) => {
+      result[`services.$.${key}`] = value;
+
+      return result;
+    },
+    {
+      'services.$._id': serviceId,
+      'services.$.updated_at': updated_at,
+    }
+  );
+
   await Organization.findOneAndUpdate(
     {_id: orgId, 'services._id': serviceId},
-    {$set: {'services.$': {...body, _id: serviceId, updated_at}}}
+    {$set: updates}
   )
     .then((orgDoc) => {
       if (!orgDoc) {
@@ -110,6 +131,36 @@ export const updateService = async (req, res) => {
       }
 
       return res.json({updated: true});
+    })
+    .catch((err) => handleErr(err, res));
+};
+
+export const getServiceBySlug = async (req, res) => {
+  const {orgSlug, serviceSlug} = req?.params;
+
+  await Organization.findOne({slug: orgSlug})
+    .then((orgDoc) => {
+      if (!orgDoc) {
+        return handleNotFound(res);
+      }
+
+      const serviceDoc = orgDoc.services.find(
+        (service) => service.slug === serviceSlug
+      );
+
+      if (!serviceDoc) {
+        return handleNotFound(res);
+      }
+
+      const service = {
+        ...(serviceDoc?.toJSON() || {}),
+        organization: {
+          ...(orgDoc?.toJSON() || {}),
+          services: undefined,
+        },
+      };
+
+      return res.json(service);
     })
     .catch((err) => handleErr(err, res));
 };

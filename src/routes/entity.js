@@ -1,10 +1,6 @@
-import {Comment, Rating} from '../mongoose';
-import {
-  getEntityQuery,
-  handleBadRequest,
-  handleErr,
-  handleNotFound,
-} from '../utils';
+import {Comment, Rating, Suggestion} from '../mongoose';
+import {handleBadRequest, handleErr, handleNotFound} from '../utils';
+import {getEntityQuery} from '../utils/query';
 
 export const getComments = async (req, res) => {
   const {orgId, serviceId} = req?.params;
@@ -12,15 +8,8 @@ export const getComments = async (req, res) => {
 
   await Comment.findOne(query)
     .then((doc) => {
-      if (!doc) {
-        return handleNotFound(res);
-      }
+      const {comments = []} = doc || {};
 
-      const {comments = []} = doc;
-
-      if (!doc) {
-        return handleNotFound(res);
-      }
       return res.json({comments});
     })
     .catch((err) => handleErr(err, res));
@@ -56,12 +45,14 @@ export const getRatings = async (req, res) => {
 
   await Rating.findOne(query)
     .then((doc) => {
-      if (!doc) {
-        return handleNotFound(res);
-      }
+      const {ratings = []} = doc || {};
+      let average = ratings.reduce((result, {rating}) => {
+        result += rating;
 
-      const average = 0;
-      const {ratings = []} = doc;
+        return result;
+      }, 0);
+
+      average = Math.ceil(average / ratings.length);
 
       return res.json({average_rating: average, ratings});
     })
@@ -88,6 +79,52 @@ export const updateRatings = async (req, res) => {
       }
 
       return res.json({updated: true});
+    })
+    .catch((err) => handleErr(err, res));
+};
+
+export const createSuggestions = async (req, res) => {
+  const {suggestions} = req?.body;
+
+  const invalidSuggestions =
+    suggestions?.length < 1 ||
+    suggestions?.some(
+      (suggestion) =>
+        !suggestion?.organizationId ||
+        !suggestion?.userEmail ||
+        !suggestion?.field ||
+        !suggestion?.value
+    );
+
+  if (!suggestions || invalidSuggestions) {
+    return handleBadRequest(res);
+  }
+
+  await Suggestion.create(suggestions)
+    .then((doc) => {
+      if (!doc) {
+        return handleNotFound(res);
+      }
+
+      return res.json({updated: true});
+    })
+    .catch((err) => handleErr(err, res));
+};
+
+export const getSuggestions = async (req, res) => {
+  await Suggestion.find({})
+    .then((suggestions) => {
+      return res.json(suggestions);
+    })
+    .catch((err) => handleErr(err, res));
+};
+
+export const deleteSuggestion = async (req, res) => {
+  const {suggestionId} = req?.params;
+
+  await Suggestion.findByIdAndDelete(suggestionId)
+    .then(() => {
+      return res.json({deleted: true});
     })
     .catch((err) => handleErr(err, res));
 };

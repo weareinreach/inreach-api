@@ -1,7 +1,9 @@
+import {User} from '../mongoose';
 import {
   handleBadRequest,
   handleErr,
   handleNotFound,
+<<<<<<< HEAD
   parsePageQuery,
   removeUserInfo
 } from '../utils';
@@ -10,6 +12,12 @@ import {
   verifyJWT
 } from './auth.js'
 import {User} from '../mongoose';
+=======
+  removeUserInfo,
+  verifyJWT,
+} from '../utils';
+import {parsePageQuery} from '../utils/query';
+>>>>>>> master
 
 export const authUser = async (req, res) => {
   const {email, password} = req?.body;
@@ -84,9 +92,11 @@ export const createUser = async (req, res) => {
   await user
     .save()
     .then((userDoc) => {
-      const user = removeUserInfo(userDoc.toJSON());
+      const userJSON = userDoc.toJSON();
+      const token = userJSON.hash;
+      const user = removeUserInfo(userJSON);
 
-      return res.json({created: true, user});
+      return res.json({created: true, token, user});
     })
     .catch((err) => handleErr(err, res));
 };
@@ -156,6 +166,105 @@ export const updateUserPassword = async (req, res) => {
       await user
         .save()
         .then(() => res.json({updated: true}))
+        .catch((err) => handleErr(err, res));
+    })
+    .catch((err) => handleErr(err, res));
+};
+
+export const createUserList = async (req, res) => {
+  const {userId} = req?.params;
+  const {name} = req?.body;
+
+  if (!name) {
+    return handleBadRequest(res);
+  }
+
+  await User.findById(userId)
+    .then(async (user) => {
+      if (!user) {
+        return handleNotFound(res);
+      }
+
+      const newList = {name};
+
+      if (user.lists) {
+        user.lists.push(newList);
+      } else {
+        user.lists = [newList];
+      }
+
+      await user
+        .save()
+        .then(() => res.json({created: true}))
+        .catch((err) => handleErr(err, res));
+    })
+    .catch((err) => handleErr(err, res));
+};
+
+export const addUserListItem = async (req, res) => {
+  const {listId, userId} = req?.params;
+  const {itemId, orgId} = req?.body;
+
+  if (!itemId) {
+    return handleBadRequest(res);
+  }
+
+  await User.findById(userId)
+    .then(async (user) => {
+      if (!user) {
+        return handleNotFound(res);
+      }
+
+      const list = user.lists.id(listId);
+
+      if (!list) {
+        return handleNotFound(res);
+      }
+
+      const newItem = {fetchable_id: itemId, orgId};
+
+      if (list.items) {
+        list.items.push(newItem);
+      } else {
+        list.items = [newItem];
+      }
+
+      await user
+        .save()
+        .then(() => res.json({updated: true}))
+        .catch((err) => handleErr(err, res));
+    })
+    .catch((err) => handleErr(err, res));
+};
+
+export const removeUserListItem = async (req, res) => {
+  const {itemId, listId, userId} = req?.params;
+
+  await User.findById(userId)
+    .then(async (user) => {
+      if (!user) {
+        return handleNotFound(res);
+      }
+
+      const list = user.lists.id(listId);
+
+      if (!list) {
+        return handleNotFound(res);
+      }
+
+      const itemIndex = list.items.findIndex(
+        (item) => item.fetchable_id === itemId
+      );
+
+      if (itemIndex === -1) {
+        return handleNotFound(res);
+      }
+
+      list.items[itemIndex].remove();
+
+      await user
+        .save()
+        .then(() => res.json({deleted: true}))
         .catch((err) => handleErr(err, res));
     })
     .catch((err) => handleErr(err, res));

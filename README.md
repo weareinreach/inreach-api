@@ -12,7 +12,7 @@ $ npm i
 $ npm start
 ```
 
-In order to run the app you need a [.env][https://www.npmjs.com/package/dotenv] file with a valid mongodb connection string.
+In order to run the app you need a [.env][https://www.npmjs.com/package/dotenv] file with a valid `MONGODB_URI` value for the mongodb connection string.
 
 ## Codebase
 
@@ -25,10 +25,10 @@ catalog-api/
 ├── src               # All of the source code for the server
 ├── src/middleware    # Various middleware functions 
 ├── src/routes        # Server's routes and router functions
+├── src/utils         # Shared utilities
 ├── src/db.js         # Initializes connection to database
 ├── src/mongoose.js   # Mongoose Schemas
 ├── src/swagger.json  # Swagger spec
-├── src/utils.js      # Shared utilities
 └── src/index.js      # Initializes the Express server
 ```
 

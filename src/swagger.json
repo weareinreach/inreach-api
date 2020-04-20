@@ -29,6 +29,15 @@
           },
           {
             "in": "query",
+            "name": "owner",
+            "schema": {
+              "type": "string"
+            },
+            "description": "The email of the organization owner",
+            "example": "1"
+          },
+          {
+            "in": "query",
             "name": "page",
             "schema": {
               "type": "string"
@@ -38,12 +47,57 @@
           },
           {
             "in": "query",
+            "name": "pending",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filter organizations that are unpublished.",
+            "example": "true"
+          },
+          {
+            "in": "query",
+            "name": "pendingOwnership",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filter organizations that have pending affiliates.",
+            "example": "true"
+          },
+          {
+            "in": "query",
             "name": "properties",
             "schema": {
               "type": "string"
             },
-            "description": "Comma delimited, list of property names and values",
-            "example": "community-asylum-seeker=true,service-county-california-san-francisco=true"
+            "description": "Comma delimited, list of property names and values. The value '$existsFalse' checks that the value does not exist",
+            "example": "community-asylum-seeker=true,service-county-california-san-francisco=true. NOTE: req-* properties are treated differently and act as OR filters instead of AND"
+          },
+          {
+            "in": "query",
+            "name": "serviceArea",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Comma delimited, list of service areas to search for",
+            "example": "service-county-california-san-francisco,service-state-california,service-national-united-states"
+          },
+          {
+            "in": "query",
+            "name": "tagLocale",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Required if using tags. The locale to query for tags",
+            "example": "united_states"
+          },
+          {
+            "in": "query",
+            "name": "tags",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Required if using tagLocale. Comma delimited, list of tags",
+            "example": "Medical,Food"
           }
         ],
         "responses": {
@@ -109,6 +163,15 @@
           },
           {
             "in": "query",
+            "name": "owner",
+            "schema": {
+              "type": "string"
+            },
+            "description": "The email of the organization owner",
+            "example": "1"
+          },
+          {
+            "in": "query",
             "name": "page",
             "schema": {
               "type": "string"
@@ -118,12 +181,57 @@
           },
           {
             "in": "query",
+            "name": "pending",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filter organizations that are unpublished.",
+            "example": "true"
+          },
+          {
+            "in": "query",
+            "name": "pendingOwnership",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filter organizations that have pending affiliates.",
+            "example": "true"
+          },
+          {
+            "in": "query",
             "name": "properties",
             "schema": {
               "type": "string"
             },
-            "description": "Comma delimited, list of properties",
-            "example": "community-lgbt,community-refugee"
+            "description": "Comma delimited, list of property names and values",
+            "example": "community-asylum-seeker=true,service-county-california-san-francisco=true. NOTE: req-* properties are treated differently and act as OR filters instead of AND"
+          },
+          {
+            "in": "query",
+            "name": "serviceArea",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Comma delimited, list of service areas to search for",
+            "example": "service-county-california-san-francisco,service-state-california,service-national-united-states"
+          },
+          {
+            "in": "query",
+            "name": "tagLocale",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Required if using tags. The locale to query for tags",
+            "example": "united_states"
+          },
+          {
+            "in": "query",
+            "name": "tags",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Required if using tagLocale. Comma delimited, list of tags",
+            "example": "Medical,Food"
           }
         ],
         "responses": {
@@ -632,6 +740,211 @@
         }
       }
     },
+    "/organizations/:orgId/owners": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "orgId",
+          "schema": {
+            "type": "string"
+          },
+          "required": true,
+          "description": "ID of the organization"
+        }
+      ],
+      "post": {
+        "summary": "Create a new organization owner",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "example": true
+                  },
+                  "userId": {
+                    "type": "string",
+                    "example": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "created": {
+                      "type": "boolean",
+                      "example": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/organizations/:orgId/owners/:userId/approve": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "orgId",
+          "schema": {
+            "type": "string"
+          },
+          "required": true,
+          "description": "ID of the organization"
+        },
+        {
+          "in": "path",
+          "name": "userId",
+          "schema": {
+            "type": "string"
+          },
+          "required": true,
+          "description": "ID of the user"
+        }
+      ],
+      "get": {
+        "summary": "Approve the user as an organzation owner",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "deleted": {
+                      "type": "boolean",
+                      "example": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/organizations/:orgId/owners/:userId": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "orgId",
+          "schema": {
+            "type": "string"
+          },
+          "required": true,
+          "description": "ID of the organization"
+        },
+        {
+          "in": "path",
+          "name": "userId",
+          "schema": {
+            "type": "string"
+          },
+          "required": true,
+          "description": "ID of the user"
+        }
+      ],
+      "delete": {
+        "summary": "Remove the owner from the organization",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "deleted": {
+                      "type": "boolean",
+                      "example": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/slug/organizations/:orgSlug": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "orgSlug",
+          "schema": {
+            "type": "string"
+          },
+          "required": true,
+          "description": "Slug of the organization"
+        }
+      ],
+      "get": {
+        "summary": "Get an organization by its slug",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Organization"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/slug/organizations/:orgSlug/services/:serviceSlug": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "orgSlug",
+          "schema": {
+            "type": "string"
+          },
+          "required": true,
+          "description": "Slug of the organization"
+        },
+        {
+          "in": "path",
+          "name": "serviceSlug",
+          "schema": {
+            "type": "string"
+          },
+          "required": true,
+          "description": "Slug of the service"
+        }
+      ],
+      "get": {
+        "summary": "Get a service by its and its org's slug",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Organization"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/auth": {
       "post": {
         "summary": "Create a token for the user",
@@ -773,6 +1086,121 @@
         }
       }
     },
+    "/suggestions": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "orgId",
+          "schema": {
+            "type": "string"
+          },
+          "required": true,
+          "description": "ID of the organization"
+        }
+      ],
+      "get": {
+        "summary": "Get all of the suggestions",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "suggestions": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a new suggestion",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "field": {
+                    "type": "string",
+                    "example": "name"
+                  },
+                  "value": {
+                    "type": "string",
+                    "example": "name"
+                  },
+                  "userId": {
+                    "type": "string",
+                    "example": "name"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "updated": {
+                      "type": "boolean",
+                      "example": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/suggestions/:suggestionId": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "suggestionId",
+          "schema": {
+            "type": "string"
+          },
+          "required": true,
+          "description": "ID of the suggestion"
+        }
+      ],
+      "delete": {
+        "summary": "Delete a suggestion",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "deleted": {
+                      "type": "boolean",
+                      "example": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/users": {
       "get": {
         "summary": "Get users",
@@ -845,6 +1273,17 @@
       }
     },
     "/users/:userId": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "userId",
+          "schema": {
+            "type": "string"
+          },
+          "required": true,
+          "description": "ID of the user"
+        }
+      ],
       "get": {
         "summary": "Get a user",
         "responses": {
@@ -951,6 +1390,167 @@
           }
         }
       }
+    },
+    "/users/:userId/lists": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "userId",
+          "schema": {
+            "type": "string"
+          },
+          "required": true,
+          "description": "ID of the user"
+        }
+      ],
+      "post": {
+        "summary": "Create a list for the user",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "example": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "updated": {
+                      "type": "boolean",
+                      "example": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/:userId/lists/:listId/items": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "userId",
+          "schema": {
+            "type": "string"
+          },
+          "required": true,
+          "description": "ID of the user"
+        },
+        {
+          "in": "path",
+          "name": "listId",
+          "schema": {
+            "type": "string"
+          },
+          "required": true,
+          "description": "ID of the list"
+        }
+      ],
+      "post": {
+        "summary": "Add an item to the user's list",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "itemId": {
+                    "type": "string",
+                    "example": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "updated": {
+                      "type": "boolean",
+                      "example": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/:userId/lists/:listId/items/:itemId": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "userId",
+          "schema": {
+            "type": "string"
+          },
+          "required": true,
+          "description": "ID of the user"
+        },
+        {
+          "in": "path",
+          "name": "listId",
+          "schema": {
+            "type": "string"
+          },
+          "required": true,
+          "description": "ID of the list"
+        },
+        {
+          "in": "path",
+          "name": "itemId",
+          "schema": {
+            "type": "string"
+          },
+          "required": true,
+          "description": "ID of the item"
+        }
+      ],
+      "delete": {
+        "summary": "Remove an item from the user's list",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "deleted": {
+                      "type": "boolean",
+                      "example": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -1014,6 +1614,12 @@
           },
           "description": {
             "type": "string"
+          },
+          "adminEmails": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
           },
           "emails": {
             "type": "array",
@@ -1249,14 +1855,8 @@
           "catalogType": {
             "type": "string"
           },
-          "email": {
-            "type": "string"
-          },
-          "favorites": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
+          "isProfessional": {
+            "type": "boolean"
           },
           "isDataManager": {
             "type": "boolean"
