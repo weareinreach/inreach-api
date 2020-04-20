@@ -66,8 +66,8 @@ versionOneRouter.get('/organizations', getOrgs);
 versionOneRouter.post('/organizations', verifyToken, createOrg);
 versionOneRouter.get('/organizations/count', getOrgsCount);
 versionOneRouter.get('/organizations/:orgId', getOrg);
-versionOneRouter.patch('/organizations/:orgId', updateOrg);
-versionOneRouter.delete('/organizations/:orgId', deleteOrg);
+versionOneRouter.patch('/organizations/:orgId', verifyToken, updateOrg);
+versionOneRouter.delete('/organizations/:orgId', verifyToken, deleteOrg);
 versionOneRouter.post('/organizations/:orgId/owners', createOrgOwner);
 versionOneRouter.get(
   '/organizations/:orgId/owners/:userId/approve',
