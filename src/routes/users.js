@@ -1,22 +1,20 @@
 import {User} from '../mongoose';
 import {
+  generateJWT,
   handleBadRequest,
   handleErr,
   handleNotFound,
-  removeUserInfo
-} from '../utils/index';
-import {
+  removeUserInfo,
   verifyJWT,
-  generateJWT
-} from './auth.js'
+} from '../utils';
 import {parsePageQuery} from '../utils/query';
 
 export const authUser = async (req, res) => {
   const {email, password} = req?.body;
 
   if (!password) {
-     return res.status(400).send('Please provide a valid password.');
-  };
+    return res.status(400).send('Please provide a valid password.');
+  }
 
   await User.findOne({email})
     .then((userDoc) => {

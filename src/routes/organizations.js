@@ -3,7 +3,7 @@ import {
   handleErr,
   handleNotFound,
   orderServices,
-} from '../utils/index';
+} from '../utils';
 import {ITEM_PAGE_LIMIT, getOrganizationQuery} from '../utils/query';
 import {Organization} from '../mongoose';
 
