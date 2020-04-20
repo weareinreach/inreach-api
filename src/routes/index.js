@@ -1,7 +1,7 @@
 import {Router} from 'express';
 import swaggerUi from 'swagger-ui-express';
 
-import {getToken} from './auth.js';
+import {getToken} from './auth';
 import {
   createSuggestions,
   deleteSuggestion,
@@ -48,7 +48,7 @@ import {
   updateUserPassword,
 } from './users';
 import swaggerDocument from '../swagger.json';
-import verifyToken from '../middleware/verifyToken.js';
+import verifyToken from '../middleware/verifyToken';
 
 export const baseRouter = Router();
 export const versionOneRouter = Router();
@@ -67,14 +67,23 @@ versionOneRouter.get('/organizations', getOrgs);
 versionOneRouter.post('/organizations', verifyToken, createOrg);
 versionOneRouter.get('/organizations/count', getOrgsCount);
 versionOneRouter.get('/organizations/:orgId', getOrg);
-versionOneRouter.patch('/organizations/:orgId', updateOrg);
-versionOneRouter.delete('/organizations/:orgId', deleteOrg);
-versionOneRouter.post('/organizations/:orgId/owners', createOrgOwner);
+versionOneRouter.patch('/organizations/:orgId', verifyToken, updateOrg);
+versionOneRouter.delete('/organizations/:orgId', verifyToken, deleteOrg);
+versionOneRouter.post(
+  '/organizations/:orgId/owners',
+  verifyToken,
+  createOrgOwner
+);
 versionOneRouter.get(
   '/organizations/:orgId/owners/:userId/approve',
+  verifyToken,
   approveOrgOwner
 );
-versionOneRouter.delete('/organizations/:orgId/owners/:userId', deleteOrgOwner);
+versionOneRouter.delete(
+  '/organizations/:orgId/owners/:userId',
+  verifyToken,
+  deleteOrgOwner
+);
 
 // Services
 versionOneRouter.get('/organizations/:orgId/services', getServices);
