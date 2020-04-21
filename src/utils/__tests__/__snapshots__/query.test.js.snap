@@ -1,0 +1,58 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`getOrganizationQuery should apply params and match snapshot 1`] = `
+Object {
+  "$text": Object {
+    "$search": [Function],
+  },
+  "_id": Object {
+    "$in": Array [
+      "5e7e4be1d54f1760921a557e",
+      "5e7e4bdfd54f1760921a4fbf",
+    ],
+  },
+  "is_published": false,
+  "owners.email": "test@asylumconnect.com",
+  "owners.isApproved": false,
+  "services": Object {
+    "$elemMatch": Object {
+      "$and": Array [
+        Object {
+          "$or": Array [
+            Object {
+              "properties.city": "true",
+            },
+            Object {
+              "properties.state": "true",
+            },
+            Object {
+              "properties.other-place": "true",
+            },
+          ],
+        },
+        Object {
+          "$or": Array [
+            Object {
+              "tags.en_us.Food": "true",
+            },
+            Object {
+              "tags.en_us.Medical.Check Up": "true",
+            },
+            Object {
+              "tags.en_us.Legal": "true",
+            },
+          ],
+        },
+      ],
+      "properties.foo": Object {
+        "$exists": false,
+      },
+      "properties.hello": "true",
+      "properties.req-id": Object {
+        "$exists": false,
+      },
+      "properties.world": "true",
+    },
+  },
+}
+`;

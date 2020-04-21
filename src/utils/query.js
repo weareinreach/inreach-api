@@ -57,16 +57,16 @@ export const getOrganizationQuery = (params = {}) => {
     };
   }
 
+  if (name) {
+    query.$text = {$search: name};
+  }
+
   if (owner) {
     query['owners.email'] = owner;
   }
 
   if (pendingOwnership) {
     query['owners.isApproved'] = false;
-  }
-
-  if (name) {
-    query.$text = {$search: name};
   }
 
   if (pending) {

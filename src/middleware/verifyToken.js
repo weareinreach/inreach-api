@@ -3,9 +3,9 @@
 
 // const {tokenSignature} = config;
 
-/*
-Middleware to verify the JSON Web Token and validate the client
-*/
+/**
+ * Middleware to verify the provided JSON Web Token and validate the client
+ */
 export default function verifyToken(req, res, next) {
   /**
    * Until the work is done to integrate the token here:

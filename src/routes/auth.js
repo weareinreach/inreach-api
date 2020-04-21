@@ -3,9 +3,9 @@ import config from '../utils/config';
 
 const {tokenSignature} = config;
 
-/*
-Get JSON Web Token
-*/
+/**
+ * Get JSON Web Token
+ */
 export const getToken = (req, res) => {
   jwt.sign({id: req.id}, tokenSignature, {expiresIn: 86400}, (error, token) => {
     if (error) {

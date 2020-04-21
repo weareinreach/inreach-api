@@ -7,7 +7,7 @@ const local = {};
 
 const prod = {};
 
-const env = process.env.REACT_APP_APP_ENV;
+const env = process.env.APP_ENV;
 
 export default {
   ...base,
