@@ -142,10 +142,10 @@ versionOneRouter.post('/suggestions', createSuggestions);
 versionOneRouter.delete('/suggestions/:suggestionId', deleteSuggestion);
 
 // Users
-versionOneRouter.get('/users', verifyToken, getUsers);
-versionOneRouter.post('/users', verifyToken, createUser);
-versionOneRouter.get('/users/count', verifyToken, getUsersCount);
-versionOneRouter.get('/users/:userId', verifyToken, getUser);
+versionOneRouter.get('/users', getUsers);
+versionOneRouter.post('/users', createUser);
+versionOneRouter.get('/users/count', getUsersCount);
+versionOneRouter.get('/users/:userId', getUser);
 versionOneRouter.patch('/users/:userId', verifyToken, updateUser);
 versionOneRouter.delete('/users/:userId', verifyToken, deleteUser);
 versionOneRouter.patch(
