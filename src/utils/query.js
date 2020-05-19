@@ -48,6 +48,8 @@ export const getOrganizationQuery = (params = {}) => {
     serviceArea,
     tagLocale,
     tags,
+    lat,
+    lng,
   } = params;
   let query = {};
 
@@ -136,6 +138,7 @@ export const getOrganizationQuery = (params = {}) => {
       }
     }
 
+    // map
     if (queryOnServiceAreaCoverage) {
       serviceAreaQuery = serviceArea
         .split(',')
