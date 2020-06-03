@@ -17,9 +17,6 @@ export const getOrgs = async (req, res) => {
 
   await Organization.find(query)
     .sort({updated_at: -1})
-    .near(
-      { locations: [10, 10], maxDistance: 5 }
-    )
     .skip(offset)
     .limit(limit)
     .then((organizations) => {
