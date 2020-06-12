@@ -15,6 +15,7 @@ export const getOrgs = async (req, res) => {
   const {limit, offset} = parsePageQuery(req?.query?.page);
   const query = getOrganizationQuery(req?.query);
   const sortObjectArray = query['services']['$elemMatch']['$or'];
+
   var nestedNameArray = sortObjectArray.map(function (el) {
     return Object.getOwnPropertyNames(el);
   });
@@ -24,15 +25,15 @@ export const getOrgs = async (req, res) => {
   for (var i = 0; i < nameArray.length; i++) {
     if (nameArray[i].includes('county')) {
       if (nameArray.length > 0) {
-        prioritySort[0] = nameArray[i];
+        prioritySortArray[0] = nameArray[i];
       }
     } else if (nameArray[i].includes('state')) {
       if (nameArray.length > 1) {
-        prioritySort[1] = nameArray[i];
+        prioritySortArray[1] = nameArray[i];
       }
     } else if (nameArray[i].includes('national')) {
       if (nameArray.length > 2) {
-        prioritySort[2] = nameArray[i];
+        prioritySortArray[2] = nameArray[i];
       }
     }
   }
@@ -50,7 +51,9 @@ export const getOrgs = async (req, res) => {
     .skip(offset)
     .limit(limit)
     .then((organizations) => {
-      return res.json({organizations});
+      return res.json({
+        organizations,
+      });
     })
     .catch((err) => handleErr(err, res));
 };
