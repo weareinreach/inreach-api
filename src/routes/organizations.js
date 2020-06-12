@@ -16,35 +16,38 @@ export const getOrgs = async (req, res) => {
   const query = getOrganizationQuery(req?.query);
   var sortObjectArray = '';
   var obj = {};
-  if (query['services']) {
-    sortObjectArray = query['services']['$elemMatch']['$or'];
-    var nestedNameArray = sortObjectArray.map(function (el) {
-      return Object.getOwnPropertyNames(el);
-    });
-    var nameArray = nestedNameArray.flat([1]);
-    var prioritySortArray = [];
 
-    for (var i = 0; i < nameArray.length; i++) {
-      if (nameArray[i].includes('county')) {
-        if (nameArray.length > 0) {
-          prioritySortArray[0] = nameArray[i];
-        }
-      } else if (nameArray[i].includes('state')) {
-        if (nameArray.length > 1) {
-          prioritySortArray[1] = nameArray[i];
-        }
-      } else if (nameArray[i].includes('national')) {
-        if (nameArray.length > 2) {
-          prioritySortArray[2] = nameArray[i];
+  if (query['services']) {
+    if (query['services']['$elemMatch']['$or']) {
+      sortObjectArray = query['services']['$elemMatch']['$or'];
+      var nestedNameArray = sortObjectArray.map(function (el) {
+        return Object.getOwnPropertyNames(el);
+      });
+      var nameArray = nestedNameArray.flat([1]);
+      var prioritySortArray = [];
+
+      for (var i = 0; i < nameArray.length; i++) {
+        if (nameArray[i].includes('county')) {
+          if (nameArray.length > 0) {
+            prioritySortArray[0] = nameArray[i];
+          }
+        } else if (nameArray[i].includes('state')) {
+          if (nameArray.length > 1) {
+            prioritySortArray[1] = nameArray[i];
+          }
+        } else if (nameArray[i].includes('national')) {
+          if (nameArray.length > 2) {
+            prioritySortArray[2] = nameArray[i];
+          }
         }
       }
-    }
-    var prioritySort = prioritySortArray.filter(function (el) {
-      return el != null;
-    });
+      var prioritySort = prioritySortArray.filter(function (el) {
+        return el != null;
+      });
 
-    for (const key of prioritySort) {
-      obj[key] = -1;
+      for (const key of prioritySort) {
+        obj[key] = -1;
+      }
     }
   }
 
