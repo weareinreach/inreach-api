@@ -19,7 +19,7 @@ export const getOrgs = async (req, res) => {
     return Object.getOwnPropertyNames(el);
   });
   var nameArray = nestedNameArray.flat([1]);
-  var prioritySort = [];
+  var prioritySortArray = [];
 
   for (var i = 0; i < nameArray.length; i++) {
     if (nameArray[i].includes('county')) {
@@ -36,6 +36,9 @@ export const getOrgs = async (req, res) => {
       }
     }
   }
+  var prioritySort = prioritySortArray.filter(function (el) {
+    return el != null;
+  });
   const obj = {};
 
   for (const key of prioritySort) {
