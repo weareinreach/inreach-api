@@ -226,3 +226,32 @@ UserSchema.methods.validPassword = function (password) {
 };
 
 export const User = model('User', UserSchema);
+
+const LocationSchema = new Schema(
+  {
+    organizationId: String,
+    locations: [
+      {
+        Name: String,
+        country: String,
+        google_place_id: String,
+        latitude: String,
+        longitude: String,
+        line_1: String,
+        line_2: String,
+        locality: String,
+        location_name: String,
+        organization: String,
+        phone: String,
+        postal: String,
+        region: String,
+        timezone: String,
+        IsPrimary: Boolean,
+        show_on_organization: Boolean,
+      },
+    ],
+  },
+  schmeaOptions
+);
+
+export const Location = model('Location', LocationSchema);
