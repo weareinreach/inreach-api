@@ -14,13 +14,47 @@ import {Organization} from '../mongoose';
 export const getOrgs = async (req, res) => {
   const {limit, offset} = parsePageQuery(req?.query?.page);
   const query = getOrganizationQuery(req?.query);
+  const sortObjectArray = query['services']['$elemMatch']['$or'];
+
+  var nestedNameArray = sortObjectArray.map(function (el) {
+    return Object.getOwnPropertyNames(el);
+  });
+  var nameArray = nestedNameArray.flat([1]);
+  var prioritySortArray = [];
+
+  for (var i = 0; i < nameArray.length; i++) {
+    if (nameArray[i].includes('county')) {
+      if (nameArray.length > 0) {
+        prioritySortArray[0] = nameArray[i];
+      }
+    } else if (nameArray[i].includes('state')) {
+      if (nameArray.length > 1) {
+        prioritySortArray[1] = nameArray[i];
+      }
+    } else if (nameArray[i].includes('national')) {
+      if (nameArray.length > 2) {
+        prioritySortArray[2] = nameArray[i];
+      }
+    }
+  }
+  var prioritySort = prioritySortArray.filter(function (el) {
+    return el != null;
+  });
+  const obj = {};
+
+  for (const key of prioritySort) {
+    obj[key] = -1;
+  }
+
 
   await Organization.find(query)
     .sort({updated_at: -1})
     .skip(offset)
     .limit(limit)
     .then((organizations) => {
-      return res.json({organizations});
+      return res.json({
+        organizations,
+      });
     })
     .catch((err) => handleErr(err, res));
 };
