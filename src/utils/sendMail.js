@@ -21,7 +21,7 @@ export const generatePasswordResetMail = async (req, res) => {
       <p>This notification is on behalf of AsylumConnect to let you know that your account password has been
       successfully reset to <strong>${newPassword}</strong>. Please use this password to log back into the
       <a href="https://catalog.asylumconnect.org/" target="_blank">AsylumConnect Catalog</a> where you can create a new password for your account.
-      <p>If you did not reset your account password, please contact AsylumConnect immediately at <a href="mailto:ckraczucstudent@gmail.com?subject=Problem%20with%20password%20reset">catalog@asylumconnect.org</a>.</p>
+      <p>If you did not reset your account password, please contact AsylumConnect immediately at <a href="mailto:catalog@asylumconnect.org?subject=Problem%20with%20password%20reset">catalog@asylumconnect.org</a>.</p>
       <p>Thank you, Merci, Gracias!</p>
       <p>The AsylumConnect Team</p>
       `
