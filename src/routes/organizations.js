@@ -46,8 +46,9 @@ export const getOrgs = async (req, res) => {
     obj[key] = -1;
   }
 
+
   await Organization.find(query)
-    .sort(obj)
+    .sort({updated_at: -1})
     .skip(offset)
     .limit(limit)
     .then((organizations) => {
