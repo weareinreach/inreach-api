@@ -14,13 +14,82 @@ import {Organization} from '../mongoose';
 export const getOrgs = async (req, res) => {
   const {limit, offset} = parsePageQuery(req?.query?.page);
   const query = getOrganizationQuery(req?.query);
+  var sortObjectArray = '';
+  var obj = {};
+
+  if (query['services']) {
+    if (query['services']['$elemMatch']['$or']) {
+      sortObjectArray = query['services']['$elemMatch']['$or'];
+
+      var nestedNameArray = sortObjectArray.map(function (el) {
+        return Object.getOwnPropertyNames(el);
+      });
+      var nameArray = nestedNameArray.flat([1]);
+      var prioritySortArray = [];
+
+      for (var i = 0; i < nameArray.length; i++) {
+        if (nameArray[i].includes('county')) {
+          if (nameArray.length > 0) {
+            prioritySortArray[0] = nameArray[i];
+          }
+        } else if (nameArray[i].includes('state')) {
+          if (nameArray.length > 1) {
+            prioritySortArray[1] = nameArray[i];
+          }
+        } else if (nameArray[i].includes('national')) {
+          if (nameArray.length > 2) {
+            prioritySortArray[2] = nameArray[i];
+          }
+        }
+      }
+      var prioritySort = prioritySortArray.filter(function (el) {
+        return el != null;
+      });
+
+      for (const key of prioritySort) {
+        obj[key] = -1;
+      }
+    } else if (query['services']['$elemMatch']['$and']) {
+      sortObjectArray = query['services']['$elemMatch']['$and'][0]['$or'];
+      var nestedTagNameArray = sortObjectArray.map(function (el) {
+        return Object.getOwnPropertyNames(el);
+      });
+      var nameTagArray = nestedTagNameArray.flat([1]);
+      var priorityTagSortArray = [];
+
+      for (var a = 0; a < nameTagArray.length; a++) {
+        if (nameTagArray[a].includes('county')) {
+          if (nameTagArray.length > 0) {
+            priorityTagSortArray[0] = nameTagArray[a];
+          }
+        } else if (nameTagArray[a].includes('state')) {
+          if (nameTagArray.length > 1) {
+            priorityTagSortArray[1] = nameTagArray[a];
+          }
+        } else if (nameTagArray[a].includes('national')) {
+          if (nameTagArray.length > 2) {
+            priorityTagSortArray[2] = nameTagArray[a];
+          }
+        }
+      }
+      var priorityTagSort = priorityTagSortArray.filter(function (el) {
+        return el != null;
+      });
+
+      for (const key of priorityTagSort) {
+        obj[key] = -1;
+      }
+    }
+  }
 
   await Organization.find(query)
-    .sort({updated_at: -1})
+    .sort(obj)
     .skip(offset)
     .limit(limit)
     .then((organizations) => {
-      return res.json({organizations});
+      return res.json({
+        organizations,
+      });
     })
     .catch((err) => handleErr(err, res));
 };

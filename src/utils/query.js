@@ -136,6 +136,7 @@ export const getOrganizationQuery = (params = {}) => {
       }
     }
 
+    // map
     if (queryOnServiceAreaCoverage) {
       serviceAreaQuery = serviceArea
         .split(',')
