@@ -48,16 +48,8 @@ export const getOrganizationQuery = (params = {}) => {
     serviceArea,
     tagLocale,
     tags,
-    city,
-    short_state,
   } = params;
   let query = {};
-  if (city) {
-    query['locations.city'] = city;
-  }
-  if (short_state) {
-    query['locations.state'] = short_state;
-  }
 
   if (ids) {
     query._id = {
