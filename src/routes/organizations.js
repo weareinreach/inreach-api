@@ -20,6 +20,7 @@ export const getOrgs = async (req, res) => {
   if (query['services']) {
     if (query['services']['$elemMatch']['$or']) {
       sortObjectArray = query['services']['$elemMatch']['$or'];
+
       var nestedNameArray = sortObjectArray.map(function (el) {
         return Object.getOwnPropertyNames(el);
       });
@@ -46,6 +47,36 @@ export const getOrgs = async (req, res) => {
       });
 
       for (const key of prioritySort) {
+        obj[key] = -1;
+      }
+    } else if (query['services']['$elemMatch']['$and']) {
+      sortObjectArray = query['services']['$elemMatch']['$and'][0]['$or'];
+      var nestedTagNameArray = sortObjectArray.map(function (el) {
+        return Object.getOwnPropertyNames(el);
+      });
+      var nameTagArray = nestedTagNameArray.flat([1]);
+      var priorityTagSortArray = [];
+
+      for (var a = 0; a < nameTagArray.length; a++) {
+        if (nameTagArray[a].includes('county')) {
+          if (nameTagArray.length > 0) {
+            priorityTagSortArray[0] = nameTagArray[a];
+          }
+        } else if (nameTagArray[a].includes('state')) {
+          if (nameTagArray.length > 1) {
+            priorityTagSortArray[1] = nameTagArray[a];
+          }
+        } else if (nameTagArray[a].includes('national')) {
+          if (nameTagArray.length > 2) {
+            priorityTagSortArray[2] = nameTagArray[a];
+          }
+        }
+      }
+      var priorityTagSort = priorityTagSortArray.filter(function (el) {
+        return el != null;
+      });
+
+      for (const key of priorityTagSort) {
         obj[key] = -1;
       }
     }
