@@ -11,6 +11,7 @@ import {
   updateComments,
   updateRatings,
 } from './entity';
+import {send} from './mail';
 import {
   approveOrgOwner,
   createOrg,
@@ -182,3 +183,4 @@ versionOneRouter.post('/reviews', createReview);
 
 // Static
 versionOneRouter.get('/static/:pageId', getStaticPage);
+versionOneRouter.post('/mail/:ownerStatus/:org', send);
