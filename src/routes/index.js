@@ -50,6 +50,7 @@ import {
 } from './users';
 import swaggerDocument from '../swagger.json';
 import verifyToken from '../middleware/verifyToken';
+import {generatePasswordResetMail} from '../utils/sendMail';
 
 export const baseRouter = Router();
 export const versionOneRouter = Router();
@@ -175,6 +176,7 @@ versionOneRouter.delete(
   verifyToken,
   removeUserListItem
 );
+versionOneRouter.post('/users/forgotPassword', generatePasswordResetMail);
 
 // Reviews
 versionOneRouter.get('/reviews', getReviews);
