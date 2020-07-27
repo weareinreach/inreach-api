@@ -9,6 +9,7 @@ import {
   getOrganizationQuery,
   parsePageQuery,
 } from '../utils/query';
+import {sendEmail} from '../utils/mail';
 import {Organization} from '../mongoose';
 
 export const getOrgs = async (req, res) => {
@@ -267,4 +268,32 @@ export const deleteOrgOwner = async (req, res) => {
         .catch((err) => handleErr(err, res));
     })
     .catch((err) => handleErr(err, res));
+};
+
+export let sendOrgOwnerStatus = async (req, res, next) => {
+  const {ownerStatus, org, recipient} = req?.body;
+  let subject;
+  let message;
+
+  console.log(recipient);
+  console.log(ownerStatus);
+
+  switch(ownerStatus) {
+      case 'approve':
+          subject = `You are now affiliated with ${org} on AsylumConnect`;
+          message = `Thank you for requesting to join ${org} on the AsylumConnect Catalog. Our team has approved your request and your AsylumConnect user account is now connected to ${org}\'s profile page on AsylumConnect.`;
+          break;
+      case 'deny':
+          subject = 'Follow Up Re: Request to Join Organization on AsylumConnect';
+          message = `Thank you for requesting to join ${org} on the AsylumConnect Catalog. Our team was not able to verify your connection to ${org} based on your initial registration information. Please reply to this email with more details on how exactly you are affiliated with ${org}.`
+          break;
+  }
+
+  try {
+      await sendEmail(recipient, subject, message);
+      res.json({message: 'Your query has been sent'});
+      await next();
+  } catch (e) {
+      await next(e);
+  }
 };
