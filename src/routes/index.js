@@ -11,7 +11,6 @@ import {
   updateComments,
   updateRatings,
 } from './entity';
-import {send} from './mail';
 import {
   approveOrgOwner,
   createOrg,
@@ -23,6 +22,7 @@ import {
   getOrgs,
   getOrgsCount,
   updateOrg,
+  sendOrgOwnerStatus,
 } from './organizations';
 import {getReviews, createReview} from './reviews';
 import {
@@ -86,6 +86,7 @@ versionOneRouter.delete(
   verifyToken,
   deleteOrgOwner
 );
+versionOneRouter.post('/mail', sendOrgOwnerStatus);
 
 // Services
 versionOneRouter.get('/organizations/:orgId/services', getServices);
@@ -183,4 +184,3 @@ versionOneRouter.post('/reviews', createReview);
 
 // Static
 versionOneRouter.get('/static/:pageId', getStaticPage);
-versionOneRouter.post('/mail/:ownerStatus/:org', send);
