@@ -26,6 +26,7 @@ const ServiceSchema = new Schema({
   is_published,
   location_id: String,
   name: {type: String, required: true},
+  name_ES: {type: String},
   phone_id: String,
   properties: {},
   schedule_id: String,
