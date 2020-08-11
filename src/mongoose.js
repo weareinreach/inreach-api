@@ -14,19 +14,24 @@ const ServiceSchema = new Schema({
   access_instructions: [
     {
       access_value: String,
+      access_value_ES: String,
       access_type: String,
       instructions: String,
+      instructions_ES: String,
     },
   ],
   description: String,
+  description_ES: String,
   email_id: String,
   is_published,
   location_id: String,
   name: {type: String, required: true},
+  name_ES: {type: String},
   phone_id: String,
   properties: {},
   schedule_id: String,
   slug: String,
+  slug_ES: String,
   tags: {
     canada: {},
     mexico: {},
@@ -37,7 +42,9 @@ const ServiceSchema = new Schema({
 const OrganizationSchema = new Schema(
   {
     alert_message: String,
+    alert_message_ES: String,
     description: String,
+    description_ES: String,
     emails: [
       {
         email: String,
@@ -46,6 +53,7 @@ const OrganizationSchema = new Schema(
         last_name: String,
         show_on_organization: Boolean,
         title: String,
+        title_ES: String,
       },
     ],
     name: {type: String, required: true},
@@ -54,13 +62,17 @@ const OrganizationSchema = new Schema(
       {
         address: String,
         city: String,
+        city_ES: String,
         country: String,
+        country_ES: String,
         is_primary: Boolean,
         lat: String,
         long: String,
         name: String,
+        name_ES: String,
         show_on_organization: Boolean,
         state: String,
+        state_ES: String,
         unit: String,
         zip_code: String,
       },
@@ -77,6 +89,7 @@ const OrganizationSchema = new Schema(
         digits: String,
         is_primary: Boolean,
         phone_type: String,
+        phone_type_ES: String,
         show_on_organization: Boolean,
       },
     ],
@@ -104,9 +117,11 @@ const OrganizationSchema = new Schema(
     ],
     services: [ServiceSchema],
     slug: String,
+    slug_ES: String,
     source: String,
     verified_at: Date,
     website: String,
+    website_ES: String,
   },
   schmeaOptions
 );

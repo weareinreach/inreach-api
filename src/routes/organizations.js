@@ -9,6 +9,7 @@ import {
   getOrganizationQuery,
   parsePageQuery,
 } from '../utils/query';
+import {sendEmail} from '../utils/mail';
 import {Organization} from '../mongoose';
 
 export const getOrgs = async (req, res) => {
@@ -267,4 +268,34 @@ export const deleteOrgOwner = async (req, res) => {
         .catch((err) => handleErr(err, res));
     })
     .catch((err) => handleErr(err, res));
+};
+
+export let sendOrgOwnerStatus = async (req, res, next) => {
+  const {ownerStatus, org, recipient} = req?.body;
+  let subject;
+  let message;
+  let html;
+
+  console.log(recipient);
+  console.log(ownerStatus);
+
+  switch(ownerStatus) {
+      case 'approve':
+          subject = `You are now affiliated with ${org} on AsylumConnect`;
+          message = `Thank you for requesting to join ${org} on the AsylumConnect Catalog (https://asylumconnect.org). Our team has approved your request and your AsylumConnect user account is now connected to ${org}\'s profile page on AsylumConnect.\n\nBest,\nThe AsylumConnect Team`;
+          html = `<html>Thank you for requesting to join ${org} on the <a href='https://asylumconnect.org'>AsylumConnect Catalog</a>. Our team has approved your request and your AsylumConnect user account is now connected to ${org}'s profile page on AsylumConnect.<br/><br/>Best,<br/>The AsylumConnect Team</html>`;
+          break;
+      case 'deny':
+          subject = `Follow Up Re: Request to Join ${org} on AsylumConnect`;
+          message = `Thank you for requesting to join ${org} on the AsylumConnect Catalog <https://asylumconnect.org>. Our team was not able to verify your connection to ${org} based on your initial registration information. Please reply to this email with more details on how exactly you are affiliated with ${org}.\n\nBest,\nThe AsylumConnect Team`;
+          html = `<html>Thank you for requesting to join ${org} on the <a href='https://asylumconnect.org'>AsylumConnect Catalog</a>. Our team was not able to verify your connection to ${org} based on your initial registration information. Please reply to this email with more details on how exactly you are affiliated with ${org}.<br/><br/>Best,<br/>The AsylumConnect Team</html>`;
+          break;
+  }
+  try {
+      await sendEmail(recipient, subject, message, html);
+      res.json({message: 'Your query has been sent'});
+      await next();
+  } catch (e) {
+      await next(e);
+  }
 };

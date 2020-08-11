@@ -22,6 +22,7 @@ import {
   getOrgs,
   getOrgsCount,
   updateOrg,
+  sendOrgOwnerStatus,
 } from './organizations';
 import {getReviews, createReview} from './reviews';
 import {
@@ -49,6 +50,7 @@ import {
 } from './users';
 import swaggerDocument from '../swagger.json';
 import verifyToken from '../middleware/verifyToken';
+import {generatePasswordResetMail} from '../utils/sendMail';
 
 export const baseRouter = Router();
 export const versionOneRouter = Router();
@@ -84,6 +86,7 @@ versionOneRouter.delete(
   verifyToken,
   deleteOrgOwner
 );
+versionOneRouter.post('/mail', sendOrgOwnerStatus);
 
 // Services
 versionOneRouter.get('/organizations/:orgId/services', getServices);
@@ -173,6 +176,7 @@ versionOneRouter.delete(
   verifyToken,
   removeUserListItem
 );
+versionOneRouter.post('/users/forgotPassword', generatePasswordResetMail);
 
 // Reviews
 versionOneRouter.get('/reviews', getReviews);
