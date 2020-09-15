@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 import mongoose from 'mongoose';
 
-const mongoURI = process.env.MONGODB_URI || '';
+const mongoURI = process.env.DB_URI || '';
 
 mongoose.connect(mongoURI, {
   useFindAndModify: false,
