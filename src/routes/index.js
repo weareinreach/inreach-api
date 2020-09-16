@@ -23,6 +23,7 @@ import {
   getOrgsCount,
   updateOrg,
   sendOrgOwnerStatus,
+  getOrgsByName,
 } from './organizations';
 import {getReviews, createReview} from './reviews';
 import {
@@ -69,6 +70,7 @@ versionOneRouter.get('/organizations', getOrgs);
 versionOneRouter.post('/organizations', verifyToken, createOrg);
 versionOneRouter.get('/organizations/count', getOrgsCount);
 versionOneRouter.get('/organizations/:orgId', getOrg);
+versionOneRouter.get('/organizations/name/:name', getOrgsByName);
 versionOneRouter.patch('/organizations/:orgId', verifyToken, updateOrg);
 versionOneRouter.delete('/organizations/:orgId', verifyToken, deleteOrg);
 versionOneRouter.post(

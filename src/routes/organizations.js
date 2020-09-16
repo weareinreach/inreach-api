@@ -95,6 +95,23 @@ export const getOrgs = async (req, res) => {
     .catch((err) => handleErr(err, res));
 };
 
+// Query organizations by name
+export const getOrgsByName = async (req, res) => {
+  const query = req?.params?.name;
+  const {offset} = parsePageQuery(req?.query?.page);
+
+  await Organization.find({name: { $regex: ".*^" + query + ".*$", $options: 'si' }})
+    .sort({name: 1})
+    .skip(offset)
+    .limit(5)
+    .then((organizations) => {
+      return res.json({
+        organizations,
+      });
+    })
+    .catch((err) => handleErr(err, res));
+};
+
 export const getOrgsCount = async (req, res) => {
   const query = getOrganizationQuery(req?.query);
 

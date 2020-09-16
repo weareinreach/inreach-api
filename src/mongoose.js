@@ -57,6 +57,7 @@ const OrganizationSchema = new Schema(
       },
     ],
     name: {type: String, required: true},
+    name_ES: {type: String},
     is_published,
     locations: [
       {
