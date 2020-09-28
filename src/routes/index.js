@@ -32,6 +32,7 @@ import {
   getService,
   getServiceBySlug,
   getServices,
+  getServicesCount,
   updateService,
 } from './services';
 import {getStaticPage} from './static';
@@ -91,6 +92,7 @@ versionOneRouter.delete(
 versionOneRouter.post('/mail', sendOrgOwnerStatus);
 
 // Services
+versionOneRouter.get('/services/count', getServicesCount);
 versionOneRouter.get('/organizations/:orgId/services', getServices);
 versionOneRouter.post(
   '/organizations/:orgId/services',

@@ -7,7 +7,23 @@ import {
   handleNotFound,
   orderServices,
 } from '../utils';
+import {
+  getOrganizationQuery,
+} from '../utils/query';
 import {Organization} from '../mongoose';
+
+export const getServicesCount = async (req, res) => {
+  const query = getOrganizationQuery(req?.query);
+  console.log(query)
+  await Organization.aggregate([
+    {$match: query},
+    {$unwind: "$services"},
+    {$group: {_id:0, total:{$sum:1}}}
+  ]).then((resp) => {
+    return res.json({count: resp[0].total});
+  })
+    .catch((err) => handleErr(err, res));
+};
 
 export const getServices = async (req, res) => {
   const {orgId} = req?.params;
