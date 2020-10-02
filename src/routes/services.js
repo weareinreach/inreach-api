@@ -14,7 +14,6 @@ import {Organization} from '../mongoose';
 
 export const getServicesCount = async (req, res) => {
   const query = getOrganizationQuery(req?.query);
-  console.log(query)
   await Organization.aggregate([
     {$match: query},
     {$unwind: "$services"},
