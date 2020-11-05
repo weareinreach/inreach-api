@@ -47,8 +47,7 @@ export const getOrganizationQuery = (params = {}) => {
     properties,
     serviceArea,
     tagLocale,
-    tags,
-    verified,
+    tags
   } = params;
   let query = {};
 
@@ -74,10 +73,6 @@ export const getOrganizationQuery = (params = {}) => {
     query.is_published = false;
   } else {
     query.is_published = true;
-  }
-
-  if (verified) {
-    query.verified_at = {$exists: true};
   }
 
   const queryOnProperties = properties;
