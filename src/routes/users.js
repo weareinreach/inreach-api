@@ -76,26 +76,29 @@ export const getUsersCount = async (req, res) => {
 };
 
 export const createUser = async (req, res) => {
-  const {password, ...body} = req?.body;
+ try { const {password, ...body} = req?.body;
 
   if (!body) {
     return handleBadRequest(res);
   }
-
+  // query if user already exists
+  const existingUser = await User.find({email: body.email.trim()});
+  if (existingUser.length) {
+    return res.status(409).send('User already exists.');
+  }
   const user = new User(body);
 
   user.setPassword(password);
 
-  await user
-    .save()
-    .then((userDoc) => {
-      const userJSON = userDoc.toJSON();
+  const userDoc = await user.save();
+    const userJSON = userDoc.toJSON();
       const token = userJSON.hash;
-      const user = removeUserInfo(userJSON);
-
-      return res.json({created: true, token, user});
-    })
-    .catch((err) => handleErr(err, res));
+      const userInfo = removeUserInfo(userJSON);
+      return res.json({created: true, token, userInfo});
+    }
+    catch(err){
+      handleErr(err, res)
+    }
 };
 
 export const deleteUser = async (req, res) => {
