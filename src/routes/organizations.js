@@ -100,7 +100,9 @@ export const getOrgsByName = async (req, res) => {
   const query = req?.params?.name;
   const {offset} = parsePageQuery(req?.query?.page);
 
-  await Organization.find({name: { $regex: ".*^" + query + ".*$", $options: 'si' }})
+  await Organization.find({
+    name: {$regex: '.*^' + query + '.*$', $options: 'si'},
+  })
     .sort({name: 1})
     .skip(offset)
     .limit(5)
@@ -204,33 +206,28 @@ export const getOrgBySlug = async (req, res) => {
 };
 
 export const createOrgOwner = async (req, res) => {
-  const {orgId} = req?.params;
-  const {email, userId} = req?.body;
+  try {
+    const {orgId} = req?.params;
+    const {email, userId} = req?.body;
 
-  if (!email || !userId) {
-    return handleBadRequest(res);
+    if (!email || !userId) {
+      return handleBadRequest(res);
+    }
+    const organization = await Organization.findById(orgId);
+    if (!organization) {
+      return handleNotFound(res);
+    }
+    if(organization.owners.length && organization.owners.some( owner => owner.email === email )){
+      return res.status(409).send('Affiliation request has already been received and/or approved for this user')
+    }
+    
+    const newOwner = {email, isApproved: false, userId};
+    organization.owners.push(newOwner);
+    await organization.save();
+    return res.json({created: true})
+  } catch (err) {
+    handleErr(err, res);
   }
-
-  await Organization.findById(orgId)
-    .then(async (organization) => {
-      if (!organization) {
-        return handleNotFound(res);
-      }
-
-      const newOwner = {email, isApproved: false, userId};
-
-      if (organization.owners) {
-        organization.owners.push(newOwner);
-      } else {
-        organization.owners = [newOwner];
-      }
-
-      await organization
-        .save()
-        .then(() => res.json({created: true}))
-        .catch((err) => handleErr(err, res));
-    })
-    .catch((err) => handleErr(err, res));
 };
 
 export const approveOrgOwner = async (req, res) => {
@@ -296,23 +293,23 @@ export let sendOrgOwnerStatus = async (req, res, next) => {
   console.log(recipient);
   console.log(ownerStatus);
 
-  switch(ownerStatus) {
-      case 'approve':
-          subject = `You are now affiliated with ${org} on AsylumConnect`;
-          message = `Thank you for requesting to join ${org} on the AsylumConnect Catalog (https://asylumconnect.org). Our team has approved your request and your AsylumConnect user account is now connected to ${org}\'s profile page on AsylumConnect.\n\nBest,\nThe AsylumConnect Team`;
-          html = `<html>Thank you for requesting to join ${org} on the <a href='https://asylumconnect.org'>AsylumConnect Catalog</a>. Our team has approved your request and your AsylumConnect user account is now connected to ${org}'s profile page on AsylumConnect.<br/><br/>Best,<br/>The AsylumConnect Team</html>`;
-          break;
-      case 'deny':
-          subject = `Follow Up Re: Request to Join ${org} on AsylumConnect`;
-          message = `Thank you for requesting to join ${org} on the AsylumConnect Catalog <https://asylumconnect.org>. Our team was not able to verify your connection to ${org} based on your initial registration information. Please reply to this email with more details on how exactly you are affiliated with ${org}.\n\nBest,\nThe AsylumConnect Team`;
-          html = `<html>Thank you for requesting to join ${org} on the <a href='https://asylumconnect.org'>AsylumConnect Catalog</a>. Our team was not able to verify your connection to ${org} based on your initial registration information. Please reply to this email with more details on how exactly you are affiliated with ${org}.<br/><br/>Best,<br/>The AsylumConnect Team</html>`;
-          break;
+  switch (ownerStatus) {
+    case 'approve':
+      subject = `You are now affiliated with ${org} on AsylumConnect`;
+      message = `Thank you for requesting to join ${org} on the AsylumConnect Catalog (https://asylumconnect.org). Our team has approved your request and your AsylumConnect user account is now connected to ${org}\'s profile page on AsylumConnect.\n\nBest,\nThe AsylumConnect Team`;
+      html = `<html>Thank you for requesting to join ${org} on the <a href='https://asylumconnect.org'>AsylumConnect Catalog</a>. Our team has approved your request and your AsylumConnect user account is now connected to ${org}'s profile page on AsylumConnect.<br/><br/>Best,<br/>The AsylumConnect Team</html>`;
+      break;
+    case 'deny':
+      subject = `Follow Up Re: Request to Join ${org} on AsylumConnect`;
+      message = `Thank you for requesting to join ${org} on the AsylumConnect Catalog <https://asylumconnect.org>. Our team was not able to verify your connection to ${org} based on your initial registration information. Please reply to this email with more details on how exactly you are affiliated with ${org}.\n\nBest,\nThe AsylumConnect Team`;
+      html = `<html>Thank you for requesting to join ${org} on the <a href='https://asylumconnect.org'>AsylumConnect Catalog</a>. Our team was not able to verify your connection to ${org} based on your initial registration information. Please reply to this email with more details on how exactly you are affiliated with ${org}.<br/><br/>Best,<br/>The AsylumConnect Team</html>`;
+      break;
   }
   try {
-      await sendEmail(recipient, subject, message, html);
-      res.json({message: 'Your query has been sent'});
-      await next();
+    await sendEmail(recipient, subject, message, html);
+    res.json({message: 'Your query has been sent'});
+    await next();
   } catch (e) {
-      await next(e);
+    await next(e);
   }
 };
