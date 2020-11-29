@@ -1,22 +1,46 @@
-import { handleErr } from '../utils'
-import {getVerifiedOrgsByCountryCount} from '../utils/aggregations'
-/**
- * corresponds with country property in service.tags 
- * e.g. service.tags.united_states.Mental or service.tags.canada.Legal
-**/
-const countryList = ['united_states', 'canada', 'mexico']
+import {Organization} from '../mongoose';
+import {handleBadRequest, handleErr} from '../utils';
 
-export const getVerifiedOrgsCount = async (req, res) => {
-    try {
-        let result = {}, counts = {};
-        counts = await countryList.map(async country => {
-         const res = await getVerifiedOrgsByCountryCount(country)
-         return result[`${country}`] = res[0].count || 0
-        });
-        await Promise.all(counts)
-        return res.json({result: result});
-    }
-    catch(err)  {
-        handleErr(err)
-    }
-}
+const createCountryQuery = (country) => {
+  let countryString = `services.tags.${country}`;
+  let queryString = {};
+  queryString['$and'] = [];
+  let exists = {},
+    not = {},
+    notEqual = {};
+  exists[countryString] = {$exists: true};
+  not[countryString] = {$not: {$size: 0}};
+  notEqual[countryString] = {$ne: {}};
+  queryString['$and'].push(exists);
+  queryString['$and'].push(not);
+  queryString['$and'].push(notEqual);
+  queryString['$and'].push({is_published: true});
+  return queryString;
+};
+export const getVerifiedOrgsCountryCount = async (req, res) => {
+  if (!req?.params?.country) return handleBadRequest(res);
+  try {
+    const {country} = req.params;
+    let queryString = createCountryQuery(country);
+    const count = await Organization.countDocuments(queryString);
+    return res.json({count: count || 0});
+  } catch (err) {
+    handleErr(err);
+  }
+};
+
+export const getServicesCountryCount = async (req, res) => {
+  if (!req?.params?.country) return handleBadRequest(res);
+  try {
+    const {country} = req.params;
+    let queryString = createCountryQuery(country);
+    const count = await Organization.aggregate([
+      {$match: queryString},
+      {$unwind: '$services'},
+      {$count: 'services'},
+    ]);
+    return res.json({count: count[0].services || 0});
+  } catch (err) {
+    handleErr(err);
+  }
+};
