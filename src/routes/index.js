@@ -32,6 +32,7 @@ import {
   getService,
   getServiceBySlug,
   getServices,
+  getServicesCount,
   updateService,
 } from './services';
 import {getStaticPage} from './static';
@@ -52,7 +53,7 @@ import {
 import swaggerDocument from '../swagger.json';
 import verifyToken from '../middleware/verifyToken';
 import {generatePasswordResetMail} from '../utils/sendMail';
-
+import {getVerifiedOrgsCountryCount, getServicesCountryCount } from './reporting'
 export const baseRouter = Router();
 export const versionOneRouter = Router();
 
@@ -91,6 +92,7 @@ versionOneRouter.delete(
 versionOneRouter.post('/mail', sendOrgOwnerStatus);
 
 // Services
+versionOneRouter.get('/services/count', getServicesCount);
 versionOneRouter.get('/organizations/:orgId/services', getServices);
 versionOneRouter.post(
   '/organizations/:orgId/services',
@@ -179,6 +181,10 @@ versionOneRouter.delete(
   removeUserListItem
 );
 versionOneRouter.post('/users/forgotPassword', generatePasswordResetMail);
+
+//Reporting
+versionOneRouter.get('/reporting/:country/organizations/count', getVerifiedOrgsCountryCount)
+versionOneRouter.get('/reporting/:country/services/count', getServicesCountryCount)
 
 // Reviews
 versionOneRouter.get('/reviews', getReviews);
