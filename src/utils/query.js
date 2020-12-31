@@ -47,7 +47,7 @@ export const getOrganizationQuery = (params = {}) => {
     properties,
     serviceArea,
     tagLocale,
-    tags,
+    tags
   } = params;
   let query = {};
 
