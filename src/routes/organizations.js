@@ -101,7 +101,7 @@ export const getOrgsByName = async (req, res) => {
   const {offset} = parsePageQuery(req?.query?.page);
 
   await Organization.find({
-    name: {$regex: '.*^' + query + '.*$', $options: 'si'},
+    name: {$regex: `.${query}.`, $options: 'si'},
   })
     .sort({name: 1})
     .skip(offset)
