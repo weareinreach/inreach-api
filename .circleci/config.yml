@@ -34,7 +34,10 @@ jobs:
           command: npm run build
   e2e:
     docker:
-      - image: cypress/base:12
+      - image: cypress/included:3.2.0
+        environment:
+          ## this enables colors in the output
+          TERM: xterm
     working_directory: ~/catalog-api
     steps:
       - checkout
