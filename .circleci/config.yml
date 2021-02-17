@@ -28,6 +28,17 @@ jobs:
          paths:
           - node_modules
          key: v1-dependencies-{{ checksum "package.json" }}
+      #Recreate .env file from CircleCI Project Env Vars
+      - run:
+          name: Create .env file
+          command: |
+           cat \<< EOF > ./catalog-api/.env
+           MAILGUN_API_KEY=$MAILGUN_API_KEY
+           MAILGUN_DOMAIN=$MAILGUN_DOMAIN
+           DB_URI=$DB_URI
+           SHEETS_API_KEY=$SHEETS_API_KEY
+           EOF
+
       #Building and Compiling Binary
       - run: 
           name: Compile Binary
@@ -59,6 +70,16 @@ jobs:
           - node_modules
          key: v1-dependencies-{{ checksum "package.json" }}
       #Building and Compiling Binary
+      #Recreate .env file from CircleCI Project Env Vars
+      - run:
+          name: Create .env file
+          command: |
+           cat \<< EOF > ./catalog-api/.env
+           MAILGUN_API_KEY=$MAILGUN_API_KEY
+           MAILGUN_DOMAIN=$MAILGUN_DOMAIN
+           DB_URI=$DB_URI
+           SHEETS_API_KEY=$SHEETS_API_KEY
+           EOF
       - run: 
           name: End2End Testing
           command: npm run e2e
