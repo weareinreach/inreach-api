@@ -28,7 +28,7 @@ jobs:
       #Building and Compiling Binary
       - run: 
           name: Compile Binary
-          command: npm build
+          command: npm run build
   e2e:
     docker:
       - image: circleci/node:15.6.0
@@ -52,7 +52,7 @@ jobs:
       #Building and Compiling Binary
       - run: 
           name: End2End Testing
-          command: npm e2e
+          command: npm run e2e
 
 workflows:
   version: 1
