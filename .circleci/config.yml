@@ -70,6 +70,7 @@ jobs:
           - node_modules
          key: v1-dependencies-{{ checksum "package.json" }}
       #Building and Compiling Binary
+      - run: ls
       #Recreate .env file from CircleCI Project Env Vars
       - run:
           name: Create .env file
