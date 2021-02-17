@@ -34,7 +34,7 @@ jobs:
           command: npm run build
   e2e:
     docker:
-      - image: circleci/node:15.6.0
+      - image: cypress/base:12
     working_directory: ~/catalog-api
     steps:
       - checkout
