@@ -83,20 +83,23 @@ jobs:
            DB_URI=$DB_URI
            SHEETS_API_KEY=$SHEETS_API_KEY
            EOF
-      #Start Server
+      #Pre Test
       - run: 
-          name: "Start Server"
+          name: "Pre Tests"
           command: "npm run pre-test"
       #Running E2E Tests
       - run: 
           name: End2End Testing
           command: npm run e2e-circle
+      #Post Test
+      - run: 
+          name: "Post Tests"
+          command: "npm run post-test"
       - codecov/upload:
-          file: 'coverage/coverage-final.json'
+          file: 'coverageReport/coverage-final.json'
           flags: 'Integration'
       - store_artifacts:
-          path: "reports/e2e-report.hml"
-
+          path: "reports/"
 
 workflows:
   version: 1
