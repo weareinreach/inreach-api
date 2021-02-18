@@ -85,7 +85,7 @@ jobs:
           name: End2End Testing
           command: npm run e2e
       - codecov/upload:
-          path: 'coverage/coverage-final.json'
+          file: 'coverage/coverage-final.json'
           flags: 'Integration'
       - store_artifacts:
           path: "reports/e2e-report.hml"
