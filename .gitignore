@@ -124,3 +124,4 @@ cypress/videos
 cypress/screenshots
 mochawesome-report/
 reports/
+instrumented/

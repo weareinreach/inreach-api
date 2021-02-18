@@ -2,21 +2,18 @@
   "name": "asylum-connect-catalog-api",
   "private": true,
   "scripts": {
-    "cypress:open": "npm run clean:reports && cypress open --config-file ./cypress.json",
-    "cypress:run": "npm run clean:reports && cypress run --config-file ./cypress.json",
-    "clean:reports": "rm -R -f ./mochawesome-report && rm -R -f ./coverage && rm -R -f ./reports",
+    "cypress:open": "cypress open --config-file ./cypress.json",
+    "cypress:run": "cypress run --config-file ./cypress.json",
+    "clean:reports": "rm -R -f ./mochawesome-report && rm -R -f ./.nyc_output && rm -R -f ./coverage && rm -R -f ./reports",
     "combine-reports": "mkdir ./reports && mochawesome-merge mochawesome-report/*.json > ./reports/reporte2e.json",
     "generate-report": "marge ./reports/reporte2e.json -f e2e-report -o ./reports",
     "post-test": "npm run combine-reports && npm run generate-report",
-    "run-e2e": "npm run cypress:run && npm run post-test",
-    "run-e2eUI": "npm run cypress:open",
-    "start-server-e2e": "npm run dev-background && npm run cypress:run && npm run post-test",
-    "start-server-e2eUI": "npm run dev-background && npm run cypress:open",
+    "e2e": "npm run clean:reports && nyc npm run dev-background && npm run cypress:run && npm run post-test",
+    "e2eUI": "npm run clean:reports && nyc npm run dev-background && npm run cypress:open",
     "dev": "npm run start",
     "dev-background": "(npm run start&)",
     "start": "backpack",
     "build": "backpack build",
-    "test": "jest",
     "serve": "node ./build/main.js"
   },
   "dependencies": {
@@ -37,8 +34,10 @@
   "devDependencies": {
     "@babel/core": "^7.9.0",
     "@babel/preset-env": "^7.9.5",
+    "@cypress/code-coverage": "^3.9.2",
     "babel-eslint": "^10.1.0",
     "babel-jest": "^25.4.0",
+    "babel-plugin-istanbul": "^6.0.0",
     "cypress": "^6.4.0",
     "dotenv-webpack": "^1.7.0",
     "eslint": "^6.8.0",
@@ -47,6 +46,7 @@
     "lint-staged": "^10.1.7",
     "mochawesome": "^6.2.2",
     "mochawesome-merge": "^4.2.0",
+    "nyc": "^15.1.0",
     "prettier": "^2.0.5"
   },
   "engines": {
