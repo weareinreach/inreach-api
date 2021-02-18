@@ -65,6 +65,9 @@ jobs:
       - run:
           name: Install Packages
           command: npm install
+      - run:
+          name: Install NYC
+          command: npm i nyc
       #save cache for use next tests
       - save_cache:
          paths:
