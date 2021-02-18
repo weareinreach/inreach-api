@@ -83,18 +83,10 @@ jobs:
            DB_URI=$DB_URI
            SHEETS_API_KEY=$SHEETS_API_KEY
            EOF
-      #Pre Test
+      #Testing 
       - run: 
-          name: "Pre Tests"
-          command: "npm run pre-test"
-      #Running E2E Tests
-      - run: 
-          name: End2End Testing
-          command: npm run e2e-circle
-      #Post Test
-      - run: 
-          name: "Post Tests"
-          command: "npm run post-test"
+          name: "E2E Automation"
+          command: "npm run pre-test && npm run e2e-circle && npm run post-test"
       - codecov/upload:
           file: 'coverageReport/coverage-final.json'
           flags: 'Integration'
