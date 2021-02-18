@@ -10,7 +10,7 @@
     "post-test": "npm run combine-reports && npm run generate-report",
     "pre-test": "npm run clean:reports && nyc npm run dev-background",
     "wait-on": "wait-on http://localhost:8080/",
-    "e2e-circle": "npm run wait-on && npm run cypress:run && npm run post-test",
+    "e2e-circle": "npm run cypress:run && npm run post-test",
     "e2e-local": "npm run clean:reports && nyc npm run dev-background && npm run cypress:run && npm run post-test",
     "e2eUI-local": "npm run clean:reports && nyc npm run dev-background && npm run cypress:open",
     "dev": "npm run start",
