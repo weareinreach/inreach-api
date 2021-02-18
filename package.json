@@ -8,8 +8,9 @@
     "combine-reports": "mkdir ./reports && mochawesome-merge mochawesome-report/*.json > ./reports/reporte2e.json",
     "generate-report": "marge ./reports/reporte2e.json -f e2e-report -o ./reports",
     "post-test": "npm run combine-reports && npm run generate-report",
-    "pre-test": "npm run clean:reports",
-    "e2e-circle":"nyc npm run dev-background && npm run cypress:run && npm run post-test",
+    "pre-test": "npm run clean:reports && nyc npm run dev-background",
+    "wait-on": "wait-on http://localhost:8080/",
+    "e2e-circle": "npm run wait-on && npm run cypress:run && npm run post-test",
     "e2e-local": "npm run clean:reports && nyc npm run dev-background && npm run cypress:run && npm run post-test",
     "e2eUI-local": "npm run clean:reports && nyc npm run dev-background && npm run cypress:open",
     "dev": "npm run start",
@@ -31,7 +32,8 @@
     "mailgun-js": "^0.22.0",
     "mongodb": "^3.5.6",
     "mongoose": "^5.9.10",
-    "swagger-ui-express": "^4.1.4"
+    "swagger-ui-express": "^4.1.4",
+    "wait-on": "^5.2.1"
   },
   "devDependencies": {
     "@babel/core": "^7.9.0",
