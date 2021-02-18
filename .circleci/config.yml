@@ -80,10 +80,14 @@ jobs:
            DB_URI=$DB_URI
            SHEETS_API_KEY=$SHEETS_API_KEY
            EOF
+      #Start Server
+      - run: 
+          name: "Start Server"
+          command: "nyc npm run dev-background" 
       #Running E2E Tests
       - run: 
           name: End2End Testing
-          command: npm run e2e
+          command: npm run e2e-circle
       - codecov/upload:
           file: 'coverage/coverage-final.json'
           flags: 'Integration'
