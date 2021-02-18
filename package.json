@@ -8,6 +8,7 @@
     "combine-reports": "mkdir ./reports && mochawesome-merge mochawesome-report/*.json > ./reports/reporte2e.json",
     "generate-report": "marge ./reports/reporte2e.json -f e2e-report -o ./reports",
     "post-test": "npm run combine-reports && npm run generate-report",
+    "pre-test": "npm run clean:reports && nyc npm run dev-background",
     "e2e-circle":"npm run cypress:run && npm run post-test",
     "e2e-local": "npm run clean:reports && nyc npm run dev-background && npm run cypress:run && npm run post-test",
     "e2eUI-local": "npm run clean:reports && nyc npm run dev-background && npm run cypress:open",

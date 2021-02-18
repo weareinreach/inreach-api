@@ -83,7 +83,7 @@ jobs:
       #Start Server
       - run: 
           name: "Start Server"
-          command: "nyc npm run dev-background" 
+          command: "npm run pre-test" 
       #Running E2E Tests
       - run: 
           name: End2End Testing
