@@ -87,9 +87,6 @@ jobs:
       - run: 
           name: "Start Server"
           command: "npm run pre-test"
-      - run:
-              shell: /bin/sh
-              command: wget --retry-connrefused --waitretry=1 --read-timeout=20 --timeout=15 -t 10 http://localhost:8080/
       #Running E2E Tests
       - run: 
           name: End2End Testing
