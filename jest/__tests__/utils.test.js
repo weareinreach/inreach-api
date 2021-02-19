@@ -7,7 +7,7 @@ import {
   orderServices,
   removeUserInfo,
   verifyJWT,
-} from '../index';
+} from '../../src/utils/index';
 
 const testResponse = {
   status: (status) => ({

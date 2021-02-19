@@ -124,4 +124,7 @@ cypress/videos
 cypress/screenshots
 mochawesome-report/
 reports/
-coverageReport
+coverageReports
+cypressCoverage
+jestCoverage
+junit.xml

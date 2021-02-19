@@ -1,4 +1,5 @@
 {
+    "integrationFolder":"cypress/integration",
     "reporter":"mochawesome",
     "reporterOptions": {
         "overwrite": false,
