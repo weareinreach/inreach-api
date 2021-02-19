@@ -86,7 +86,7 @@ jobs:
       #Testing 
       - run: 
           name: "E2E Automation"
-          command: "npm run pre-test && npm run e2e-circle && npm run post-test"
+          command: "npm run pre-test && npm run e2e && npm run post-test"
       - codecov/upload:
           file: 'coverageReport/coverage-final.json'
           flags: 'Integration'

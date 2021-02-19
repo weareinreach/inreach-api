@@ -3,13 +3,14 @@
   "private": true,
   "scripts": {
     "cypress:open": "cypress open --config-file ./cypress.json",
-    "cypress:run": "cypress run --config-file ./cypress.json",
+    "cypress:run": "nyc cypress run --config-file ./cypress.json",
     "clean:reports": "rm -R -f ./mochawesome-report && rm -R -f ./.nyc_output && rm -R -f ./coverageReport && rm -R -f ./reports",
     "combine-reports": "mkdir ./reports && mochawesome-merge mochawesome-report/*.json > ./reports/reporte2e.json",
     "generate-report": "marge ./reports/reporte2e.json -f e2e-report -o ./reports",
     "post-test": "npm run combine-reports && npm run generate-report && npx nyc report --reporter=text",
-    "pre-test": "npm run clean:reports && npm run dev-background && (wait-on http://localhost:8080 -l -v -t 10000 && exit 0)",
-    "e2e-circle": "nyc npm run cypress:run",
+    "pre-test": "npm run clean:reports && nyc npm run dev-background && (wait-on http://localhost:8080 -l -v -t 10000 && exit 0)",
+    "e2e": "npm run cypress:run",
+    "e2eUI": "npm run cypress:open",
     "dev": "npm run start",
     "dev-background": "(npm run start&)",
     "start": "backpack",
@@ -54,7 +55,7 @@
     "all":true,
     "include":["**/src/*"],
     "report-dir":"coverageReport",
-    "reporter":["html","json","lcov"]
+    "reporter":["html","json"]
   },
   "engines": {
     "node": "12.x"
