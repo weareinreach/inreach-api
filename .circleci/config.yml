@@ -70,7 +70,7 @@ jobs:
          key: v1-dependencies-{{ checksum "package.json" }}
       #Unit Testing
       - run: 
-          name: "E2E Automation"
+          name: "Unit Testing"
           command: "npm run pre-unit-test && npm run unit-test" 
       - codecov/upload:
           file: 'jestCoverage/coverage-final.json'
