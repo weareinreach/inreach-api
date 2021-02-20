@@ -1,5 +1,5 @@
 module.exports = {
-  plugins:["istanbul"],
+  plugins:[["istanbul",{},'plugin-cypress-code-coverage']],
   presets: [
     [
       '@babel/preset-env',
