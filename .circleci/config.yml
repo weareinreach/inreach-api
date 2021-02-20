@@ -122,7 +122,7 @@ jobs:
           name: "E2E Automation"
           command: "npm run pre-e2e-test && npm run e2e && npm run post-e2e-test"
       - codecov/upload:
-          file: 'cypressCoverage/coverage-final.json'
+          file: 'cypressCoverage/report/coverage-final.json'
           flags: 'Integration'
       
       - store_artifacts:
