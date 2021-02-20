@@ -122,5 +122,6 @@ dist
 cypress/temp_data
 cypress/videos
 cypress/screenshots
-
-
+mochawesome-report/
+reports/
+coverageReport

@@ -4,6 +4,7 @@
 version: 2.1
 orbs:
   node: circleci/node@3.0.0
+  codecov: codecov/codecov@1.1.3
 jobs: 
   build:
     docker:
@@ -64,6 +65,9 @@ jobs:
       - run:
           name: Install Packages
           command: npm install
+      - run:
+          name: Install NYC
+          command: npm i nyc
       #save cache for use next tests
       - save_cache:
          paths:
@@ -79,10 +83,15 @@ jobs:
            DB_URI=$DB_URI
            SHEETS_API_KEY=$SHEETS_API_KEY
            EOF
-      #Running E2E Tests
+      #Testing 
       - run: 
-          name: End2End Testing
-          command: npm run e2e
+          name: "E2E Automation"
+          command: "npm run pre-test && npm run e2e && npm run post-test"
+      - codecov/upload:
+          file: 'coverageReport/coverage-final.json'
+          flags: 'Integration'
+      - store_artifacts:
+          path: "reports/"
 
 workflows:
   version: 1

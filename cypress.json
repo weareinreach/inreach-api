@@ -1,1 +1,14 @@
-{}
+{
+    "reporter":"mochawesome",
+    "reporterOptions": {
+        "overwrite": false,
+        "html":false,
+        "json":true
+      },
+      "env": {
+        "codeCoverage": {
+          "url": "http://localhost:8080/__coverage__",
+          "expectBackendCoverageOnly":true
+        }
+      }
+}
