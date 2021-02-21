@@ -81,7 +81,10 @@ jobs:
           file: 'jestCoverage/coverage-final.json'
           flags: 'Unit-Tests'
       - store_test_results:
-          path: ./
+          path: ./jestUnitTest
+      - store_artifacts:
+          path: ./jestCoverage
+          destination: Unit
     
   e2e:
     docker:
@@ -141,9 +144,12 @@ jobs:
       - codecov/upload:
           file: 'cypressCoverage/coverage-final.json'
           flags: 'Integration'
-      
       - store_artifacts:
           path: "reports/"
+          destination: E2E
+      - store_artifacts:
+          path: ./cypressCoverage
+          destination: E2E
 
 workflows:
   version: 1
