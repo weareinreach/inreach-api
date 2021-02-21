@@ -3,7 +3,7 @@
     "reporter":"mochawesome",
     "reporterOptions": {
         "overwrite": false,
-        "html":false,
+        "html":true,
         "json":true
       },
       "env": {
