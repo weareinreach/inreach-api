@@ -81,7 +81,7 @@ jobs:
           file: 'jestCoverage/coverage-final.json'
           flags: 'Unit-Tests'
       - store_test_results:
-          path: junit.xml
+          path: ./
     
   e2e:
     docker:
