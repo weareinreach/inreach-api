@@ -38,31 +38,6 @@ Technologies
 - [Mongoose](https://mongoosejs.com/)
 - [Backpack](https://github.com/jaredpalmer/backpack)
 
-Testing
-Project uses both Unit Testing and E2E Testing to ensure quality and coverage standards.
-
-- [Jest](https://jestjs.io/)
-- [Cypress](https://www.cypress.io/)
-- [Istanbul](https://istanbul.js.org/)
-
-- Running Unit Testing
-Run these package.json scripts:
- - pre-unit-test
- - unit-test
- 
-
-- Running E2E
-Run these package.json scripts:
- - pre-e2e-test
- - e2e or e2eUI
- - post-e2e-test
-
-
-CI/CD
-CircleCI is being used to enforce Code quality in all pull requests. Passed status checks are necessary in order to merge a PR.
-
-- [CircleCI](https://circleci.com/)
-
 Code Standards
 
 In order to enforce code standards we use [eslint](https://eslint.org/) and [prettier](https://prettier.io/). Setting up eslint in your code editor is the easiest way to adhere to guidlines while programming but we also lint and prettify code during the commit process using [lint-staged](https://github.com/okonet/lint-staged).

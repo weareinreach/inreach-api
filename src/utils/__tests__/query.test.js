@@ -4,7 +4,7 @@ import {
   getOrganizationQuery,
   getUserQuery,
   parsePageQuery,
-} from '../../src/utils/query';
+} from '../query';
 
 describe('getEntityQuery', () => {
   it('should default to empty', () => {

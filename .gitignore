@@ -114,17 +114,3 @@ dist
 .yarn/unplugged
 .yarn/build-state.yml
 .pnp.*
-
-# Mac files
-.DS_Store
-
-# Cypress Testing
-cypress/temp_data
-cypress/videos
-cypress/screenshots
-mochawesome-report/
-reports/
-coverageReports
-cypressCoverage
-jestCoverage
-junit.xml
