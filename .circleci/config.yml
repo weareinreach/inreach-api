@@ -139,7 +139,7 @@ jobs:
           name: "Show Coverage"
           command: "npm run show-coverage"
       - codecov/upload:
-          file: 'cypressCoverage/report/coverage-final.json'
+          file: 'cypressCoverage/coverage-final.json'
           flags: 'Integration'
       
       - store_artifacts:
