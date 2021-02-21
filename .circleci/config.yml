@@ -68,11 +68,6 @@ jobs:
          paths:
           - node_modules
          key: v1-dependencies-{{ checksum "package.json" }}
-      #Remove babelrc file so Unit Tests can run 
-      #TODO figure out how to make them play nicely
-      - run:
-          name: "Delete .babelrc file"
-          command: "rm ./.babelrc"
       #Unit Testing
       - run: 
           name: "Unit Testing"
@@ -125,15 +120,6 @@ jobs:
            DB_URI=$DB_URI
            SHEETS_API_KEY=$SHEETS_API_KEY
            EOF
-      #TODO to be removed once fiogure out how to make jest and cypress work together
-      - run:
-          name: Create .babelrc file
-          command: |
-           cat \<< EOF > ./.babelrc
-           {
-               "plugins":["istanbul"]
-           }
-           EOF
       #Testing
       - run: 
           name: "E2E Automation"
@@ -156,7 +142,5 @@ workflows:
   pull_request:
     jobs:
       - build
-      - e2e:
-         requires:
-          - unit
+      - e2e
       - unit
