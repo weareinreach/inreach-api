@@ -1,6 +1,10 @@
 /* eslint-disable no-undef */
 /// <reference types="cypress" />
 
+
+//TODO CHECK FOR KEYS IN REPONSE
+
+
 //Instantiate up Server variable
 const port = process.env.PORT || 8080;
 const url = process.env.HOST || `http://localhost:${port}`;

@@ -44,6 +44,43 @@ jobs:
       - run: 
           name: Compile Binary
           command: npm run build
+
+  unit:
+    docker:
+      - image: circleci/node:15.6.0
+    working_directory: ~/catalog-api
+    steps:
+      - checkout
+      # Download and cache dependencies
+      - restore_cache:
+          keys:
+          - v1-dependencies-{{ checksum "package.json" }}
+          # fallback to using the latest cache if no exact match is found
+          - v1-dependencies-
+      - run: 
+          name: Check Node Version
+          command: node --version
+      - run:
+          name: Install Packages
+          command: npm install
+      #save cache for use next tests
+      - save_cache:
+         paths:
+          - node_modules
+         key: v1-dependencies-{{ checksum "package.json" }}
+      #Unit Testing
+      - run: 
+          name: "Unit Testing"
+          command: "npm run pre-unit-test && npm run unit-test" 
+      - codecov/upload:
+          file: 'jestCoverage/coverage-final.json'
+          flags: 'Unit-Tests'
+      - store_test_results:
+          path: ./jestUnitTest
+      - store_artifacts:
+          path: ./jestCoverage
+          destination: Unit
+    
   e2e:
     docker:
       - image: cypress/base:10
@@ -83,15 +120,22 @@ jobs:
            DB_URI=$DB_URI
            SHEETS_API_KEY=$SHEETS_API_KEY
            EOF
-      #Testing 
+      #Testing
       - run: 
           name: "E2E Automation"
-          command: "npm run pre-test && npm run e2e && npm run post-test"
+          command: "npm run pre-e2e-test && npm run e2e && npm run post-e2e-test"
+      - run:
+          name: "Show Coverage"
+          command: "npm run show-coverage"
       - codecov/upload:
-          file: 'coverageReport/coverage-final.json'
+          file: 'cypressCoverage/coverage-final.json'
           flags: 'Integration'
       - store_artifacts:
           path: "reports/"
+          destination: E2E
+      - store_artifacts:
+          path: ./cypressCoverage
+          destination: E2E
 
 workflows:
   version: 1
@@ -99,3 +143,4 @@ workflows:
     jobs:
       - build
       - e2e
+      - unit
