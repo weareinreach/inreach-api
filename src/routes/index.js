@@ -70,7 +70,7 @@ versionOneRouter.post('/auth', authUser);
 versionOneRouter.post('/auth/check', checkUserToken);
 versionOneRouter.get('/auth/token', getToken);
 
-// Organizations -
+// Organizations - Partially Automation Tested
 versionOneRouter.get('/organizations', getOrgs);
 versionOneRouter.post('/organizations', verifyToken, createOrg);
 versionOneRouter.get('/organizations/count', getOrgsCount);
@@ -95,7 +95,7 @@ versionOneRouter.delete(
 );
 versionOneRouter.post('/mail', sendOrgOwnerStatus);
 
-// Services
+// Services - Partially Automated Tested
 versionOneRouter.get('/services/count', getServicesCount);
 versionOneRouter.get('/organizations/:orgId/services', getServices);
 versionOneRouter.post(
@@ -161,7 +161,7 @@ versionOneRouter.get('/suggestions', getSuggestions);
 versionOneRouter.post('/suggestions', createSuggestions);
 versionOneRouter.delete('/suggestions/:suggestionId', deleteSuggestion);
 
-// Users
+// Users - Partially Automated Tested
 versionOneRouter.get('/users', verifyToken, getUsers);
 versionOneRouter.post('/users', verifyToken, createUser);
 versionOneRouter.get('/users/count', verifyToken, getUsersCount);

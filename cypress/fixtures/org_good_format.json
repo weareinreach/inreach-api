@@ -1,3 +1,5 @@
 {
-	"name": "Test Organization"
+	"name": "Test Organization",
+	"description": "Test organizations",
+	"website": "https://google.com"
 }
