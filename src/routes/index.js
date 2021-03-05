@@ -70,7 +70,7 @@ versionOneRouter.post('/auth', authUser);
 versionOneRouter.post('/auth/check', checkUserToken);
 versionOneRouter.get('/auth/token', getToken);
 
-// Organizations - Partially Automation Tested
+// Organizations - Automation Tested
 versionOneRouter.get('/organizations', getOrgs);
 versionOneRouter.post('/organizations', verifyToken, createOrg);
 versionOneRouter.get('/organizations/count', getOrgsCount);
@@ -87,7 +87,7 @@ versionOneRouter.get(
 	'/organizations/:orgId/owners/:userId/approve',
 	verifyToken,
 	approveOrgOwner
-);
+); //This should be a patch, not a get
 versionOneRouter.delete(
 	'/organizations/:orgId/owners/:userId',
 	verifyToken,

@@ -16,10 +16,21 @@ let compoundURL = null;
 const route_org = '/organizations';
 const route_org_count = `/${route_org}/count`;
 const route_org_name = `/${route_org}/name`;
+const route_org_owners = '/owners';
+const route_org_approve = '/approve';
+const route_org_mail = '/mail';
 
 //Test Suite
 describe('Organization Routers', () => {
-	it('GET - /organizations - Get Organizations', () => {
+	before(() => {
+		cy.fixture('user_new.json').then((user) => {
+			cy.addUser(user).then((response) => {
+				cy.writeFile(`${filesPath}/user.json`, response.body);
+			});
+		});
+	});
+
+	it('GET - /v1/organizations - Get Organizations', () => {
 		compoundURL = `${url}${version}${route_org}`;
 		cy.request({
 			method: 'GET',
@@ -54,7 +65,7 @@ describe('Organization Routers', () => {
 		});
 	});
 
-	it('GET- /Organizations/count - Get Organizations Count', () => {
+	it('GET- /v1/Organizations/count - Get Organizations Count', () => {
 		compoundURL = `${url}${version}${route_org_count}`;
 		cy.request({
 			method: 'GET',
@@ -70,7 +81,7 @@ describe('Organization Routers', () => {
 		});
 	});
 
-	it('GET - /organizations/:orgId - Get Org Data from Id - Good ID', () => {
+	it('GET - /v1/organizations/:orgId - Get Org Data from Id - Good ID', () => {
 		compoundURL = `${url}${version}${route_org}`;
 		cy.readFile(`${filesPath}/org_good.json`).then((object) => {
 			cy.request({
@@ -91,7 +102,7 @@ describe('Organization Routers', () => {
 		});
 	});
 
-	it('GET - /organizations/:orgId - Get Org Data from Id - Bad ID', () => {
+	it('GET - /v1/organizations/:orgId - Get Org Data from Id - Bad ID', () => {
 		compoundURL = `${url}${version}${route_org}`;
 		cy.readFile(`${filesPath}/org_bad.json`).then((object) => {
 			cy.request({
@@ -106,7 +117,7 @@ describe('Organization Routers', () => {
 		});
 	});
 
-	it('GET - /organizations/name/:name - Get Org Data from name - Good name', () => {
+	it('GET - /v1/organizations/name/:name - Get Org Data from name - Good name', () => {
 		compoundURL = `${url}${version}${route_org_name}`;
 		cy.readFile(`${filesPath}/org_good.json`).then((object) => {
 			cy.request({
@@ -123,7 +134,7 @@ describe('Organization Routers', () => {
 		});
 	});
 
-	it('GET - /organizations/name/:name - Get Org Data from name - Bad name', () => {
+	it('GET - /v1/organizations/name/:name - Get Org Data from name - Bad name', () => {
 		compoundURL = `${url}${version}${route_org_name}`;
 		cy.readFile(`${filesPath}/org_bad.json`).then((object) => {
 			cy.request({
@@ -138,7 +149,7 @@ describe('Organization Routers', () => {
 		});
 	});
 
-	it('POST - /organizations - Create Organization', () => {
+	it('POST - /v1/organizations - Create Organization', () => {
 		compoundURL = `${url}${version}${route_org}`;
 		//Get Org Data
 		cy.fixture('org_good_format.json').then((org_data) => {
@@ -166,7 +177,7 @@ describe('Organization Routers', () => {
 		});
 	});
 
-	it('PATCH - /organizations - Update Organization - Good Data', () => {
+	it('PATCH - /v1/organizations - Update Organization - Good Data', () => {
 		compoundURL = `${url}${version}${route_org}`;
 		//Get Org Data
 		cy.fixture('org_good_format_update.json').then((org_data_updated) => {
@@ -224,7 +235,7 @@ describe('Organization Routers', () => {
 		});
 	});
 
-	it('PATCH - /organizations - Update Organization - Bad Data', () => {
+	it('PATCH - /v1/organizations - Update Organization - Bad Data', () => {
 		compoundURL = `${url}${version}${route_org}`;
 		//Get Org Data
 		cy.fixture('org_good_format_update.json').then((org_data_updated) => {
@@ -241,7 +252,108 @@ describe('Organization Routers', () => {
 		});
 	});
 
-	it('DELETE - /organizations - Delete Organization - Good Data and authenticated', () => {
+	it('POST - /v1/organizations/:orgId/owners - Add Organization Owners', () => {
+		//Get User ID
+		cy.readFile(`${filesPath}/user.json`).then((user) => {
+			cy.readFile(`${filesPath}/created_org_data.json`).then((org_data) => {
+				compoundURL = `${url}${version}${route_org}/${org_data.organization._id}${route_org_owners}`;
+				cy.request({
+					method: 'POST',
+					url: compoundURL,
+					body: {
+						email: user.userInfo.email,
+						userId: user.userInfo._id
+					}
+				}).should((response) => {
+					expect(response.status).to.be.eq(200);
+					expect(response.body.created).to.be.an('boolean');
+					expect(response.body.created).to.be.eq(true);
+				});
+			});
+		});
+	});
+
+	it('GET - /v1/organizations/:orgId/owners/:userId/approve - Approve Organization Owner - Good Data', () => {
+		cy.readFile(`${filesPath}/created_org_data.json`).then((org_data) => {
+			cy.readFile(`${filesPath}/user.json`).then((user) => {
+				compoundURL = `${url}${version}${route_org}/${org_data.organization._id}${route_org_owners}/${user.userInfo._id}${route_org_approve}`;
+				cy.request({
+					method: 'GET',
+					url: compoundURL
+				}).should((response) => {
+					expect(response.status).to.be.eq(200);
+					expect(response.body.updated).to.be.an('boolean');
+					expect(response.body.updated).to.be.eq(true);
+				});
+			});
+		});
+	});
+
+	it('GET - /v1/organizations/:orgId/owners/:userId/approve - Approve Organization Owner - Bad Data', () => {
+		compoundURL = `${url}${version}${route_org}/badOrg${route_org_owners}/badUserData${route_org_approve}`;
+		cy.request({
+			method: 'GET',
+			url: compoundURL,
+			failOnStatusCode: false
+		}).should((response) => {
+			expect(response.status).to.be.eq(500);
+		});
+	});
+
+	it('DELETE - /v1/organizations/:orgId/owners/:userId - Approve Organization Owner - Good Data', () => {
+		cy.readFile(`${filesPath}/created_org_data.json`).then((org_data) => {
+			cy.readFile(`${filesPath}/user.json`).then((user) => {
+				compoundURL = `${url}${version}${route_org}/${org_data.organization._id}${route_org_owners}/${user.userInfo._id}`;
+				cy.request({
+					method: 'DELETE',
+					url: compoundURL
+				}).should((response) => {
+					expect(response.status).to.be.eq(200);
+					expect(response.body.deleted).to.be.an('boolean');
+					expect(response.body.deleted).to.be.eq(true);
+				});
+			});
+		});
+	});
+
+	it('POST - /v1/mail - Send Mail', () => {
+		compoundURL = `${url}${version}${route_org_mail}`;
+		cy.readFile(`${filesPath}/created_org_data.json`).then((org_data) => {
+			cy.readFile(`${filesPath}/user.json`).then((user) => {
+				//Approve Email
+				cy.request({
+					method: 'POST',
+					url: compoundURL,
+					body: {
+						ownerStatus: 'approve',
+						org: org_data.organization.name,
+						recipient: user.userInfo.email
+					}
+				}).should((response) => {
+					expect(response.status).to.be.eq(200);
+					expect(response.body.message).to.be.an('string');
+					expect(response.body.message).to.be.eq('Your query has been sent');
+				});
+
+				//Denial Email
+				cy.request({
+					method: 'POST',
+					url: compoundURL,
+					body: {
+						ownerStatus: 'deny',
+						org: org_data.organization.name,
+						recipient: user.userInfo.email
+					}
+				}).should((response) => {
+					expect(response.status).to.be.eq(200);
+					expect(response.body.message).to.be.an('string');
+					expect(response.body.message).to.be.eq('Your query has been sent');
+				});
+			});
+		});
+	});
+
+	it('DELETE - /v1/organizations - Delete Organization - Good Data and authenticated', () => {
 		compoundURL = `${url}${version}${route_org}`;
 		//Get Org Data
 		cy.readFile(`${filesPath}/created_org_data.json`).then((org_data) => {
@@ -256,37 +368,11 @@ describe('Organization Routers', () => {
 		});
 	});
 
-	// it('POST - /organizations/:orgId/owners - Add Organization Owners', () => {
-	// 	//Get User
-	// 	cy.fixture('auth_user_good_creds').then((creds)=>{
-	// 		//Login
-	// 		cy.login(creds).then((response) => {
-	// 			//Save User info
-	// 			cy.writeFile(`${filesPath}/authenticated_user.json`,response.body);
-	// 		});
-	// 	})
-
-	// 	//Get Org Data
-	// 	cy.fixture('org_good_format.json').then((org_data) => {
-	// 		cy.addOrg(org_data).then((org_response) => {
-	// 			cy.readFile('authenticated_user.json').then((creds) => {
-	// 				compoundURL = `${url}${version}${route_org}/${org_response.body.organization._id}/owners`;
-	// 				// cy.request({
-	// 				// 	method: 'POST',
-	// 				// 	url: compoundURL,
-	// 				// 	body: creds
-	// 				// })
-	// 				cy.log(creds);
-	// 				expect(true).to.be.eq(true);
-	// 			})
-
-	// 		})
-
-	// 	})
-	// })
-
 	after(() => {
 		//Delete temp_data folder
-		cy.exec(`rm -fr ${filesPath}`);
+		cy.readFile(`${filesPath}/user.json`).then((user) => {
+			cy.deleteUser(user.userInfo._id);
+			//cy.exec(`rm -fr ${filesPath}`);
+		});
 	});
 });
