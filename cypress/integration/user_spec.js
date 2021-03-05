@@ -163,7 +163,7 @@ describe('Users Routers', () => {
 						expect(response.body.lists[0].name).to.be.an('string');
 						expect(response.body.lists[0].name).to.be.eq(user_list.name);
 						//Save user with new list in it
-						cy.writeFile(`${filesPath}/created_user.json`, response.body);
+						cy.writeFile(`${filesPath}/created_user_list.json`, response.body);
 					});
 				});
 			});
@@ -184,8 +184,8 @@ describe('Users Routers', () => {
 		});
 	});
 
-	// after(() => {
-	//     //Delete temp_data folder
-	//     cy.exec(`rm -fr ${filesPath}`);
-	// });
+	after(() => {
+		//Delete temp_data folder
+		cy.exec(`rm -fr ${filesPath}`);
+	});
 });
