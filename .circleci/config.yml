@@ -125,8 +125,8 @@ jobs:
           name: "E2E Automation"
           command: "npm run pre-e2e-test && npm run e2e && npm run post-e2e-test"
       - run:
-          name: "Kill Node"
-          command: "pkill node"
+          name: "List Node"
+          command: "ps -e|grep node"
       - run:
           name: "Show Coverage"
           command: "npm run show-coverage"
@@ -135,10 +135,10 @@ jobs:
           flags: 'Integration'
       - store_artifacts:
           path: "reports/"
-          destination: E2E
+          destination: E2E Test Reports
       - store_artifacts:
           path: ./cypressCoverage
-          destination: E2E
+          destination: E2E Coverage Reports
 
 workflows:
   version: 1
