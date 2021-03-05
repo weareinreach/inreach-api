@@ -125,9 +125,6 @@ jobs:
           name: "E2E Automation"
           command: "npm run pre-e2e-test && npm run e2e && npm run post-e2e-test"
       - run:
-          name: "Kill Node"
-          command: "killall node"
-      - run:
           name: "Show Coverage"
           command: "npm run show-coverage"
       - codecov/upload:
