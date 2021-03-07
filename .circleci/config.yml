@@ -124,7 +124,7 @@ jobs:
       - run: 
           name: "E2E Automation"
           command: "npm run pre-e2e-test && npm run e2e && npm run post-e2e-test"
-      - run: "sleep 10s"
+      - run: "sleep 10s && killall node"
       - run:
           name: "Show Coverage"
           command: "npm run show-coverage"
