@@ -95,7 +95,7 @@ versionOneRouter.delete(
 );
 versionOneRouter.post('/mail', sendOrgOwnerStatus);
 
-// Services - Partially Automated Tested
+// Services - Automation Tested
 versionOneRouter.get('/services/count', getServicesCount);
 versionOneRouter.get('/organizations/:orgId/services', getServices);
 versionOneRouter.post(
