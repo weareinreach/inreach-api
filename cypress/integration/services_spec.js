@@ -28,7 +28,7 @@ describe('Services Routers', () => {
 		});
 	});
 
-	it('GET - /v1/organizations/:orgId/services - Get Organization Services', () => {
+	it('GET - /v1/organizations/:orgId/services - Get Organization Services - Good Org ID', () => {
 		cy.readFile(`${filesPath}/org_created.json`).then((org) => {
 			compoundURL = `${url}${version}${route_organizations}/${org.organization._id}${route_services}`;
 			cy.request({
@@ -39,6 +39,18 @@ describe('Services Routers', () => {
 			});
 		});
 	});
+
+	it('GET - /v1/organizations/:orgId/services - Get Organization Services - Bad Org ID', () => {
+		compoundURL = `${url}${version}${route_organizations}/BadOrgID`;
+		cy.request({
+			method: 'GET',
+			url: compoundURL,
+			failOnStatusCode: false
+		}).should((response) => {
+			expect(response.status).to.be.eq(404);
+		});
+	});
+
 	it('GET - /v1/services/count - Get Services Count', () => {
 		compoundURL = `${url}${version}${route_services_count}`;
 		cy.request({
