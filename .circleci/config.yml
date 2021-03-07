@@ -127,6 +127,7 @@ jobs:
       - run:
           name: "Show Coverage"
           command: "npm run show-coverage"
+      - run: "curl http://localhost:8080/"
       - codecov/upload:
           file: 'cypressCoverage/coverage-final.json'
           flags: 'Integration'
