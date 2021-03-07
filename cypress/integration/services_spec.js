@@ -204,7 +204,7 @@ describe('Services Routers', () => {
 				//Get Organization and verify it was updated
 				cy.getOrgById(org._id).then((response) => {
 					expect(response.body.services).to.be.an('array');
-					expect(response.body.services).to.be.empty();
+					expect(response.body.services).to.have.lengthOf(0);
 				});
 			});
 		});
