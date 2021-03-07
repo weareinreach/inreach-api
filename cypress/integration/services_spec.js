@@ -47,7 +47,7 @@ describe('Services Routers', () => {
 			url: compoundURL,
 			failOnStatusCode: false
 		}).should((response) => {
-			expect(response.status).to.be.eq(404);
+			expect(response.status).to.be.eq(500);
 		});
 	});
 
