@@ -19,11 +19,6 @@ server.use(bodyParser.json());
 server.use(baseRouter);
 server.use('/v1', versionOneRouter);
 
-// /* istanbul ignore next */
-// if (global.__coverage__) {
-// require('@cypress/code-coverage/middleware/express')(server);
-// }
-
 // Start server
 server.listen(port, () =>
 	// eslint-disable-next-line

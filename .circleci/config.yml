@@ -123,8 +123,7 @@ jobs:
       #Testing
       - run: 
           name: "E2E Automation"
-          command: "npm run pre-e2e-test && npm run e2e && npm run post-e2e-test"
-      - run: "ps -aux | less"
+          command: "npm run pre-e2e-test && npm run e2e && npm run post-e2e-test && exit 0"
       - run:
           name: "Show Coverage"
           command: "npm run show-coverage"
