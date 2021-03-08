@@ -55,11 +55,22 @@ Cypress.Commands.add('getOrgById', (id) => {
 	});
 });
 
+//Delete Org by ID
 Cypress.Commands.add('deleteOrgById', (id) => {
 	compoundURL = `http://localhost:8080/v1/organizations/${id}`;
 	cy.request({
 		method: 'DELETE',
 		url: compoundURL
+	});
+});
+
+// Add Slug to Org
+Cypress.Commands.add('addServiceToOrg', (orgId, services) => {
+	compoundURL = `http://localhost:8080/v1/organizations/${orgId}/services`;
+	cy.request({
+		method: 'POST',
+		url: compoundURL,
+		body: services
 	});
 });
 

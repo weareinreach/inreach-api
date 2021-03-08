@@ -115,7 +115,7 @@ versionOneRouter.delete(
 	deleteService
 );
 
-// Slug
+// Slug - Automation tested
 versionOneRouter.get('/slug/organizations/:orgSlug', getOrgBySlug);
 versionOneRouter.get(
 	'/slug/organizations/:orgSlug/services/:serviceSlug',

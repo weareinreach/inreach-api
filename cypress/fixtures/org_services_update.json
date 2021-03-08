@@ -1,4 +1,5 @@
 {
 	"name": "Test Service Name Updated",
-	"description": "This is a test service description Updated"
+	"description": "This is a test service description Updated",
+	"slug": "test-service-name-updated"
 }
