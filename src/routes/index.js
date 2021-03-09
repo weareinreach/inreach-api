@@ -122,7 +122,7 @@ versionOneRouter.get(
 	getServiceBySlug
 );
 
-// Comments
+// Comments - Automation tested
 versionOneRouter.get('/organizations/:orgId/comments', getComments);
 versionOneRouter.patch(
 	'/organizations/:orgId/comments',

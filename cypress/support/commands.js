@@ -64,13 +64,13 @@ Cypress.Commands.add('deleteOrgById', (id) => {
 	});
 });
 
-// Add Slug to Org
-Cypress.Commands.add('addServiceToOrg', (orgId, services) => {
+//Add Service to org
+Cypress.Commands.add('addServiceToOrg', (orgId, service) => {
 	compoundURL = `http://localhost:8080/v1/organizations/${orgId}/services`;
 	cy.request({
 		method: 'POST',
 		url: compoundURL,
-		body: services
+		body: service
 	});
 });
 

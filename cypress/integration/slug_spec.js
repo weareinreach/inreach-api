@@ -12,7 +12,7 @@ const version = '/v1';
 //compound url
 let compoundURL = null;
 
-//Route Constancts
+//Route Constants
 const route_organizations = '/slug/organizations';
 const route_services = '/services';
 
@@ -97,7 +97,7 @@ describe('Slug Routers', () => {
 		cy.readFile(`${filesPath}/org_created.json`).then((org) => {
 			cy.deleteOrgById(org._id);
 			//Delete temp_data folder
-			//cy.exec(`rm -fr ${filesPath}`);
+			cy.exec(`rm -fr ${filesPath}`);
 		});
 	});
 });
