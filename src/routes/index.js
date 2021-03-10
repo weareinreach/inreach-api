@@ -139,7 +139,7 @@ versionOneRouter.patch(
 	updateComments
 );
 
-// Ratings
+// Ratings - Automation tested
 versionOneRouter.get('/organizations/:orgId/ratings', getRatings);
 versionOneRouter.patch(
 	'/organizations/:orgId/ratings',
