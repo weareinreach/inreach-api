@@ -208,7 +208,7 @@ export const addUserListItem = async (req, res) => {
 	const {listId, userId} = req?.params;
 	const {itemId, orgId} = req?.body;
 
-	if (!itemId) {
+	if (!itemId || !listId || !userId) {
 		return handleBadRequest(res);
 	}
 
