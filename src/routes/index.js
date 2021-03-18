@@ -196,9 +196,9 @@ versionOneRouter.get(
 	getServicesCountryCount
 );
 
-// Reviews
+// Reviews - Automation Tested - Missing Delete Review endpoint
 versionOneRouter.get('/reviews', getReviews);
 versionOneRouter.post('/reviews', createReview);
 
-// Static
+// Static - Partially Automation Tested
 versionOneRouter.get('/static/:pageId', getStaticPage);
