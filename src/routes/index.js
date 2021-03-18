@@ -156,7 +156,7 @@ versionOneRouter.patch(
 	updateRatings
 );
 
-// Suggestions
+// Suggestions - Automated Tested
 versionOneRouter.get('/suggestions', getSuggestions);
 versionOneRouter.post('/suggestions', createSuggestions);
 versionOneRouter.delete('/suggestions/:suggestionId', deleteSuggestion);
