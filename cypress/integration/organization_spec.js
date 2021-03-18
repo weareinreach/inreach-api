@@ -372,7 +372,7 @@ describe('Organization Routers', () => {
 		//Delete temp_data folder
 		cy.readFile(`${filesPath}/user.json`).then((user) => {
 			cy.deleteUser(user.userInfo._id);
-			//cy.exec(`rm -fr ${filesPath}`);
+			cy.exec(`rm -fr ${filesPath}`);
 		});
 	});
 });
