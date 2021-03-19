@@ -188,7 +188,14 @@ export const createUserList = async (req, res) => {
 			const newList = {name};
 
 			if (user.lists) {
-				user.lists.push(newList);
+				const exists = user.lists.find((list) => list.name === name) || null;
+				if (!exists) {
+					user.lists.push(newList);
+				} else {
+					return res
+						.status(409)
+						.send('Resource has already been added to this list.');
+				}
 			} else {
 				user.lists = [newList];
 			}
@@ -234,7 +241,7 @@ export const addUserListItem = async (req, res) => {
 
 			await user
 				.save()
-				.then(() => res.json({updated: true}))
+				.then(() => res.json({updated: true, list}))
 				.catch((err) => handleErr(err, res));
 		})
 		.catch((err) => handleErr(err, res));
@@ -242,7 +249,9 @@ export const addUserListItem = async (req, res) => {
 
 export const removeUserListItem = async (req, res) => {
 	const {itemId, listId, userId} = req?.params;
-
+	if (!itemId || !orgId || !listId || !userId) {
+		return handleBadRequest(res);
+	}
 	await User.findById(userId)
 		.then(async (user) => {
 			if (!user) {
