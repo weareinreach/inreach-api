@@ -126,7 +126,7 @@ jobs:
           command: "npm run pre-e2e-test && npm run e2e && npm run post-e2e-test"
       - run:
             name: "Kill Node Processes"
-            command: "sudo pkill node"
+            command: "sudo pkill -SIGQUIT node"
       - codecov/upload:
           file: 'cypressCoverage/coverage-final.json'
           flags: 'Integration'
