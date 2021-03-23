@@ -249,7 +249,7 @@ export const addUserListItem = async (req, res) => {
 
 export const removeUserListItem = async (req, res) => {
 	const {itemId, listId, userId} = req?.params;
-	if (!itemId || !orgId || !listId || !userId) {
+	if (!itemId || !listId || !userId) {
 		return handleBadRequest(res);
 	}
 	await User.findById(userId)
