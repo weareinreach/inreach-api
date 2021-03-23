@@ -125,7 +125,7 @@ describe('Suggestion Routes', () => {
 
 	after(() => {
 		cy.readFile(`${filesPath}/org_created.json`).then((org) => {
-			cy.deleteOrgById(org._id);
+			cy.deleteOrgById(org.organization._id);
 			//Delete temp_data folder
 			cy.exec(`rm -fr ${filesPath}`);
 		});
