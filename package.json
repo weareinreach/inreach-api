@@ -9,7 +9,7 @@
 		"generate-report": "marge ./reports/reporte2e.json -f e2e-report -o ./reports",
 		"post-e2e-test": "npm run combine-reports && npm run generate-report",
 		"show-coverage": "npx nyc report --reporter=text",
-		"pre-e2e-test": "npm run clean:reports && nyc npm run dev && (wait-on http://localhost:8080 -l -v -t 10000 && exit 0)",
+		"pre-e2e-test": "npm run clean:reports && nyc npm run dev-background && (wait-on http://localhost:8080 -l -v -t 10000 && exit 0)",
 		"pre-unit-test": "npm run clean:reports",
 		"copy:reports": "mkdir coverageReports && cp cypressCoverage/coverage-final.json coverageReports/from-cypress.json && cp jestCoverage/coverage-final.json coverageReports/from-jest.json",
 		"combine:reports": "npx nyc merge coverageReports",
