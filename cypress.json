@@ -1,15 +1,9 @@
 {
-    "integrationFolder":"cypress/integration",
-    "reporter":"mochawesome",
-    "reporterOptions": {
-        "overwrite": false,
-        "html":true,
-        "json":true
-      },
-      "env": {
-        "codeCoverage": {
-          "url": "http://localhost:8080/__coverage__",
-          "expectBackendCoverageOnly":true
-        }
-      }
+	"integrationFolder": "cypress/integration",
+	"reporter": "mochawesome",
+	"reporterOptions": {
+		"overwrite": false,
+		"html": true,
+		"json": true
+	}
 }
