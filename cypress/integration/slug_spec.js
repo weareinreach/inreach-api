@@ -77,7 +77,7 @@ describe('Slug Routers', () => {
 		});
 	});
 
-	it('GET - /v1/organizations/:orgSlug/services/:serviceSlug - Get Organization Service from slug - Good Slug', () => {
+	it('GET - /v1/organizations/:orgSlug/services/:serviceSlug - Get Organization Service from slug - Bad Slug', () => {
 		cy.readFile(`${filesPath}/org_created.json`).then((org) => {
 			compoundURL = `${url}${version}${route_organizations}/${org.slug}${route_services}/bad-slug-name`;
 			cy.request({
