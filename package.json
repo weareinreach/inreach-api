@@ -22,7 +22,8 @@
 		"dev-background": "(nyc npm run start&)",
 		"start": "backpack",
 		"build": "backpack build",
-		"serve": "node ./build/main.js"
+		"serve": "node ./build/main.js",
+		"lint":"eslint ./src/*.js"
 	},
 	"dependencies": {
 		"backpack-core": "^0.8.4",
@@ -91,8 +92,10 @@
 			"ecmaVersion": 2020,
 			"sourceType": "module"
 		},
+		"output-file": "./lint/lint-report",
 		"rules": {
-			"no-console": "warn"
+			"no-console": 0,
+      		"no-unused-vars": 1
 		}
 	},
 	"husky": {
@@ -101,7 +104,7 @@
 		}
 	},
 	"lint-staged": {
-		"**/*.{js,json,md}": [
+		"**/*.{js,md}": [
 			"prettier --write",
 			"git add"
 		]
