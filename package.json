@@ -92,7 +92,6 @@
 			"ecmaVersion": 2020,
 			"sourceType": "module"
 		},
-		"output-file": "./lint/lint-report",
 		"rules": {
 			"no-console": 0,
       		"no-unused-vars": 1
