@@ -1,23 +1,15 @@
 /* eslint-disable no-undef */
 /// <reference types="cypress" />
 
-//TODO CHECK FOR KEYS IN REPONSE
-
-//Instantiate up Server variable
-const port = process.env.PORT || 8080;
-const url = process.env.HOST || `http://localhost:${port}`;
-const filesPath = './cypress/temp_data';
-const version = '/v1';
-
 //compound url
 let compoundURL = null;
 
-//Routes constants
-const route_reviews = '/reviews';
-
 describe('Reviews Routes', () => {
 	it('GET - /v1/reviews - Get Reviews', () => {
-		compoundURL = `${url}${version}${route_reviews}`;
+		compoundURL = Cypress.env('baseUrl').concat(
+			Cypress.env('version'),
+			Cypress.env('route_reviews')
+		);
 		cy.request({
 			method: 'GET',
 			url: compoundURL
@@ -29,7 +21,10 @@ describe('Reviews Routes', () => {
 
 	// Even with empty body it posts to reviews
 	it('POST - /v1/reviews - Post Reviews - Good Body', () => {
-		compoundURL = `${url}${version}${route_reviews}`;
+		compoundURL = Cypress.env('baseUrl').concat(
+			Cypress.env('version'),
+			Cypress.env('route_reviews')
+		);
 		let review = {
 			comment: 'Automated Comment',
 			hasAccount: true,
