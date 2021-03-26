@@ -186,7 +186,7 @@ versionOneRouter.delete(
 );
 versionOneRouter.post('/users/forgotPassword', generatePasswordResetMail);
 
-//Reporting
+//Reporting- Automation Tested
 versionOneRouter.get(
 	'/reporting/:country/organizations/count',
 	getVerifiedOrgsCountryCount
