@@ -27,7 +27,24 @@ describe('Users Routers', () => {
 		});
 	});
 
-	it('POST - /v1/users - Create User - New User', () => {
+	it('POST - /v1/users - Create User - New User - No Password', () => {
+		compoundURL = Cypress.env('baseUrl').concat(
+			Cypress.env('version'),
+			Cypress.env('route_users')
+		);
+		cy.fixture('user_new_bad.json').then((new_user_bad) => {
+			cy.request({
+				method: 'POST',
+				url: compoundURL,
+				body: new_user_bad,
+				failOnStatusCode: false
+			}).should((response) => {
+				expect(response.status).to.be.eq(500);
+			});
+		});
+	});
+
+	it('POST - /v1/users - Create User - New User - Good Data', () => {
 		compoundURL = Cypress.env('baseUrl').concat(
 			Cypress.env('version'),
 			Cypress.env('route_users')
@@ -160,6 +177,73 @@ describe('Users Routers', () => {
 				}
 			);
 		});
+	});
+
+	it('PATCH - /v1/users/:userId/password - Update Password - Bad User Id', () => {
+		cy.readFile(Cypress.env('filePath').concat('/created_user.json')).then(
+			(createdUser) => {
+				cy.fixture('user_new_password.json').then((new_password) => {
+					compoundURL = Cypress.env('baseUrl').concat(
+						Cypress.env('version'),
+						Cypress.env('route_users'),
+						'/BadUserID',
+						Cypress.env('route_users_password')
+					);
+					cy.request({
+						method: 'PATCH',
+						url: compoundURL,
+						body: new_password,
+						failOnStatusCode: false
+					}).should((response) => {
+						expect(response.status).to.be.eq(500);
+					});
+				});
+			}
+		);
+	});
+
+	it('PATCH - /v1/users/:userId/password - Update Password - Bad User Id - Bad Password', () => {
+		cy.readFile(Cypress.env('filePath').concat('/created_user.json')).then(
+			(createdUser) => {
+				compoundURL = Cypress.env('baseUrl').concat(
+					Cypress.env('version'),
+					Cypress.env('route_users'),
+					`/${createdUser.userInfo._id}`,
+					Cypress.env('route_users_password')
+				);
+				cy.request({
+					method: 'PATCH',
+					url: compoundURL,
+					body: {},
+					failOnStatusCode: false
+				}).should((response) => {
+					expect(response.status).to.be.eq(400);
+				});
+			}
+		);
+	});
+
+	it('PATCH - /v1/users/:userId/password - Update Password - Good Password', () => {
+		cy.readFile(Cypress.env('filePath').concat('/created_user.json')).then(
+			(createdUser) => {
+				cy.fixture('user_new_password.json').then((new_password) => {
+					compoundURL = Cypress.env('baseUrl').concat(
+						Cypress.env('version'),
+						Cypress.env('route_users'),
+						`/${createdUser.userInfo._id}`,
+						Cypress.env('route_users_password')
+					);
+					cy.request({
+						method: 'PATCH',
+						url: compoundURL,
+						body: new_password,
+						failOnStatusCode: false
+					}).should((response) => {
+						expect(response.status).to.be.eq(200);
+					});
+				});
+			}
+		);
 	});
 
 	it('POST - /v1/users/:userid/lists - Add user lists', () => {
