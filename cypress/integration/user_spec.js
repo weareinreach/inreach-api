@@ -279,6 +279,42 @@ describe('Users Routers', () => {
 		);
 	});
 
+	it('POST - /v1/users/forgotPassword - Forgot Password - Bad Email', () => {
+		compoundURL = Cypress.env('baseUrl').concat(
+			Cypress.env('version'),
+			Cypress.env('route_users'),
+			Cypress.env('route_users_forgot_password')
+		);
+		cy.request({
+			method: 'POST',
+			url: compoundURL,
+			failOnStatusCode: false
+		}).should((response) => {
+			expect(response.status).to.be.eq(400);
+			expect(response.body).to.be.an('string');
+			expect(response.body).to.be.eq('That email does not exist!');
+		});
+	});
+
+	it('POST - /v1/users/forgotPassword - Forgot Password - Good Email', () => {
+		compoundURL = Cypress.env('baseUrl').concat(
+			Cypress.env('version'),
+			Cypress.env('route_users'),
+			Cypress.env('route_users_forgot_password')
+		);
+		cy.fixture('user_new_update.json').then((new_user_update) => {
+			cy.request({
+				method: 'POST',
+				url: compoundURL,
+				body: {
+					email: new_user_update.email
+				}
+			}).should((response) => {
+				expect(response.status).to.be.eq(200);
+			});
+		});
+	});
+
 	it('DELETE - /v1/users - Delete User', () => {
 		cy.readFile(Cypress.env('filePath').concat('/created_user.json')).then(
 			(user) => {
