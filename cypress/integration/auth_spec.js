@@ -6,6 +6,17 @@ let compoundURL = null;
 
 //Test Suite
 describe('Authentication Routers', () => {
+	before(() => {
+		cy.fixture('user_new.json').then((user) => {
+			cy.addUser(user).then((response) => {
+				cy.writeFile(
+					Cypress.env('filePath').concat('/user.json'),
+					response.body
+				);
+			});
+		});
+	});
+
 	it('POST - /v1/auth - Authentication Page - Bad Credentials', () => {
 		compoundURL = Cypress.env('baseUrl').concat(
 			Cypress.env('version'),
@@ -93,7 +104,7 @@ describe('Authentication Routers', () => {
 					expect(response.body.isDataManager).to.be.an('boolean');
 					expect(response.body.isDataManager).to.be.eq(false);
 					expect(response.body.isProfessional).to.be.an('boolean');
-					expect(response.body.isProfessional).to.be.eq(true);
+					expect(response.body.isProfessional).to.be.eq(false);
 					expect(response.body.email).to.be.an('string');
 					//Load good credentials
 					cy.fixture('auth_user_good_creds.json').then((good_crendentials) => {
@@ -118,6 +129,9 @@ describe('Authentication Routers', () => {
 
 	after(() => {
 		//Delete temp_data folder
-		cy.exec('rm -fr '.concat(Cypress.env('filePath')));
+		cy.readFile(Cypress.env('filePath').concat('/user.json')).then((user) => {
+			cy.deleteUser(user.userInfo._id);
+			//cy.exec('rm -fr '.concat(Cypress.env('filePath')));
+		});
 	});
 });
