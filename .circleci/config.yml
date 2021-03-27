@@ -43,7 +43,7 @@ jobs:
       #Building and Compiling Binary
       - run: 
           name: Compile Binary
-          command: npm run build
+          command: yarn build
 
   unit:
     docker:
@@ -71,7 +71,7 @@ jobs:
       #Unit Testing
       - run: 
           name: "Unit Testing"
-          command: "npm run pre-unit-test && npm run unit-test" 
+          command: "yarn pre-unit-test && yarn unit-test" 
       - codecov/upload:
           file: 'jestCoverage/coverage-final.json'
           flags: 'Unit-Tests'
@@ -123,16 +123,16 @@ jobs:
       #Testing
       - run: 
           name: "E2E Automation"
-          command: "npm run pre-e2e-test && npm run e2e"
+          command: "yarn pre-e2e-test && yarn e2e"
       - run:
           name: "Show Coverage"
-          command: "npm run show-coverage"
+          command: "yarn show-coverage"
       - codecov/upload:
           file: 'cypressCoverage/coverage-final.json'
           flags: 'Integration'
       - run:
           name: "Post E2E tasks"
-          command: "npm run post-e2e-test"
+          command: "yarn post-e2e-test"
       - store_artifacts:
           path: "reports/"
           destination: E2E Test Reports
@@ -165,7 +165,7 @@ jobs:
       #Run linting
       - run:
           name: Run linting
-          command: "npm run lint"
+          command: "yarn lint"
 
 workflows:
   version: 1
