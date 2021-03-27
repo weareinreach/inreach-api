@@ -161,7 +161,7 @@ versionOneRouter.get('/suggestions', getSuggestions);
 versionOneRouter.post('/suggestions', createSuggestions);
 versionOneRouter.delete('/suggestions/:suggestionId', deleteSuggestion);
 
-// Users - Partially Automated Tested
+// Users - Automated Tested
 versionOneRouter.get('/users', verifyToken, getUsers);
 versionOneRouter.post('/users', verifyToken, createUser);
 versionOneRouter.get('/users/count', verifyToken, getUsersCount);
