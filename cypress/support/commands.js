@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 // ***********************************************
 // This example commands.js shows you how to
 // create various custom commands and overwrite
@@ -22,12 +23,16 @@
 //
 //
 // -- This will overwrite an existing command --
+
 // Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
 let compoundURL = null;
 
 //Authentication Functions
 Cypress.Commands.add('login', (creds_json) => {
-	compoundURL = `http://localhost:8080/v1/auth`;
+	compoundURL = Cypress.env('baseUrl').concat(
+		Cypress.env('version'),
+		Cypress.env('route_auth')
+	);
 	cy.request({
 		method: 'POST',
 		url: compoundURL,
@@ -38,7 +43,10 @@ Cypress.Commands.add('login', (creds_json) => {
 //Organizations Functions
 //Add Org
 Cypress.Commands.add('addOrg', (org) => {
-	compoundURL = `http://localhost:8080/v1/organizations`;
+	compoundURL = Cypress.env('baseUrl').concat(
+		Cypress.env('version'),
+		Cypress.env('route_organizations')
+	);
 	cy.request({
 		method: 'POST',
 		url: compoundURL,
@@ -48,7 +56,11 @@ Cypress.Commands.add('addOrg', (org) => {
 
 //Get Org By ID
 Cypress.Commands.add('getOrgById', (id) => {
-	compoundURL = `http://localhost:8080/v1/organizations/${id}`;
+	compoundURL = Cypress.env('baseUrl').concat(
+		Cypress.env('version'),
+		Cypress.env('route_organizations'),
+		`/${id}`
+	);
 	cy.request({
 		method: 'GET',
 		url: compoundURL
@@ -57,7 +69,11 @@ Cypress.Commands.add('getOrgById', (id) => {
 
 //Delete Org by ID
 Cypress.Commands.add('deleteOrgById', (id) => {
-	compoundURL = `http://localhost:8080/v1/organizations/${id}`;
+	compoundURL = Cypress.env('baseUrl').concat(
+		Cypress.env('version'),
+		Cypress.env('route_organizations'),
+		`/${id}`
+	);
 	cy.request({
 		method: 'DELETE',
 		url: compoundURL
@@ -66,7 +82,12 @@ Cypress.Commands.add('deleteOrgById', (id) => {
 
 //Add Service to org
 Cypress.Commands.add('addServiceToOrg', (orgId, service) => {
-	compoundURL = `http://localhost:8080/v1/organizations/${orgId}/services`;
+	compoundURL = Cypress.env('baseUrl').concat(
+		Cypress.env('version'),
+		Cypress.env('route_organizations'),
+		`/${orgId}`,
+		Cypress.env('route_services')
+	);
 	cy.request({
 		method: 'POST',
 		url: compoundURL,
@@ -76,7 +97,11 @@ Cypress.Commands.add('addServiceToOrg', (orgId, service) => {
 
 //Get User
 Cypress.Commands.add('getUser', (user_id) => {
-	compoundURL = `http://localhost:8080/v1/users/${user_id}`;
+	compoundURL = Cypress.env('baseUrl').concat(
+		Cypress.env('version'),
+		Cypress.env('route_users'),
+		`/${user_id}`
+	);
 	cy.request({
 		method: 'GET',
 		url: compoundURL
@@ -85,7 +110,10 @@ Cypress.Commands.add('getUser', (user_id) => {
 
 //Add User
 Cypress.Commands.add('addUser', (user_data) => {
-	compoundURL = `http://localhost:8080/v1/users`;
+	compoundURL = Cypress.env('baseUrl').concat(
+		Cypress.env('version'),
+		Cypress.env('route_users')
+	);
 	cy.request({
 		method: 'POST',
 		url: compoundURL,
@@ -95,7 +123,11 @@ Cypress.Commands.add('addUser', (user_data) => {
 
 //Delete User
 Cypress.Commands.add('deleteUser', (user_id) => {
-	compoundURL = `http://localhost:8080/v1/users/${user_id}`;
+	compoundURL = Cypress.env('baseUrl').concat(
+		Cypress.env('version'),
+		Cypress.env('route_users'),
+		`/${user_id}`
+	);
 	cy.request({
 		method: 'DELETE',
 		url: compoundURL

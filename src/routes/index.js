@@ -161,7 +161,7 @@ versionOneRouter.get('/suggestions', getSuggestions);
 versionOneRouter.post('/suggestions', createSuggestions);
 versionOneRouter.delete('/suggestions/:suggestionId', deleteSuggestion);
 
-// Users - Partially Automated Tested
+// Users - Automated Tested
 versionOneRouter.get('/users', verifyToken, getUsers);
 versionOneRouter.post('/users', verifyToken, createUser);
 versionOneRouter.get('/users/count', verifyToken, getUsersCount);
@@ -186,7 +186,7 @@ versionOneRouter.delete(
 );
 versionOneRouter.post('/users/forgotPassword', generatePasswordResetMail);
 
-//Reporting
+//Reporting- Automation Tested
 versionOneRouter.get(
 	'/reporting/:country/organizations/count',
 	getVerifiedOrgsCountryCount

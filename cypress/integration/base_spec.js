@@ -1,22 +1,15 @@
 /* eslint-disable no-undef */
 /// <reference types="cypress" />
 
-//TODO CHECK FOR KEYS IN REPONSE
-
-//Instantiate up Server variable
-const port = process.env.PORT || 8080;
-const url = process.env.HOST || `http://localhost:${port}`;
-
 //compound url
 let compoundURL = null;
 
 //Routes constants
-const route_docs = '/docs';
 
 //Test Suite
 describe('Base Routers', () => {
 	it('GET - / - Base URL', () => {
-		cy.request(url).should((response) => {
+		cy.request(Cypress.env('baseUrl')).should((response) => {
 			expect(response.status).to.eq(200);
 			expect(response.body.ok).to.be.an('boolean');
 			expect(response.body.ok).to.be.eq(true);
@@ -24,7 +17,7 @@ describe('Base Routers', () => {
 	});
 
 	it('GET - /docs - Swagger Page', () => {
-		compoundURL = `${url}${route_docs}`;
+		compoundURL = Cypress.env('baseUrl').concat(Cypress.env('route_docs'));
 		cy.request(compoundURL).should((response) => {
 			expect(response.status).to.be.eq(200);
 		});

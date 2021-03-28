@@ -22,7 +22,8 @@
 		"dev-background": "(nyc yarn start&)",
 		"start": "backpack",
 		"build": "backpack build",
-		"serve": "node ./build/main.js"
+		"serve": "node ./build/main.js",
+		"lint":"eslint ./src/*.js"
 	},
 	"dependencies": {
 		"backpack-core": "^0.8.4",
@@ -92,7 +93,8 @@
 			"sourceType": "module"
 		},
 		"rules": {
-			"no-console": "warn"
+			"no-console": 0,
+      		"no-unused-vars": 1
 		}
 	},
 	"husky": {
@@ -101,7 +103,7 @@
 		}
 	},
 	"lint-staged": {
-		"**/*.{js,json,md}": [
+		"**/*.{js,md}": [
 			"prettier --write",
 			"git add"
 		]
