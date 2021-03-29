@@ -79,7 +79,7 @@ export const createUser = async (req, res) => {
 	try {
 		const {password, ...body} = req?.body;
 
-		if (!body) {
+		if (!body || !password) {
 			return handleBadRequest(res);
 		}
 		// query if user already exists

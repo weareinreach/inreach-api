@@ -52,7 +52,7 @@ describe('Users Routers', () => {
 					body: new_user_bad,
 					failOnStatusCode: false
 				}).should((response) => {
-					expect(response.status).to.be.eq(500);
+					expect(response.status).to.be.eq(400);
 				});
 			});
 		});
@@ -98,7 +98,10 @@ describe('Users Routers', () => {
 			cy.fixture('user_new.json').then((new_user) => {
 				cy.addUser(new_user).then((response) => {
 					//Save ID of User
-					cy.writeFile(Cypress.env('filePath').concat('created_user.json'), response.body);
+					cy.writeFile(
+						Cypress.env('filePath').concat('/created_user.json'),
+						response.body
+					);
 				});
 			});
 		});
@@ -159,13 +162,12 @@ describe('Users Routers', () => {
 			);
 			cy.fixture('user_new.json').then((new_user) => {
 				cy.request({
-					method: 'GET',
-					url: compoundURL
+					method: 'POST',
+					url: compoundURL,
+					body: new_user,
+					failOnStatusCode: false
 				}).should((response) => {
-					expect(response.status).to.be.eq(200);
-					expect(response.body).has.all.keys('count', 'pages');
-					expect(response.body.count).to.be.greaterThan(0);
-					expect(response.body.pages).to.be.greaterThan(0);
+					expect(response.status).to.be.eq(409);
 				});
 			});
 		});
@@ -308,14 +310,19 @@ describe('Users Routers', () => {
 				Cypress.env('route_users'),
 				Cypress.env('route_users_forgot_password')
 			);
-			cy.request({
-				method: 'POST',
-				url: compoundURL,
-				failOnStatusCode: false
-			}).should((response) => {
-				expect(response.status).to.be.eq(400);
-				expect(response.body).to.be.an('string');
-				expect(response.body).to.be.eq('That email does not exist!');
+			cy.fixture('user_new_bad.json').then((user) => {
+				cy.request({
+					method: 'POST',
+					url: compoundURL,
+					failOnStatusCode: false,
+					body: {
+						email: user.email
+					}
+				}).should((response) => {
+					expect(response.status).to.be.eq(400);
+					expect(response.body).to.be.an('string');
+					expect(response.body).to.be.eq('That email does not exist!');
+				});
 			});
 		});
 
@@ -336,229 +343,209 @@ describe('Users Routers', () => {
 					expect(response.status).to.be.eq(200);
 				});
 			});
+		});
 
-			it('POST - /v1/users/:userId/lists/:listId/items - Add Item to list - Bad User ID', () => {
-				cy.readFile(
-					Cypress.env('filePath').concat('/created_user_list.json')
-				).then((user) => {
-					compoundURL = Cypress.env('baseUrl').concat(
-						Cypress.env('version'),
-						Cypress.env('route_users'),
-						'/BadUserID',
-						Cypress.env('route_users_list'),
-						`/${user.lists[0]._id}`,
-						Cypress.env('route_users_items')
-					);
-					cy.request({
-						method: 'POST',
-						url: compoundURL,
-						failOnStatusCode: false,
-						body: {
-							itemId: 'Bad Item'
-						}
-					}).should((response) => {
-						expect(response.status).to.be.eq(500);
-					});
+		it('POST - /v1/users/:userId/lists/:listId/items - Add Item to list - Bad User ID', () => {
+			cy.readFile(
+				Cypress.env('filePath').concat('/created_user_list.json')
+			).then((user) => {
+				compoundURL = Cypress.env('baseUrl').concat(
+					Cypress.env('version'),
+					Cypress.env('route_users'),
+					'/BadUserID',
+					Cypress.env('route_users_list'),
+					`/${user.lists[0]._id}`,
+					Cypress.env('route_users_items')
+				);
+				cy.request({
+					method: 'POST',
+					url: compoundURL,
+					failOnStatusCode: false,
+					body: {
+						itemId: 'Bad Item'
+					}
+				}).should((response) => {
+					expect(response.status).to.be.eq(500);
 				});
 			});
+		});
 
-			it('POST - /v1/users/:userId/lists/:listId/items - Add Item to list - Bad List ID', () => {
-				cy.readFile(
-					Cypress.env('filePath').concat('/created_user_list.json')
-				).then((user) => {
-					compoundURL = Cypress.env('baseUrl').concat(
-						Cypress.env('version'),
-						Cypress.env('route_users'),
-						`/${user._id}`,
-						Cypress.env('route_users_list'),
-						'/badListId',
-						Cypress.env('route_users_items')
-					);
-					cy.request({
-						method: 'POST',
-						url: compoundURL,
-						failOnStatusCode: false,
-						body: {
-							itemId: 'Bad Item'
-						}
-					}).should((response) => {
-						expect(response.status).to.be.eq(404);
-					});
+		it('POST - /v1/users/:userId/lists/:listId/items - Add Item to list - Bad List ID', () => {
+			cy.readFile(
+				Cypress.env('filePath').concat('/created_user_list.json')
+			).then((user) => {
+				compoundURL = Cypress.env('baseUrl').concat(
+					Cypress.env('version'),
+					Cypress.env('route_users'),
+					`/${user._id}`,
+					Cypress.env('route_users_list'),
+					'/badListId',
+					Cypress.env('route_users_items')
+				);
+				cy.request({
+					method: 'POST',
+					url: compoundURL,
+					failOnStatusCode: false,
+					body: {
+						itemId: 'Bad Item'
+					}
+				}).should((response) => {
+					expect(response.status).to.be.eq(404);
 				});
 			});
+		});
 
-			//We dont verify that Item Id is an organization ID this should be a 404
-			it('POST - /v1/users/:userId/lists/:listId/items - Add Item to list - Bad List ID', () => {
-				cy.readFile(
-					Cypress.env('filePath').concat('/created_user_list.json')
-				).then((user) => {
-					compoundURL = Cypress.env('baseUrl').concat(
-						Cypress.env('version'),
-						Cypress.env('route_users'),
-						`/${user._id}`,
-						Cypress.env('route_users_list'),
-						`/${user.lists[0]._id}`,
-						Cypress.env('route_users_items')
-					);
-					cy.request({
-						method: 'POST',
-						url: compoundURL,
-						failOnStatusCode: false,
-						body: {
-							itemId: 'Bad Item'
-						}
-					}).should((response) => {
-						expect(response.status).to.be.eq(200);
-					});
+		//We dont verify that Item Id is an organization ID this should be a 404
+		it('POST - /v1/users/:userId/lists/:listId/items - Add Item to list - Bad List ID', () => {
+			cy.readFile(
+				Cypress.env('filePath').concat('/created_user_list.json')
+			).then((user) => {
+				compoundURL = Cypress.env('baseUrl').concat(
+					Cypress.env('version'),
+					Cypress.env('route_users'),
+					`/${user._id}`,
+					Cypress.env('route_users_list'),
+					`/${user.lists[0]._id}`,
+					Cypress.env('route_users_items')
+				);
+				cy.request({
+					method: 'POST',
+					url: compoundURL,
+					failOnStatusCode: false,
+					body: {
+						itemId: 'Bad Item'
+					}
+				}).should((response) => {
+					expect(response.status).to.be.eq(200);
 				});
 			});
+		});
 
-			it('POST - /v1/users/:userId/lists/:listId/items - Add Item to list - Good List Item ID', () => {
-				cy.readFile(
-					Cypress.env('filePath').concat('/created_user_list.json')
-				).then((user) => {
-					cy.readFile(Cypress.env('filePath').concat('/org_created.json')).then(
-						(org) => {
-							compoundURL = Cypress.env('baseUrl').concat(
-								Cypress.env('version'),
-								Cypress.env('route_users'),
-								`/${user._id}`,
-								Cypress.env('route_users_list'),
-								`/${user.lists[0]._id}`,
-								Cypress.env('route_users_items')
-							);
-							cy.request({
-								method: 'POST',
-								url: compoundURL,
-								body: {
-									itemId: `${org.organization._id}`
-								}
-							}).should((response) => {
-								expect(response.status).to.be.eq(200);
-								expect(response.body.updated).to.be.an('boolean');
-								expect(response.body.updated).to.be.eq(true);
-							});
-						}
-					);
-				});
-			});
-
-			it('DELETE - /v1/users/:userId/lists/:listId/items/:itemId - Delete Item from list - Bad User', () => {
-				cy.readFile(
-					Cypress.env('filePath').concat('/created_user_list.json')
-				).then((user) => {
-					cy.readFile(Cypress.env('filePath').concat('/org_created.json')).then(
-						(org) => {
-							compoundURL = Cypress.env('baseUrl').concat(
-								Cypress.env('version'),
-								Cypress.env('route_users'),
-								`/BadddUserId`,
-								Cypress.env('route_users_list'),
-								`/${user.lists[0]._id}`,
-								Cypress.env('route_users_items'),
-								`/${org.organization._id}`
-							);
-							cy.request({
-								method: 'DELETE',
-								url: compoundURL,
-								failOnStatusCode: false
-							}).should((response) => {
-								expect(response.status).to.be.eq(500);
-							});
-						}
-					);
-				});
-			});
-
-			it('DELETE - /v1/users/:userId/lists/:listId/items/:itemId - Delete Item from list - Bad Org ID', () => {
-				cy.readFile(
-					Cypress.env('filePath').concat('/created_user_list.json')
-				).then((user) => {
-					cy.readFile(Cypress.env('filePath').concat('/org_created.json')).then(
-						(org) => {
-							compoundURL = Cypress.env('baseUrl').concat(
-								Cypress.env('version'),
-								Cypress.env('route_users'),
-								`/${user._id}`,
-								Cypress.env('route_users_list'),
-								`/BadOrgID`,
-								Cypress.env('route_users_items'),
-								`/${org.organization._id}`
-							);
-							cy.request({
-								method: 'DELETE',
-								url: compoundURL,
-								failOnStatusCode: false
-							}).should((response) => {
-								expect(response.status).to.be.eq(404);
-							});
-						}
-					);
-				});
-			});
-
-			it('DELETE - /v1/users/:userId/lists/:listId/items/:itemId - Delete Item from list - Bad List Item ID', () => {
-				cy.readFile(
-					Cypress.env('filePath').concat('/created_user_list.json')
-				).then((user) => {
-					cy.readFile(Cypress.env('filePath').concat('/org_created.json')).then(
-						(org) => {
-							compoundURL = Cypress.env('baseUrl').concat(
-								Cypress.env('version'),
-								Cypress.env('route_users'),
-								`/${user._id}`,
-								Cypress.env('route_users_list'),
-								`/${user.lists[0]._id}`,
-								Cypress.env('route_users_items'),
-								`/BadListItem`
-							);
-							cy.request({
-								method: 'DELETE',
-								url: compoundURL,
-								failOnStatusCode: false
-							}).should((response) => {
-								expect(response.status).to.be.eq(404);
-							});
-						}
-					);
-				});
-			});
-
-			it('DELETE - /v1/users/:userId/lists/:listId/items/:itemId - Delete Item from list - Good List Item ID', () => {
-				cy.readFile(
-					Cypress.env('filePath').concat('/created_user_list.json')
-				).then((user) => {
-					cy.readFile(Cypress.env('filePath').concat('/org_created.json')).then(
-						(org) => {
-							compoundURL = Cypress.env('baseUrl').concat(
-								Cypress.env('version'),
-								Cypress.env('route_users'),
-								`/${user._id}`,
-								Cypress.env('route_users_list'),
-								`/${user.lists[0]._id}`,
-								Cypress.env('route_users_items'),
-								`/${org.organization._id}`
-							);
-							cy.request({
-								method: 'DELETE',
-								url: compoundURL
-							}).should((response) => {
-								expect(response.status).to.be.eq(200);
-								expect(response.body.deleted).to.be.an('boolean');
-								expect(response.body.deleted).to.be.eq(true);
-							});
-						}
-					);
-				});
-			});
-
-			it('DELETE - /v1/users - Delete User', () => {
-				cy.readFile(Cypress.env('filePath').concat('/created_user.json')).then(
-					(user) => {
+		it('POST - /v1/users/:userId/lists/:listId/items - Add Item to list - Good List Item ID', () => {
+			cy.readFile(
+				Cypress.env('filePath').concat('/created_user_list.json')
+			).then((user) => {
+				cy.readFile(Cypress.env('filePath').concat('/org_created.json')).then(
+					(org) => {
 						compoundURL = Cypress.env('baseUrl').concat(
 							Cypress.env('version'),
 							Cypress.env('route_users'),
-							`/${user.userInfo._id}`
+							`/${user._id}`,
+							Cypress.env('route_users_list'),
+							`/${user.lists[0]._id}`,
+							Cypress.env('route_users_items')
+						);
+						cy.request({
+							method: 'POST',
+							url: compoundURL,
+							body: {
+								itemId: `${org.organization._id}`
+							}
+						}).should((response) => {
+							expect(response.status).to.be.eq(200);
+							expect(response.body.updated).to.be.an('boolean');
+							expect(response.body.updated).to.be.eq(true);
+						});
+					}
+				);
+			});
+		});
+
+		it('DELETE - /v1/users/:userId/lists/:listId/items/:itemId - Delete Item from list - Bad User', () => {
+			cy.readFile(
+				Cypress.env('filePath').concat('/created_user_list.json')
+			).then((user) => {
+				cy.readFile(Cypress.env('filePath').concat('/org_created.json')).then(
+					(org) => {
+						compoundURL = Cypress.env('baseUrl').concat(
+							Cypress.env('version'),
+							Cypress.env('route_users'),
+							`/BadddUserId`,
+							Cypress.env('route_users_list'),
+							`/${user.lists[0]._id}`,
+							Cypress.env('route_users_items'),
+							`/${org.organization._id}`
+						);
+						cy.request({
+							method: 'DELETE',
+							url: compoundURL,
+							failOnStatusCode: false
+						}).should((response) => {
+							expect(response.status).to.be.eq(500);
+						});
+					}
+				);
+			});
+		});
+
+		it('DELETE - /v1/users/:userId/lists/:listId/items/:itemId - Delete Item from list - Bad Org ID', () => {
+			cy.readFile(
+				Cypress.env('filePath').concat('/created_user_list.json')
+			).then((user) => {
+				cy.readFile(Cypress.env('filePath').concat('/org_created.json')).then(
+					(org) => {
+						compoundURL = Cypress.env('baseUrl').concat(
+							Cypress.env('version'),
+							Cypress.env('route_users'),
+							`/${user._id}`,
+							Cypress.env('route_users_list'),
+							`/BadOrgID`,
+							Cypress.env('route_users_items'),
+							`/${org.organization._id}`
+						);
+						cy.request({
+							method: 'DELETE',
+							url: compoundURL,
+							failOnStatusCode: false
+						}).should((response) => {
+							expect(response.status).to.be.eq(404);
+						});
+					}
+				);
+			});
+		});
+
+		it('DELETE - /v1/users/:userId/lists/:listId/items/:itemId - Delete Item from list - Bad List Item ID', () => {
+			cy.readFile(
+				Cypress.env('filePath').concat('/created_user_list.json')
+			).then((user) => {
+				cy.readFile(Cypress.env('filePath').concat('/org_created.json')).then(
+					(org) => {
+						compoundURL = Cypress.env('baseUrl').concat(
+							Cypress.env('version'),
+							Cypress.env('route_users'),
+							`/${user._id}`,
+							Cypress.env('route_users_list'),
+							`/${user.lists[0]._id}`,
+							Cypress.env('route_users_items'),
+							`/BadListItem`
+						);
+						cy.request({
+							method: 'DELETE',
+							url: compoundURL,
+							failOnStatusCode: false
+						}).should((response) => {
+							expect(response.status).to.be.eq(404);
+						});
+					}
+				);
+			});
+		});
+
+		it('DELETE - /v1/users/:userId/lists/:listId/items/:itemId - Delete Item from list - Good List Item ID', () => {
+			cy.readFile(
+				Cypress.env('filePath').concat('/created_user_list.json')
+			).then((user) => {
+				cy.readFile(Cypress.env('filePath').concat('/org_created.json')).then(
+					(org) => {
+						compoundURL = Cypress.env('baseUrl').concat(
+							Cypress.env('version'),
+							Cypress.env('route_users'),
+							`/${user._id}`,
+							Cypress.env('route_users_list'),
+							`/${user.lists[0]._id}`,
+							Cypress.env('route_users_items'),
+							`/${org.organization._id}`
 						);
 						cy.request({
 							method: 'DELETE',
@@ -571,16 +558,41 @@ describe('Users Routers', () => {
 					}
 				);
 			});
+		});
 
-			after(() => {
-				cy.readFile(Cypress.env('filePath').concat('/org_created.json')).then(
-					(org) => {
-						cy.deleteOrgById(org.organization._id);
-						//Delete temp_data folder
-						cy.exec('rm -fr '.concat(Cypress.env('filePath')));
-					}
-				);
-			});
+		it('DELETE - /v1/users - Delete User', () => {
+			cy.readFile(Cypress.env('filePath').concat('/created_user.json')).then(
+				(user) => {
+					compoundURL = Cypress.env('baseUrl').concat(
+						Cypress.env('version'),
+						Cypress.env('route_users'),
+						`/${user.userInfo._id}`
+					);
+					cy.request({
+						method: 'DELETE',
+						url: compoundURL
+					}).should((response) => {
+						expect(response.status).to.be.eq(200);
+						expect(response.body.deleted).to.be.an('boolean');
+						expect(response.body.deleted).to.be.eq(true);
+					});
+				}
+			);
+		});
+
+		after(() => {
+			cy.readFile(Cypress.env('filePath').concat('/org_created.json')).then(
+				(org) => {
+					cy.deleteOrgById(org.organization._id);
+				}
+			);
+			cy.readFile(Cypress.env('filePath').concat('/created_user.json')).then(
+				(user) => {
+					cy.deleteUser(user.userInfo._id);
+				}
+			);
+			//Delete temp_data folder
+			cy.exec('rm -fr '.concat(Cypress.env('filePath')));
 		});
 	});
 });
