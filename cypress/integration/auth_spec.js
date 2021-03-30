@@ -6,12 +6,19 @@ let compoundURL = null;
 
 //Test Suite
 describe('Authentication Routers', () => {
+	beforeEach(() => {
+		//Load the necessary fixtures
+		cy.fixture('user_new.json').as('new_user');
+		cy.fixture('auth_user_bad_creds.json').as('bad_credentials');
+		cy.fixture('auth_user_good_creds.json').as('good_credentials');
+	});
+
 	it('POST - /v1/auth - Authentication Page - Bad Credentials', () => {
 		compoundURL = Cypress.env('baseUrl').concat(
 			Cypress.env('version'),
 			Cypress.env('route_auth')
 		);
-		cy.fixture('auth_user_bad_creds.json').then((bad_credentials) => {
+		cy.get('@bad_credentials').then((bad_credentials) => {
 			cy.request({
 				method: 'POST',
 				url: compoundURL,
@@ -27,14 +34,14 @@ describe('Authentication Routers', () => {
 
 	it('POST - /v1/auth - Authentication Page - Good Credentials', () => {
 		//Get User Info
-		cy.fixture('user_new.json').then((new_user) => {
+		cy.get('@new_user').then((new_user) => {
 			//Add the User
 			cy.addUser(new_user).then((add_user_response) => {
 				compoundURL = Cypress.env('baseUrl').concat(
 					Cypress.env('version'),
 					Cypress.env('route_auth')
 				);
-				cy.fixture('auth_user_good_creds.json').then((good_crendentials) => {
+				cy.get('@good_credentials').then((good_crendentials) => {
 					cy.request({
 						method: 'POST',
 						url: compoundURL,
@@ -73,7 +80,7 @@ describe('Authentication Routers', () => {
 
 	it('POST - /v1/auth/check - Checking Token - Good Token', () => {
 		//Create User
-		cy.fixture('user_new.json').then((new_user) => {
+		cy.get('@new_user').then((new_user) => {
 			//Add the User
 			cy.addUser(new_user).then((add_user_response) => {
 				compoundURL = Cypress.env('baseUrl').concat(
@@ -82,7 +89,7 @@ describe('Authentication Routers', () => {
 				);
 
 				//Login and Save Token
-				cy.fixture('auth_user_good_creds.json').then((creds) => {
+				cy.get('@good_credentials').then((creds) => {
 					cy.login(creds).then((login_response) => {
 						compoundURL = Cypress.env('baseUrl').concat(
 							Cypress.env('version'),

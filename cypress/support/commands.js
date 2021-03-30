@@ -95,6 +95,39 @@ Cypress.Commands.add('addServiceToOrg', (orgId, service) => {
 	});
 });
 
+//Add Comment to Org
+Cypress.Commands.add('addCommentToOrg', (orgId, comment) => {
+	compoundURL = Cypress.env('baseUrl').concat(
+		Cypress.env('version'),
+		Cypress.env('route_organizations'),
+		`/${orgId}`,
+		Cypress.env('route_comments')
+	);
+	cy.request({
+		method: 'PATCH',
+		url: compoundURL,
+		body: comment
+	});
+});
+
+//Add Comment to Service
+Cypress.Commands.add('addCommentToService', (orgId, serviceId, comment) => {
+	compoundURL = Cypress.env('baseUrl').concat(
+		Cypress.env('version'),
+		Cypress.env('route_organizations'),
+		`/${orgId}`,
+		Cypress.env('route_services'),
+		`/${serviceId}`,
+		Cypress.env('route_comments')
+	);
+
+	cy.request({
+		method: 'PATCH',
+		url: compoundURL,
+		body: comment
+	});
+});
+
 //Get User
 Cypress.Commands.add('getUser', (user_id) => {
 	compoundURL = Cypress.env('baseUrl').concat(
