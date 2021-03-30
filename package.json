@@ -23,7 +23,7 @@
 		"start": "backpack",
 		"build": "backpack build",
 		"serve": "node ./build/main.js",
-		"lint":"eslint ./src/*.js"
+		"lint": "eslint ./src/*.js"
 	},
 	"dependencies": {
 		"backpack-core": "^0.8.4",
@@ -94,7 +94,7 @@
 		},
 		"rules": {
 			"no-console": 0,
-      		"no-unused-vars": 1
+			"no-unused-vars": 1
 		}
 	},
 	"husky": {
