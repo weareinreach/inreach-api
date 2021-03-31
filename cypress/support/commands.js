@@ -133,3 +133,27 @@ Cypress.Commands.add('deleteUser', (user_id) => {
 		url: compoundURL
 	});
 });
+
+//Create Favorites List
+Cypress.Commands.add('addList', (user_id, list) => {
+	compoundURL = Cypress.env('baseUrl').concat(
+		Cypress.env('version'),
+		Cypress.env('route_users'),
+		`/${user_id}`,
+		Cypress.env('route_users_list')
+	);
+	cy.request({
+		method: 'POST',
+		url: compoundURL,
+		body: list
+	});
+});
+
+//Delete Favorites List
+Cypress.Commands.add('deleteListById', (user_id, list_id) => {
+	compoundURL = `http://localhost:8080/v1/users/${user_id}/lists/${list_id}`;
+	cy.request({
+		method: 'DELETE',
+		url: compoundURL
+	});
+});
