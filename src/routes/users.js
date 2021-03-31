@@ -211,6 +211,31 @@ export const createUserList = async (req, res) => {
 		.catch((err) => handleErr(err, res));
 };
 
+export const deleteUserList = async (req, res) => {
+	const {listId, userId} = req?.params;
+	if (!listId || !userId) {
+		return handleBadRequest(res);
+	}
+	await User.findById(userId)
+		.then(async (user) => {
+			if (!user) {
+				return handleNotFound(res);
+			}
+
+			const itemIndex = user.lists.findIndex((item) => item.id === listId);
+			if (itemIndex === -1) {
+				return handleNotFound(res);
+			}
+
+			user.lists[itemIndex].remove();
+			await user
+				.save()
+				.then(() => res.json({deleted: true}))
+				.catch((err) => handleErr(err, res));
+		})
+		.catch((err) => handleErr(err, res));
+};
+
 export const addUserListItem = async (req, res) => {
 	const {listId, userId} = req?.params;
 	const {itemId, orgId} = req?.body;
