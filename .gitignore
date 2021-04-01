@@ -128,3 +128,6 @@ coverageReports
 cypressCoverage
 jestCoverage
 junit.xml
+
+#linting
+lint/*

@@ -18,15 +18,9 @@ server.use(bodyParser.json());
 // Set up routes
 server.use(baseRouter);
 server.use('/v1', versionOneRouter);
-/* istanbul ignore next */
-
-if (global.__coverage__) {
-require('@cypress/code-coverage/middleware/express')(server);
-}
-
 
 // Start server
 server.listen(port, () =>
-  // eslint-disable-next-line
-  console.log(`Listening at: http://localhost:${port}`)
+	// eslint-disable-next-line
+	console.log(`Listening at: http://localhost:${port}`)
 );

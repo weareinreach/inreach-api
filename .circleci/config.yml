@@ -43,7 +43,7 @@ jobs:
       #Building and Compiling Binary
       - run: 
           name: Compile Binary
-          command: npm run build
+          command: yarn build
 
   unit:
     docker:
@@ -71,16 +71,19 @@ jobs:
       #Unit Testing
       - run: 
           name: "Unit Testing"
-          command: "npm run pre-unit-test && npm run unit-test" 
+          command: "yarn pre-unit-test && yarn unit-test" 
       - codecov/upload:
           file: 'jestCoverage/coverage-final.json'
           flags: 'Unit-Tests'
       - store_test_results:
-          path: junit.xml
+          path: ./jestUnitTest
+      - store_artifacts:
+          path: ./jestCoverage
+          destination: Unit
     
   e2e:
     docker:
-      - image: cypress/base:10
+      - image: cypress/base:12
         environment:
           ## this enables colors in the output
           TERM: xterm
@@ -120,13 +123,49 @@ jobs:
       #Testing
       - run: 
           name: "E2E Automation"
-          command: "npm run pre-e2e-test && npm run e2e && npm run post-e2e-test"
+          command: "yarn pre-e2e-test && yarn e2e"
+      - run:
+          name: "Show Coverage"
+          command: "yarn show-coverage"
       - codecov/upload:
           file: 'cypressCoverage/coverage-final.json'
           flags: 'Integration'
-      
+      - run:
+          name: "Post E2E tasks"
+          command: "yarn post-e2e-test"
       - store_artifacts:
           path: "reports/"
+          destination: E2E Test Reports
+      - store_artifacts:
+          path: ./cypressCoverage
+          destination: E2E Coverage Reports
+  lint:
+    docker:
+      - image: circleci/node:15.6.0
+    working_directory: ~/catalog-api
+    steps:
+      - checkout
+      # Download and cache dependencies
+      - restore_cache:
+          keys:
+          - v1-dependencies-{{ checksum "package.json" }}
+          # fallback to using the latest cache if no exact match is found
+          - v1-dependencies-
+      - run: 
+          name: Check Node Version
+          command: node --version
+      - run:
+          name: Install Packages
+          command: npm install
+      #save cache for use next tests
+      - save_cache:
+         paths:
+          - node_modules
+         key: v1-dependencies-{{ checksum "package.json" }}
+      #Run linting
+      - run:
+          name: Run linting
+          command: "yarn lint"
 
 workflows:
   version: 1
@@ -135,3 +174,4 @@ workflows:
       - build
       - e2e
       - unit
+      - lint

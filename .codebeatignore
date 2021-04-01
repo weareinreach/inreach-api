@@ -1,0 +1,6 @@
+/cypress/**
+/cypressCoverage/**
+/node_modules/**
+/jest/**
+/mochawesome-report/**
+/reports/**
