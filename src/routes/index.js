@@ -42,6 +42,7 @@ import {
 	checkUserToken,
 	createUser,
 	createUserList,
+	deleteUserList,
 	deleteUser,
 	getUser,
 	getUsers,
@@ -174,6 +175,11 @@ versionOneRouter.patch(
 	updateUserPassword
 );
 versionOneRouter.post('/users/:userId/lists', verifyToken, createUserList);
+versionOneRouter.delete(
+	'/users/:userId/lists/:listId',
+	verifyToken,
+	deleteUserList
+);
 versionOneRouter.post(
 	'/users/:userId/lists/:listId/items',
 	verifyToken,
