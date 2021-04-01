@@ -54,6 +54,23 @@ Cypress.Commands.add('addOrg', (org) => {
 	});
 });
 
+Cypress.Commands.add('addOrgOwner', (orgId, userId, userEmail) => {
+	compoundURL = Cypress.env('baseUrl').concat(
+		Cypress.env('version'),
+		Cypress.env('route_organizations'),
+		`/${orgId}`,
+		Cypress.env('route_organizations_owners')
+	);
+	cy.request({
+		method: 'POST',
+		url: compoundURL,
+		body: {
+			email: userEmail,
+			userId: userId
+		}
+	});
+});
+
 //Get Org By ID
 Cypress.Commands.add('getOrgById', (id) => {
 	compoundURL = Cypress.env('baseUrl').concat(
@@ -184,7 +201,13 @@ Cypress.Commands.add('addList', (user_id, list) => {
 
 //Delete Favorites List
 Cypress.Commands.add('deleteListById', (user_id, list_id) => {
-	compoundURL = `http://localhost:8080/v1/users/${user_id}/lists/${list_id}`;
+	compoundURL = Cypress.env('baseUrl').concat(
+		Cypress.env('version'),
+		Cypress.env('route_users'),
+		`/${user_id}`,
+		Cypress.env('route_users_list'),
+		`/${list_id}`
+	);
 	cy.request({
 		method: 'DELETE',
 		url: compoundURL
