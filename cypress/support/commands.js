@@ -112,6 +112,21 @@ Cypress.Commands.add('addServiceToOrg', (orgId, service) => {
 	});
 });
 
+//Add Rating to Org
+Cypress.Commands.add('addRatingToOrg', (orgId, rating) => {
+	compoundURL = Cypress.env('baseUrl').concat(
+		Cypress.env('version'),
+		Cypress.env('route_organizations'),
+		`/${orgId}`,
+		Cypress.env('route_ratings')
+	);
+	cy.request({
+		method: 'PATCH',
+		url: compoundURL,
+		body: rating
+	});
+});
+
 //Add Comment to Org
 Cypress.Commands.add('addCommentToOrg', (orgId, comment) => {
 	compoundURL = Cypress.env('baseUrl').concat(
@@ -142,6 +157,24 @@ Cypress.Commands.add('addCommentToService', (orgId, serviceId, comment) => {
 		method: 'PATCH',
 		url: compoundURL,
 		body: comment
+	});
+});
+
+//Add Rating to Service
+Cypress.Commands.add('addRatingToService', (orgId, serviceId, rating) => {
+	compoundURL = Cypress.env('baseUrl').concat(
+		Cypress.env('version'),
+		Cypress.env('route_organizations'),
+		`/${orgId}`,
+		Cypress.env('route_services'),
+		`/${serviceId}`,
+		Cypress.env('route_ratings')
+	);
+
+	cy.request({
+		method: 'PATCH',
+		url: compoundURL,
+		body: rating
 	});
 });
 
