@@ -6,32 +6,18 @@ let compoundURL = null;
 
 //Test suite
 describe('Slug Routers', () => {
-	before(() => {
-		cy.fixture('org_good_format.json').then((org) => {
-			//Add Automation Org
-			cy.addOrg(org).then((response) => {
-				//Add Services to that org
-				cy.fixture('org_services.json').then((service) => {
-					cy.addServiceToOrg(response.body.organization._id, service);
-					//get Org Info and save it
-					cy.getOrgById(response.body.organization._id).then((response) => {
-						cy.writeFile(
-							Cypress.env('filePath').concat('/org_created.json'),
-							response.body
-						);
-					});
-				});
-			});
-		});
+	beforeEach(() => {
+		cy.fixture('org_good_format.json').as('organization');
+		cy.fixture('org_services.json').as('services');
 	});
 
 	it('GET - /v1/slug/organizations/:orgSlug - Get Organization from slug - Good Slug', () => {
-		cy.readFile(Cypress.env('filePath').concat('/org_created.json')).then(
-			(org) => {
+		cy.get('@organization').then((org) => {
+			cy.addOrg(org).then((createdOrgResponse) => {
 				compoundURL = Cypress.env('baseUrl').concat(
 					Cypress.env('version'),
 					Cypress.env('route_slug_organizations'),
-					`/${org.slug}`
+					`/${createdOrgResponse.body.organization.slug}`
 				);
 				cy.request({
 					method: 'GET',
@@ -39,12 +25,20 @@ describe('Slug Routers', () => {
 				}).should((response) => {
 					expect(response.status).to.be.eq(200);
 					expect(response.body).to.be.not.empty;
-					expect(response.body.is_published).to.be.eq(org.is_published);
-					expect(response.body.name).to.be.eq(org.name);
-					expect(response.body.slug).to.be.eq(org.slug);
+					expect(response.body.is_published).to.be.eq(
+						createdOrgResponse.body.organization.is_published
+					);
+					expect(response.body.name).to.be.eq(
+						createdOrgResponse.body.organization.name
+					);
+					expect(response.body.slug).to.be.eq(
+						createdOrgResponse.body.organization.slug
+					);
 				});
-			}
-		);
+				//Delete Org
+				cy.deleteOrgById(createdOrgResponse.body.organization._id);
+			});
+		});
 	});
 
 	it('GET - /v1/slug/organizations/:orgSlug - Get Organization from slug - Bad Slug', () => {
@@ -66,36 +60,48 @@ describe('Slug Routers', () => {
 
 	// MIGHT HAVE FOUND BUG IN CODE - slugs are not unique
 	it('GET - /v1/organizations/:orgSlug/services/:serviceSlug - Get Organization Service from slug - Good Slug', () => {
-		cy.readFile(Cypress.env('filePath').concat('/org_created.json')).then(
-			(org) => {
-				compoundURL = Cypress.env('baseUrl').concat(
-					Cypress.env('version'),
-					Cypress.env('route_slug_organizations'),
-					`/${org.slug}`,
-					Cypress.env('route_services'),
-					`/${org.services[0].slug}`
-				);
-				cy.request({
-					method: 'GET',
-					url: compoundURL
-				}).should((response) => {
-					cy.writeFile(
-						Cypress.env('filePath').concat('/response1.json'),
-						response.body
-					);
-					expect(response.status).to.be.eq(200);
+		cy.get('@organization').then((org) => {
+			cy.addOrg(org).then((createdOrgResponse) => {
+				cy.get('@services').then((service) => {
+					//Add it to Org
+					cy.addServiceToOrg(
+						createdOrgResponse.body.organization._id,
+						service
+					).then(() => {
+						//Get Service Details by getting Org Info
+						cy.getOrgById(createdOrgResponse.body.organization._id).then(
+							(organization) => {
+								cy.writeFile('response.json', organization);
+								compoundURL = Cypress.env('baseUrl').concat(
+									Cypress.env('version'),
+									Cypress.env('route_slug_organizations'),
+									`/${organization.body.slug}`,
+									Cypress.env('route_services'),
+									`/${organization.body.services[0].slug}`
+								);
+								cy.request({
+									method: 'GET',
+									url: compoundURL
+								}).should((response) => {
+									expect(response.status).to.be.eq(200);
+								});
+							}
+						);
+					});
 				});
-			}
-		);
+				//Delete Org
+				cy.deleteOrgById(createdOrgResponse.body.organization._id);
+			});
+		});
 	});
 
 	it('GET - /v1/organizations/:orgSlug/services/:serviceSlug - Get Organization Service from slug - Bad Slug', () => {
-		cy.readFile(Cypress.env('filePath').concat('/org_created.json')).then(
-			(org) => {
+		cy.get('@organization').then((org) => {
+			cy.addOrg(org).then((createdOrgResponse) => {
 				compoundURL = Cypress.env('baseUrl').concat(
 					Cypress.env('version'),
 					Cypress.env('route_slug_organizations'),
-					`/${org.slug}`,
+					`/${createdOrgResponse.body.organization.slug}`,
 					Cypress.env('route_services'),
 					'/bad-slug-name'
 				);
@@ -104,25 +110,17 @@ describe('Slug Routers', () => {
 					url: compoundURL,
 					failOnStatusCode: false
 				}).should((response) => {
-					cy.writeFile(
-						Cypress.env('filePath').concat('/response.json'),
-						response.body
-					);
 					expect(response.status).to.be.eq(404);
 					expect(response.body.notFound).to.be.an('boolean');
 					expect(response.body.notFound).to.be.eq(true);
 				});
-			}
-		);
+				//Delete Org
+				cy.deleteOrgById(createdOrgResponse.body.organization._id);
+			});
+		});
 	});
 
 	after(() => {
-		cy.readFile(Cypress.env('filePath').concat('/org_created.json')).then(
-			(org) => {
-				cy.deleteOrgById(org._id);
-				//Delete temp_data folder
-				cy.exec('rm -fr '.concat(Cypress.env('filePath')));
-			}
-		);
+		cy.exec('rm -fr '.concat(Cypress.env('filePath')));
 	});
 });
