@@ -142,6 +142,31 @@ Cypress.Commands.add('addCommentToOrg', (orgId, comment) => {
 	});
 });
 
+//Add Suggestion to Org
+Cypress.Commands.add('addSuggestionToOrg', (suggestion) => {
+	compoundURL = Cypress.env('baseUrl').concat(
+		Cypress.env('version'),
+		Cypress.env('route_suggestions')
+	);
+	cy.request({
+		method: 'POST',
+		url: compoundURL,
+		body: suggestion
+	});
+});
+
+//Get Suggestions from Org ID - Consider making this return all the suggestions for the org
+Cypress.Commands.add('getSuggestionByOrgId', () => {
+	compoundURL = Cypress.env('baseUrl').concat(
+		Cypress.env('version'),
+		Cypress.env('route_suggestions')
+	);
+	cy.request({
+		method: 'GET',
+		url: compoundURL
+	});
+});
+
 //Add Comment to Service
 Cypress.Commands.add('addCommentToService', (orgId, serviceId, comment) => {
 	compoundURL = Cypress.env('baseUrl').concat(

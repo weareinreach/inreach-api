@@ -5,17 +5,10 @@
 let compoundURL = null;
 
 describe('Suggestion Routes', () => {
-	before(() => {
+	beforeEach(() => {
 		//Add Org
-		cy.fixture('org_good_format.json').then((org) => {
-			//Add Automation Org
-			cy.addOrg(org).then((response) => {
-				cy.writeFile(
-					Cypress.env('filePath').concat('/org_created.json'),
-					response.body
-				);
-			});
-		});
+		cy.fixture('org_good_format.json').as('organization');
+		cy.fixture('auth_user_good_creds.json').as('user_creds');
 	});
 
 	it('GET - /v1/suggestions - Get Suggestions', () => {
@@ -60,17 +53,18 @@ describe('Suggestion Routes', () => {
 	});
 
 	it('POST - /v1/suggestions - Create a new Suggestion - Good Body', () => {
-		compoundURL = Cypress.env('baseUrl').concat(
-			Cypress.env('version'),
-			Cypress.env('route_suggestions')
-		);
-		cy.fixture('auth_user_good_creds.json').then((user) => {
-			cy.readFile(Cypress.env('filePath').concat('/org_created.json')).then(
-				(org) => {
+		cy.get('@organization').then((org) => {
+			cy.addOrg(org).then((createdOrgResponse) => {
+				cy.get('@user_creds').then((user) => {
+					compoundURL = Cypress.env('baseUrl').concat(
+						Cypress.env('version'),
+						Cypress.env('route_suggestions')
+					);
+
 					let suggestion = {
 						suggestions: [
 							{
-								organizationId: org.organization._id,
+								organizationId: createdOrgResponse.body.organization._id,
 								userEmail: user.email,
 								field: 'Description',
 								value: 'The Description should be changed suggestion'
@@ -87,66 +81,121 @@ describe('Suggestion Routes', () => {
 						expect(response.body.updated).to.be.an('boolean');
 						expect(response.body.updated).to.be.eq(true);
 					});
-				}
-			);
+				});
+				//Delete Org
+				cy.deleteOrgById(createdOrgResponse.body.organization._id);
+			});
 		});
 	});
 
 	it('GET - /v1/suggestions - Get Suggestions and find Added suggestion', () => {
-		compoundURL = Cypress.env('baseUrl').concat(
-			Cypress.env('version'),
-			Cypress.env('route_suggestions')
-		);
-		cy.request({
-			method: 'GET',
-			url: compoundURL
-		}).should((response) => {
-			expect(response.status).to.be.eq(200);
-			let suggestionArray = response.body;
-			//Find the one i added
-			suggestionArray.forEach((suggestion) => {
-				//Find the ID of the Org
-				cy.readFile(Cypress.env('filePath').concat('/org_created.json')).then(
-					(org) => {
-						if (suggestion.organizationId === org.organization._id) {
-							cy.writeFile(
-								Cypress.env('filePath').concat('/created_suggestion.json'),
-								suggestion
-							);
-						}
-					}
-				);
+		cy.get('@organization').then((org) => {
+			cy.addOrg(org).then((createdOrgResponse) => {
+				cy.get('@user_creds').then((user) => {
+					let suggestion = {
+						suggestions: [
+							{
+								organizationId: createdOrgResponse.body.organization._id,
+								userEmail: user.email,
+								field: 'Description',
+								value: 'The Description should be changed suggestion'
+							}
+						]
+					};
+					//Add the suggestion
+					cy.addSuggestionToOrg(suggestion).then(() => {
+						compoundURL = Cypress.env('baseUrl').concat(
+							Cypress.env('version'),
+							Cypress.env('route_suggestions')
+						);
+						cy.request({
+							method: 'GET',
+							url: compoundURL
+						}).should((response) => {
+							expect(response.status).to.be.eq(200);
+							let suggestionArray = response.body;
+							//Find the one i added
+							suggestionArray.forEach((suggestionItem) => {
+								//Find the ID of the Org
+								if (
+									suggestionItem.organizationId ===
+									createdOrgResponse.body.organization._id
+								) {
+									expect(suggestionItem.organizationId).to.be.eq(
+										createdOrgResponse.body.organization._id
+									);
+									expect(suggestionItem.userEmail).to.be.eq(
+										suggestion.suggestions[0].userEmail
+									);
+									expect(suggestionItem.field).to.be.eq(
+										suggestion.suggestions[0].field
+									);
+									expect(suggestionItem.value).to.be.eq(
+										suggestion.suggestions[0].value
+									);
+								}
+							});
+						});
+					});
+				});
+				//Delete Org
+				cy.deleteOrgById(createdOrgResponse.body.organization._id);
 			});
 		});
 	});
 
 	it('DELETE - /v1/suggestions/:suggestionId - Delete Suggestion', () => {
-		cy.readFile(
-			Cypress.env('filePath').concat('/created_suggestion.json')
-		).then((suggestion) => {
-			compoundURL = Cypress.env('baseUrl').concat(
-				Cypress.env('version'),
-				Cypress.env('route_suggestions'),
-				`/${suggestion._id}`
-			);
-			cy.request({
-				method: 'DELETE',
-				url: compoundURL
-			}).should((response) => {
-				expect(response.status).to.be.eq(200);
-				expect(response.body.deleted).to.be.an('boolean');
-				expect(response.body.deleted).to.be.eq(true);
+		cy.get('@organization').then((org) => {
+			cy.addOrg(org).then((createdOrgResponse) => {
+				cy.get('@user_creds').then((user) => {
+					let suggestion = {
+						suggestions: [
+							{
+								organizationId: createdOrgResponse.body.organization._id,
+								userEmail: user.email,
+								field: 'Description',
+								value: 'The Description should be changed suggestion'
+							}
+						]
+					};
+					//Add the suggestion
+					cy.addSuggestionToOrg(suggestion).then(() => {
+						cy.getSuggestionByOrgId(
+							createdOrgResponse.body.organization._id
+						).then((retrievedSuggestionArray) => {
+							let retrievedSuggestion;
+							retrievedSuggestionArray.body.forEach((suggestion) => {
+								if (
+									suggestion.organizationId ===
+									createdOrgResponse.body.organization._id
+								) {
+									retrievedSuggestion = suggestion;
+								}
+							});
+							compoundURL = Cypress.env('baseUrl').concat(
+								Cypress.env('version'),
+								Cypress.env('route_suggestions'),
+								`/${retrievedSuggestion._id}`
+							);
+							cy.request({
+								method: 'DELETE',
+								url: compoundURL
+							}).should((response) => {
+								expect(response.status).to.be.eq(200);
+								expect(response.body.deleted).to.be.an('boolean');
+								expect(response.body.deleted).to.be.eq(true);
+							});
+						});
+					});
+				});
+				//Delete Org
+				cy.deleteOrgById(createdOrgResponse.body.organization._id);
 			});
 		});
 	});
 
 	after(() => {
-		cy.readFile(Cypress.env('filePath').concat('/org_created.json')).then(
-			(org) => {
-				cy.deleteOrgById(org.organization._id);
-				//Delete temp_data folder
-				cy.exec('rm -fr '.concat(Cypress.env('filePath')));
-			}
-		);
+		//Delete temp_data folder
+		cy.exec('rm -fr '.concat(Cypress.env('filePath')));
 	});
 });
