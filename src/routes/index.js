@@ -206,5 +206,5 @@ versionOneRouter.get(
 versionOneRouter.get('/reviews', getReviews);
 versionOneRouter.post('/reviews', createReview);
 
-// Static - Partially Automation Tested
+// Static -  Automation Tested
 versionOneRouter.get('/static/:pageId', getStaticPage);
