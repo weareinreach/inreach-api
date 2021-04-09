@@ -271,3 +271,22 @@ Cypress.Commands.add('deleteListById', (user_id, list_id) => {
 		url: compoundURL
 	});
 });
+
+//Add Item to Favorites List
+Cypress.Commands.add('addListItem', (user, itemId) => {
+	compoundURL = Cypress.env('baseUrl').concat(
+		Cypress.env('version'),
+		Cypress.env('route_users'),
+		`/${user._id}`,
+		Cypress.env('route_users_list'),
+		`/${user.lists[0]._id}`,
+		Cypress.env('route_users_items')
+	);
+	cy.request({
+		method: 'POST',
+		url: compoundURL,
+		body: {
+			itemId: `${itemId}`
+		}
+	});
+});
