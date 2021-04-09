@@ -73,7 +73,6 @@ describe('Slug Routers', () => {
 						//Get Service Details by getting Org Info
 						cy.getOrgById(createdOrgResponse.body.organization._id).then(
 							(organization) => {
-								cy.writeFile('response.json', organization);
 								compoundURL = Cypress.env('baseUrl').concat(
 									Cypress.env('version'),
 									Cypress.env('route_slug_organizations'),

@@ -331,8 +331,8 @@ Cypress.Commands.add('deleteOrgsIfExist', () => {
 		orgArray.forEach((org) => {
 			//Regular Org
 			if (
-				org.slug === 'test-organizations-slug' ||
-				org.slug === 'test-organizations-slug-updated'
+				org.slug === 'surprisingly-unique-organizations-slug' ||
+				org.slug === 'surprisingly-unique-test-service-name-updated'
 			) {
 				cy.deleteOrgById(org._id);
 			}
