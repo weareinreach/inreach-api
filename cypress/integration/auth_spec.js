@@ -13,6 +13,11 @@ describe('Authentication Routers', () => {
 		cy.fixture('auth_user_good_creds.json').as('good_credentials');
 	});
 
+	afterEach(() => {
+		//Do the clean up
+		cy.deleteUsersIfExist();
+	});
+
 	it('POST - /v1/auth - Authentication Page - Bad Credentials', () => {
 		compoundURL = Cypress.env('baseUrl').concat(
 			Cypress.env('version'),
@@ -53,8 +58,6 @@ describe('Authentication Routers', () => {
 						expect(response.body.token).to.be.an('string');
 						expect(response.body.token).to.not.be.empty;
 					});
-					//Delete User
-					cy.deleteUser(add_user_response.body.userInfo._id);
 				});
 			});
 		});
@@ -112,8 +115,6 @@ describe('Authentication Routers', () => {
 						});
 					});
 				});
-				//Delete User
-				cy.deleteUser(add_user_response.body.userInfo._id);
 			});
 		});
 	});

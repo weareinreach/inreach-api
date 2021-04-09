@@ -10,7 +10,11 @@ describe('Suggestion Routes', () => {
 		cy.fixture('org_good_format.json').as('organization');
 		cy.fixture('auth_user_good_creds.json').as('user_creds');
 	});
-
+	afterEach(() => {
+		//Do the clean up
+		cy.deleteUsersIfExist();
+		cy.deleteOrgsIfExist();
+	});
 	it('GET - /v1/suggestions - Get Suggestions', () => {
 		compoundURL = Cypress.env('baseUrl').concat(
 			Cypress.env('version'),
@@ -82,8 +86,6 @@ describe('Suggestion Routes', () => {
 						expect(response.body.updated).to.be.eq(true);
 					});
 				});
-				//Delete Org
-				cy.deleteOrgById(createdOrgResponse.body.organization._id);
 			});
 		});
 	});
@@ -138,8 +140,6 @@ describe('Suggestion Routes', () => {
 						});
 					});
 				});
-				//Delete Org
-				cy.deleteOrgById(createdOrgResponse.body.organization._id);
 			});
 		});
 	});
@@ -188,8 +188,6 @@ describe('Suggestion Routes', () => {
 						});
 					});
 				});
-				//Delete Org
-				cy.deleteOrgById(createdOrgResponse.body.organization._id);
 			});
 		});
 	});

@@ -17,6 +17,12 @@ describe('Comments Routers', () => {
 		cy.fixture('comment.json').as('comment');
 	});
 
+	afterEach(() => {
+		//Do the clean up
+		cy.deleteUsersIfExist();
+		cy.deleteOrgsIfExist();
+	});
+
 	it('PATCH - /v1/organizations/:orgId/comments - Add Comments - Bad Comment No Body', () => {
 		cy.get('@organization').then((org) => {
 			//Add Automation Org
@@ -37,8 +43,6 @@ describe('Comments Routers', () => {
 					expect(response.body.error).to.be.an('boolean');
 					expect(response.body.error).to.be.eq(true);
 				});
-				//Delete Org
-				cy.deleteOrgById(createOrgResponse.body.organization._id);
 			});
 		});
 	});
@@ -109,8 +113,6 @@ describe('Comments Routers', () => {
 						});
 					});
 				});
-				//Delete Org
-				cy.deleteOrgById(createOrgResponse.body.organization._id);
 			});
 		});
 	});

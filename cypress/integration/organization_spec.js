@@ -12,6 +12,11 @@ describe('Organization Routers', () => {
 		cy.fixture('org_good_format.json').as('organization');
 		cy.fixture('org_good_format_update.json').as('organization_updated');
 	});
+	afterEach(() => {
+		//Do the clean up
+		cy.deleteUsersIfExist();
+		cy.deleteOrgsIfExist();
+	});
 
 	it('GET - /v1/organizations - Get Organizations', () => {
 		compoundURL = Cypress.env('baseUrl').concat(
@@ -85,8 +90,6 @@ describe('Organization Routers', () => {
 						createdOrgResponse.body.organization.verified_at
 					);
 				});
-				//Delete Org
-				cy.deleteOrgById(createdOrgResponse.body.organization._id);
 			});
 		});
 	});
@@ -133,9 +136,6 @@ describe('Organization Routers', () => {
 						createdOrgResponse.body.organization.slug
 					);
 				});
-
-				//Delete Org
-				cy.deleteOrgById(createdOrgResponse.body.organization._id);
 			});
 		});
 	});
@@ -182,8 +182,6 @@ describe('Organization Routers', () => {
 				expect(response.body.organization.description).to.be.eq(
 					org.description
 				);
-				//Delete Org
-				cy.deleteOrgById(response.body.organization._id);
 			});
 		});
 	});
@@ -226,9 +224,6 @@ describe('Organization Routers', () => {
 							expect(retrieved_org.body.website).to.be.not.eq(org.website);
 						}
 					);
-
-					//Delete Org
-					cy.deleteOrgById(createdOrgResponse.body.organization._id);
 				});
 			});
 		});
@@ -278,11 +273,7 @@ describe('Organization Routers', () => {
 							expect(response.body.created).to.be.an('boolean');
 							expect(response.body.created).to.be.eq(true);
 						});
-						//Delete organization
-						cy.deleteOrgById(createdOrgResponse.body.organization._id);
 					});
-					//Delete User
-					cy.deleteUser(addedUserResponse.body.userInfo._id);
 				});
 			});
 		});
@@ -314,12 +305,7 @@ describe('Organization Routers', () => {
 								expect(response.body.updated).to.be.an('boolean');
 								expect(response.body.updated).to.be.eq(true);
 							});
-
-							//Delete Org
-							cy.deleteOrgById(createdOrgResponse.body.organization._id);
 						});
-						//Delete User
-						cy.deleteUser(addedUserResponse.body.userInfo._id);
 					});
 				});
 			});
@@ -370,11 +356,7 @@ describe('Organization Routers', () => {
 								expect(response.body.deleted).to.be.eq(true);
 							});
 						});
-						//Delete Org
-						cy.deleteOrgById(createdOrgResponse.body.organization._id);
 					});
-					//Delete User
-					cy.deleteUser(addedUserResponse.body.userInfo._id);
 				});
 			});
 		});
@@ -417,8 +399,6 @@ describe('Organization Routers', () => {
 						expect(response.body.message).to.be.an('string');
 						expect(response.body.message).to.be.eq('Your query has been sent');
 					});
-					//Delete Org
-					cy.deleteOrgById(createdOrgResponse.body.organization._id);
 				});
 			});
 		});

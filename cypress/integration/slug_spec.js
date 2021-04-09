@@ -10,7 +10,11 @@ describe('Slug Routers', () => {
 		cy.fixture('org_good_format.json').as('organization');
 		cy.fixture('org_services.json').as('services');
 	});
-
+	afterEach(() => {
+		//Do the clean up
+		cy.deleteUsersIfExist();
+		cy.deleteOrgsIfExist();
+	});
 	it('GET - /v1/slug/organizations/:orgSlug - Get Organization from slug - Good Slug', () => {
 		cy.get('@organization').then((org) => {
 			cy.addOrg(org).then((createdOrgResponse) => {
@@ -35,8 +39,6 @@ describe('Slug Routers', () => {
 						createdOrgResponse.body.organization.slug
 					);
 				});
-				//Delete Org
-				cy.deleteOrgById(createdOrgResponse.body.organization._id);
 			});
 		});
 	});
@@ -89,8 +91,6 @@ describe('Slug Routers', () => {
 						);
 					});
 				});
-				//Delete Org
-				cy.deleteOrgById(createdOrgResponse.body.organization._id);
 			});
 		});
 	});
@@ -114,8 +114,6 @@ describe('Slug Routers', () => {
 					expect(response.body.notFound).to.be.an('boolean');
 					expect(response.body.notFound).to.be.eq(true);
 				});
-				//Delete Org
-				cy.deleteOrgById(createdOrgResponse.body.organization._id);
 			});
 		});
 	});

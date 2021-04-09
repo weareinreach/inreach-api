@@ -11,7 +11,11 @@ describe('Services Routers', () => {
 		cy.fixture('org_services.json').as('service');
 		cy.fixture('org_services_update.json').as('service_update');
 	});
-
+	afterEach(() => {
+		//Do the clean up
+		cy.deleteUsersIfExist();
+		cy.deleteOrgsIfExist();
+	});
 	it('GET - /v1/organizations/:orgId/services - Get Organization Services - Good Org ID', () => {
 		cy.get('@organization').then((org) => {
 			cy.addOrg(org).then((createdOrgResponse) => {
@@ -27,8 +31,6 @@ describe('Services Routers', () => {
 				}).should((response) => {
 					expect(response.status).to.be.eq(200);
 				});
-				//Delete Org
-				cy.deleteOrgById(createdOrgResponse.body.organization._id);
 			});
 		});
 	});
@@ -111,8 +113,6 @@ describe('Services Routers', () => {
 						}
 					);
 				});
-				//Delete Org
-				cy.deleteOrgById(createdOrgResponse.body.organization._id);
 			});
 		});
 	});
@@ -148,8 +148,6 @@ describe('Services Routers', () => {
 						);
 					});
 				});
-				//Delete Org
-				cy.deleteOrgById(createdOrgResponse.body.organization._id);
 			});
 		});
 	});
@@ -181,8 +179,6 @@ describe('Services Routers', () => {
 						);
 					});
 				});
-				//Delete Org
-				cy.deleteOrgById(createdOrgResponse.body.organization._id);
 			});
 		});
 	});
@@ -204,8 +200,6 @@ describe('Services Routers', () => {
 				}).should((response) => {
 					expect(response.status).to.be.eq(404);
 				});
-				//Delete Org
-				cy.deleteOrgById(createdOrgResponse.body.organization._id);
 			});
 		});
 	});
@@ -254,8 +248,6 @@ describe('Services Routers', () => {
 						);
 					});
 				});
-				//Delete Org
-				cy.deleteOrgById(createdOrgResponse.body.organization._id);
 			});
 		});
 	});
@@ -291,8 +283,6 @@ describe('Services Routers', () => {
 						);
 					});
 				});
-				//Delete Org
-				cy.deleteOrgById(createdOrgResponse.body.organization._id);
 			});
 		});
 	});
@@ -315,8 +305,6 @@ describe('Services Routers', () => {
 				}).should((response) => {
 					expect(response.status).to.be.eq(500);
 				});
-				//Delete Org
-				cy.deleteOrgById(createdOrgResponse.body.organization._id);
 			});
 		});
 	});
@@ -356,8 +344,6 @@ describe('Services Routers', () => {
 						);
 					});
 				});
-				//Delete Org
-				cy.deleteOrgById(createdOrgResponse.body.organization._id);
 			});
 		});
 	});

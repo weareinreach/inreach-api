@@ -10,7 +10,11 @@ describe('Comments Routers', () => {
 		cy.fixture('user_new.json').as('new_user');
 		cy.fixture('org_services.json').as('service');
 	});
-
+	afterEach(() => {
+		//Do the clean up
+		cy.deleteUsersIfExist();
+		cy.deleteOrgsIfExist();
+	});
 	it('PATCH - /v1/organizations/:orgId/ratings - Add Ratings - Bad Ratings No Body', () => {
 		cy.get('@organization').then((org) => {
 			cy.addOrg(org).then((createdOrgResponse) => {
@@ -30,8 +34,6 @@ describe('Comments Routers', () => {
 					expect(response.body.error).to.be.an('boolean');
 					expect(response.body.error).to.be.eq(true);
 				});
-				//Delete Org
-				cy.deleteOrgById(createdOrgResponse.body.organization._id);
 			});
 		});
 	});
@@ -61,12 +63,8 @@ describe('Comments Routers', () => {
 							expect(response.body.updated).to.be.an('boolean');
 							expect(response.body.updated).to.be.eq(true);
 						});
-						//Delete organization
-						cy.deleteOrgById(createdOrgResponse.body.organization._id);
 					});
 				});
-				//Delete User
-				cy.deleteUser(addedUserResponse.body.userInfo._id);
 			});
 		});
 	});
@@ -109,12 +107,8 @@ describe('Comments Routers', () => {
 								expect(response.body.ratings[0].userId).to.be.eq(rating.userId);
 							});
 						});
-						//Delete organization
-						cy.deleteOrgById(createdOrgResponse.body.organization._id);
 					});
 				});
-				//Delete User
-				cy.deleteUser(addedUserResponse.body.userInfo._id);
 			});
 		});
 	});
@@ -151,8 +145,6 @@ describe('Comments Routers', () => {
 						);
 					});
 				});
-				//Delete organization
-				cy.deleteOrgById(createdOrgResponse.body.organization._id);
 			});
 		});
 	});
@@ -197,13 +189,8 @@ describe('Comments Routers', () => {
 								);
 							});
 						});
-						//Delete organization
-						cy.deleteOrgById(createdOrgResponse.body.organization._id);
 					});
 				});
-
-				//Delete User
-				cy.deleteUser(addedUserResponse.body.userInfo._id);
 			});
 		});
 	});
@@ -272,12 +259,8 @@ describe('Comments Routers', () => {
 								);
 							});
 						});
-						//Delete organization
-						cy.deleteOrgById(createdOrgResponse.body.organization._id);
 					});
 				});
-				//Delete User
-				cy.deleteUser(addedUserResponse.body.userInfo._id);
 			});
 		});
 	});

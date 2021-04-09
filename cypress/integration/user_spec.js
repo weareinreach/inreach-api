@@ -15,7 +15,11 @@ describe('Users Routers', () => {
 		cy.fixture('user_new_password.json').as('new_user_password');
 		cy.fixture('user_new_list.json').as('new_user_list');
 	});
-
+	afterEach(() => {
+		//Do the clean up
+		cy.deleteUsersIfExist();
+		cy.deleteOrgsIfExist();
+	});
 	it('GET - /v1/users - Get Users', () => {
 		compoundURL = Cypress.env('baseUrl').concat(
 			Cypress.env('version'),
@@ -59,7 +63,6 @@ describe('Users Routers', () => {
 			Cypress.env('route_users')
 		);
 		cy.get('@new_user').then((new_user) => {
-			let userId;
 			cy.request({
 				method: 'POST',
 				url: compoundURL,
@@ -82,8 +85,6 @@ describe('Users Routers', () => {
 				expect(response.body.userInfo.identitySupplimental).to.be.lengthOf(0);
 				expect(response.body.userInfo.lists).to.be.an('array');
 				expect(response.body.userInfo.lists).to.be.lengthOf(0);
-				//Delete UserId
-				cy.deleteUser(response.body.userInfo._id);
 			});
 		});
 	});
@@ -133,8 +134,6 @@ describe('Users Routers', () => {
 					expect(response.body.lists).to.be.an('array');
 					expect(response.body.lists).to.be.lengthOf(0);
 				});
-				//Delete User
-				cy.deleteUser(addedUserResponse.body.userInfo._id);
 			});
 		});
 	});
@@ -154,8 +153,6 @@ describe('Users Routers', () => {
 				}).should((response) => {
 					expect(response.status).to.be.eq(409);
 				});
-				//Delete User
-				cy.deleteUser(addedUserResponse.body.userInfo._id);
 			});
 		});
 	});
@@ -189,8 +186,6 @@ describe('Users Routers', () => {
 							}
 						);
 					});
-					//Delete User
-					cy.deleteUser(addedUserResponse.body.userInfo._id);
 				});
 			});
 		});
@@ -215,8 +210,6 @@ describe('Users Routers', () => {
 						expect(response.status).to.be.eq(500);
 					});
 				});
-				//Delete User
-				cy.deleteUser(addedUserResponse.body.userInfo._id);
 			});
 		});
 	});
@@ -238,8 +231,6 @@ describe('Users Routers', () => {
 				}).should((response) => {
 					expect(response.status).to.be.eq(400);
 				});
-				//Delete User
-				cy.deleteUser(addedUserResponse.body.userInfo._id);
 			});
 		});
 	});
@@ -262,8 +253,6 @@ describe('Users Routers', () => {
 						expect(response.status).to.be.eq(200);
 					});
 				});
-				//Delete User
-				cy.deleteUser(addedUserResponse.body.userInfo._id);
 			});
 		});
 	});
@@ -309,8 +298,6 @@ describe('Users Routers', () => {
 				}).should((response) => {
 					expect(response.status).to.be.eq(200);
 				});
-				//Delete User
-				cy.deleteUser(addedUserResponse.body.userInfo._id);
 			});
 		});
 	});
@@ -331,8 +318,6 @@ describe('Users Routers', () => {
 					expect(response.body.deleted).to.be.an('boolean');
 					expect(response.body.deleted).to.be.eq(true);
 				});
-				//Delete User
-				cy.deleteUser(addedUserResponse.body.userInfo._id);
 			});
 		});
 	});
@@ -361,8 +346,6 @@ describe('Users Routers', () => {
 						});
 					});
 				});
-				//Delete User
-				cy.deleteUser(addedUserResponse.body.userInfo._id);
 			});
 		});
 	});
@@ -396,8 +379,6 @@ describe('Users Routers', () => {
 						}
 					);
 				});
-				//Delete User
-				cy.deleteUser(addedUserResponse.body.userInfo._id);
 			});
 		});
 	});
@@ -431,8 +412,6 @@ describe('Users Routers', () => {
 						}
 					);
 				});
-				//
-				cy.deleteUser(addedUserResponse.body.userInfo._id);
 			});
 		});
 	});
@@ -467,8 +446,6 @@ describe('Users Routers', () => {
 						}
 					);
 				});
-				//
-				cy.deleteUser(addedUserResponse.body.userInfo._id);
 			});
 		});
 	});
@@ -501,16 +478,12 @@ describe('Users Routers', () => {
 											expect(response.body.updated).to.be.an('boolean');
 											expect(response.body.updated).to.be.eq(true);
 										});
-										//Delete Org
-										cy.deleteOrgById(createdOrgResponse.body.organization._id);
 									});
 								});
 							});
 						}
 					);
 				});
-				//
-				cy.deleteUser(addedUserResponse.body.userInfo._id);
 			});
 		});
 	});
@@ -544,9 +517,6 @@ describe('Users Routers', () => {
 											}).should((response) => {
 												expect(response.status).to.be.eq(500);
 											});
-											cy.deleteOrgById(
-												createdOrgResponse.body.organization._id
-											);
 										});
 									});
 								});
@@ -554,7 +524,6 @@ describe('Users Routers', () => {
 						}
 					);
 				});
-				cy.deleteUser(addedUserResponse.body.userInfo._id);
 			});
 		});
 	});
@@ -589,14 +558,12 @@ describe('Users Routers', () => {
 												expect(response.status).to.be.eq(404);
 											});
 										});
-										cy.deleteOrgById(createdOrgResponse.body.organization._id);
 									});
 								});
 							});
 						}
 					);
 				});
-				cy.deleteUser(addedUserResponse.body.userInfo._id);
 			});
 		});
 	});
@@ -631,14 +598,12 @@ describe('Users Routers', () => {
 												expect(response.status).to.be.eq(404);
 											});
 										});
-										cy.deleteOrgById(createdOrgResponse.body.organization._id);
 									});
 								});
 							});
 						}
 					);
 				});
-				cy.deleteUser(addedUserResponse.body.userInfo._id);
 			});
 		});
 	});
@@ -674,14 +639,12 @@ describe('Users Routers', () => {
 												expect(response.body.deleted).to.be.eq(true);
 											});
 										});
-										cy.deleteOrgById(createdOrgResponse.body.organization._id);
 									});
 								});
 							});
 						}
 					);
 				});
-				cy.deleteUser(addedUserResponse.body.userInfo._id);
 			});
 		});
 	});
@@ -715,14 +678,12 @@ describe('Users Routers', () => {
 												expect(response.body.deleted).to.be.eq(true);
 											});
 										});
-										cy.deleteOrgById(createdOrgResponse.body.organization._id);
 									});
 								});
 							});
 						}
 					);
 				});
-				cy.deleteUser(addedUserResponse.body.userInfo._id);
 			});
 		});
 	});

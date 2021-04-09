@@ -290,3 +290,54 @@ Cypress.Commands.add('addListItem', (user, itemId) => {
 		}
 	});
 });
+
+// -------------- Cleaning Functions ------------------
+//Users
+Cypress.Commands.add('deleteUsersIfExist', () => {
+	cy.log('Cleaning Users...');
+	compoundURL = Cypress.env('baseUrl').concat(
+		Cypress.env('version'),
+		Cypress.env('route_users')
+	);
+	cy.request({
+		method: 'GET',
+		url: compoundURL
+	}).then((response) => {
+		let usersArray = response.body.users;
+		usersArray.forEach((user) => {
+			//Regular User
+			if (
+				user.email === 'automation@gmail.com' ||
+				user.email === 'automation-updated@gmail.com'
+			) {
+				cy.deleteUser(user._id);
+			}
+		});
+	});
+});
+
+//Organizations
+Cypress.Commands.add('deleteOrgsIfExist', () => {
+	cy.log('Cleaning Orgs...');
+	compoundURL = Cypress.env('baseUrl').concat(
+		Cypress.env('version'),
+		Cypress.env('route_organizations')
+	);
+	cy.request({
+		method: 'GET',
+		url: compoundURL
+	}).then((response) => {
+		let orgArray = response.body.organizations;
+		orgArray.forEach((org) => {
+			//Regular Org
+			if (
+				org.slug === 'test-organizations-slug' ||
+				org.slug === 'test-organizations-slug-updated'
+			) {
+				cy.deleteOrgById(org._id);
+			}
+		});
+	});
+});
+
+//Need Reviews and Comments and Ratings
