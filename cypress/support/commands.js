@@ -321,22 +321,15 @@ Cypress.Commands.add('deleteOrgsIfExist', () => {
 	cy.log('Cleaning Orgs...');
 	compoundURL = Cypress.env('baseUrl').concat(
 		Cypress.env('version'),
-		Cypress.env('route_organizations')
+		Cypress.env('route_slug_organizations'),
+		'/surprisingly-unique-organizations-slug'
 	);
 	cy.request({
 		method: 'GET',
-		url: compoundURL
+		url: compoundURL,
+		failOnStatusCode: false
 	}).then((response) => {
-		let orgArray = response.body.organizations;
-		orgArray.forEach((org) => {
-			//Regular Org
-			if (
-				org.slug === 'surprisingly-unique-organizations-slug' ||
-				org.slug === 'surprisingly-unique-test-service-name-updated'
-			) {
-				cy.deleteOrgById(org._id);
-			}
-		});
+		if (!response.body.notFound) cy.deleteOrgById(response.body._id);
 	});
 });
 
