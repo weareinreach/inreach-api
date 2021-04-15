@@ -1,0 +1,7 @@
+{
+    "comment": "Automated Comment",
+    "hasAccount": true,
+    "hasLeftFeedbackBefore": false,
+    "negativeReasons": ["Negative 1", "Negative 2"],
+    "rating": 5
+}

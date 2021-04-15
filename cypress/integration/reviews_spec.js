@@ -5,6 +5,11 @@
 let compoundURL = null;
 
 describe('Reviews Routes', () => {
+	beforeEach(() => {
+		//Loading Necessary Fixtures
+		cy.fixture('review.json').as('review');
+	});
+
 	it('GET - /v1/reviews - Get Reviews', () => {
 		compoundURL = Cypress.env('baseUrl').concat(
 			Cypress.env('version'),
@@ -36,25 +41,20 @@ describe('Reviews Routes', () => {
 
 	// Even with empty body it posts to reviews
 	it('POST - /v1/reviews - Post Reviews - Good Body', () => {
-		compoundURL = Cypress.env('baseUrl').concat(
-			Cypress.env('version'),
-			Cypress.env('route_reviews')
-		);
-		let review = {
-			comment: 'Automated Comment',
-			hasAccount: true,
-			hasLeftFeedbackBefore: false,
-			negativeReasons: ['Negative 1', 'Negative 2'],
-			rating: 5
-		};
-		cy.request({
-			method: 'POST',
-			url: compoundURL,
-			body: review
-		}).should((response) => {
-			expect(response.status).to.be.eq(200);
-			expect(response.body.created).to.be.an('boolean');
-			expect(response.body.created).to.be.eq(true);
+		cy.get('@review').then((review) => {
+			compoundURL = Cypress.env('baseUrl').concat(
+				Cypress.env('version'),
+				Cypress.env('route_reviews')
+			);
+			cy.request({
+				method: 'POST',
+				url: compoundURL,
+				body: review
+			}).should((response) => {
+				expect(response.status).to.be.eq(200);
+				expect(response.body.created).to.be.an('boolean');
+				expect(response.body.created).to.be.eq(true);
+			});
 		});
 	});
 });

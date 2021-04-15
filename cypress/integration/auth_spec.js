@@ -6,15 +6,16 @@ let compoundURL = null;
 
 //Test Suite
 describe('Authentication Routers', () => {
-	before(() => {
-		cy.fixture('user_new.json').then((user) => {
-			cy.addUser(user).then((response) => {
-				cy.writeFile(
-					Cypress.env('filePath').concat('/user.json'),
-					response.body
-				);
-			});
-		});
+	beforeEach(() => {
+		//Load the necessary fixtures
+		cy.fixture('user_new.json').as('new_user');
+		cy.fixture('auth_user_bad_creds.json').as('bad_credentials');
+		cy.fixture('auth_user_good_creds.json').as('good_credentials');
+	});
+
+	afterEach(() => {
+		//Do the clean up
+		cy.deleteUsersIfExist();
 	});
 
 	it('POST - /v1/auth - Authentication Page - Bad Credentials', () => {
@@ -22,7 +23,7 @@ describe('Authentication Routers', () => {
 			Cypress.env('version'),
 			Cypress.env('route_auth')
 		);
-		cy.fixture('auth_user_bad_creds.json').then((bad_credentials) => {
+		cy.get('@bad_credentials').then((bad_credentials) => {
 			cy.request({
 				method: 'POST',
 				url: compoundURL,
@@ -37,82 +38,85 @@ describe('Authentication Routers', () => {
 	});
 
 	it('POST - /v1/auth - Authentication Page - Good Credentials', () => {
-		compoundURL = Cypress.env('baseUrl').concat(
-			Cypress.env('version'),
-			Cypress.env('route_auth')
-		);
-		cy.fixture('auth_user_good_creds.json').then((good_crendentials) => {
-			cy.request({
-				method: 'POST',
-				url: compoundURL,
-				body: good_crendentials
-			}).should((response) => {
-				expect(response.status).to.be.eq(200);
-				expect(response.body.valid).to.be.an('boolean');
-				expect(response.body.valid).to.be.eq(true);
-				expect(response.body.token).to.be.an('string');
-				expect(response.body.token).to.not.be.empty;
-
-				//Saving Tokens
-				cy.writeFile(Cypress.env('filePath').concat('/token_good.json'), {
-					token: response.body.token
-				});
-				cy.writeFile(Cypress.env('filePath').concat('/token_bad.json'), {
-					token: 'BaaaaaaaaadToken'
+		//Get User Info
+		cy.get('@new_user').then((new_user) => {
+			//Add the User
+			cy.addUser(new_user).then((add_user_response) => {
+				compoundURL = Cypress.env('baseUrl').concat(
+					Cypress.env('version'),
+					Cypress.env('route_auth')
+				);
+				cy.get('@good_credentials').then((good_crendentials) => {
+					cy.request({
+						method: 'POST',
+						url: compoundURL,
+						body: good_crendentials
+					}).should((response) => {
+						expect(response.status).to.be.eq(200);
+						expect(response.body.valid).to.be.an('boolean');
+						expect(response.body.valid).to.be.eq(true);
+						expect(response.body.token).to.be.an('string');
+						expect(response.body.token).to.not.be.empty;
+					});
 				});
 			});
 		});
 	});
 
 	it('POST - /v1/auth/check - Checking Token - Bad Token', () => {
+		//URL
 		compoundURL = Cypress.env('baseUrl').concat(
 			Cypress.env('version'),
 			Cypress.env('route_auth_check')
 		);
-		cy.readFile(Cypress.env('filePath').concat('/token_bad.json')).then(
-			(token) => {
-				cy.request({
-					method: 'POST',
-					url: compoundURL,
-					failOnStatusCode: false,
-					body: token
-				}).should((response) => {
-					expect(response.status).to.be.eq(400);
-					expect(response.body.error).to.be.an('boolean');
-					expect(response.body.error).to.be.eq(true);
-					cy.log(response.body);
-				});
-			}
-		);
+		cy.request({
+			method: 'POST',
+			url: compoundURL,
+			failOnStatusCode: false,
+			body: 'BaaaaaaaaadToken'
+		}).should((response) => {
+			expect(response.status).to.be.eq(400);
+			expect(response.body.error).to.be.an('boolean');
+			expect(response.body.error).to.be.eq(true);
+		});
 	});
 
 	it('POST - /v1/auth/check - Checking Token - Good Token', () => {
-		compoundURL = Cypress.env('baseUrl').concat(
-			Cypress.env('version'),
-			Cypress.env('route_auth_check')
-		);
-		cy.readFile(Cypress.env('filePath').concat('/token_good.json')).then(
-			(token) => {
-				cy.request({
-					method: 'POST',
-					url: compoundURL,
-					failOnStatusCode: false,
-					body: token
-				}).should((response) => {
-					expect(response.status).to.be.eq(200);
-					expect(response.body).to.not.be.empty;
-					expect(response.body.isDataManager).to.be.an('boolean');
-					expect(response.body.isDataManager).to.be.eq(false);
-					expect(response.body.isProfessional).to.be.an('boolean');
-					expect(response.body.isProfessional).to.be.eq(false);
-					expect(response.body.email).to.be.an('string');
-					//Load good credentials
-					cy.fixture('auth_user_good_creds.json').then((good_crendentials) => {
-						expect(response.body.email).to.be.eq(good_crendentials.email);
+		//Create User
+		cy.get('@new_user').then((new_user) => {
+			//Add the User
+			cy.addUser(new_user).then((add_user_response) => {
+				compoundURL = Cypress.env('baseUrl').concat(
+					Cypress.env('version'),
+					Cypress.env('route_auth')
+				);
+
+				//Login and Save Token
+				cy.get('@good_credentials').then((creds) => {
+					cy.login(creds).then((login_response) => {
+						compoundURL = Cypress.env('baseUrl').concat(
+							Cypress.env('version'),
+							Cypress.env('route_auth_check')
+						);
+						cy.request({
+							method: 'POST',
+							url: compoundURL,
+							body: login_response.body
+						}).should((response) => {
+							expect(response.status).to.be.eq(200);
+							expect(response.body).to.not.be.empty;
+							expect(response.body.isDataManager).to.be.an('boolean');
+							expect(response.body.isDataManager).to.be.eq(false);
+							expect(response.body.isProfessional).to.be.an('boolean');
+							expect(response.body.isProfessional).to.be.eq(false);
+							expect(response.body.email).to.be.an('string');
+							//Test against Original Credentials
+							expect(response.body.email).to.be.eq(creds.email);
+						});
 					});
 				});
-			}
-		);
+			});
+		});
 	});
 
 	it('GET - /v1/auth/token - Get Token', () => {
@@ -129,9 +133,6 @@ describe('Authentication Routers', () => {
 
 	after(() => {
 		//Delete temp_data folder
-		cy.readFile(Cypress.env('filePath').concat('/user.json')).then((user) => {
-			cy.deleteUser(user.userInfo._id);
-			//cy.exec('rm -fr '.concat(Cypress.env('filePath')));
-		});
+		cy.exec('rm -fr '.concat(Cypress.env('filePath')));
 	});
 });
