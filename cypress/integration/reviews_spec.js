@@ -25,19 +25,19 @@ describe('Reviews Routes', () => {
 	});
 
 	//Once it is fixed will un-comment
-	// it('POST - /v1/reviews - Post Reviews - No Body', () => {
-	// 	compoundURL = Cypress.env('baseUrl').concat(
-	// 		Cypress.env('version'),
-	// 		Cypress.env('route_reviews')
-	// 	);
-	// 	cy.request({
-	// 		method: 'POST',
-	// 		url: compoundURL,
-	// 		failOnStatusCode:false
-	// 	}).should((response) => {
-	// 		expect(response.status).to.be.eq(400);
-	// 	});
-	// });
+	it('POST - /v1/reviews - Post Reviews - No Body', () => {
+		compoundURL = Cypress.env('baseUrl').concat(
+			Cypress.env('version'),
+			Cypress.env('route_reviews')
+		);
+		cy.request({
+			method: 'POST',
+			url: compoundURL,
+			failOnStatusCode: false
+		}).should((response) => {
+			expect(response.status).to.be.eq(400);
+		});
+	});
 
 	// Even with empty body it posts to reviews
 	it('POST - /v1/reviews - Post Reviews - Good Body', () => {
