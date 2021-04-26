@@ -8,6 +8,7 @@ import {
 	verifyJWT
 } from '../utils';
 import {ITEM_PAGE_LIMIT, getUserQuery, parsePageQuery} from '../utils/query';
+import {shareUserList} from '../utils/sendMail';
 
 export const authUser = async (req, res) => {
 	const {email, password} = req?.body;
@@ -270,6 +271,38 @@ export const addUserListItem = async (req, res) => {
 				.catch((err) => handleErr(err, res));
 		})
 		.catch((err) => handleErr(err, res));
+};
+
+export const addSharedUser = async (req, res) => {
+	const {listId, userId} = req?.params;
+	const {email, shareType, shareUrl} = req?.body;
+	if (!email || !shareType || !shareUrl || !listId || !userId) {
+		return handleBadRequest(res);
+	}
+	try {
+		const user = await User.findById(userId);
+		if (!user) {
+			return handleNotFound(res);
+		}
+		const list = user.lists.id(listId);
+
+		if (!list) {
+			return handleNotFound(res);
+		}
+		const newUser = {user_id: null, email: email};
+
+		if (list.shared_with) {
+			list.shared_with.push(newUser);
+		} else {
+			list.shared_with = [newUser];
+		}
+		list.visibility = 'shared';
+
+		await user.save();
+		return shareUserList(email, shareType, shareUrl, list, res);
+	} catch (err) {
+		handleErr(err, res);
+	}
 };
 
 export const removeUserListItem = async (req, res) => {

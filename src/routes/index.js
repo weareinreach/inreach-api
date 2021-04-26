@@ -49,7 +49,8 @@ import {
 	getUsersCount,
 	removeUserListItem,
 	updateUser,
-	updateUserPassword
+	updateUserPassword,
+	addSharedUser
 } from './users';
 import swaggerDocument from '../swagger.json';
 import verifyToken from '../middleware/verifyToken';
@@ -184,6 +185,11 @@ versionOneRouter.post(
 	'/users/:userId/lists/:listId/items',
 	verifyToken,
 	addUserListItem
+);
+versionOneRouter.post(
+	'/users/:userId/lists/:listId/share',
+	verifyToken,
+	addSharedUser
 );
 versionOneRouter.delete(
 	'/users/:userId/lists/:listId/items/:itemId',
