@@ -16,6 +16,7 @@
 /**
  * @type {Cypress.PluginConfig}
  */
+require('dotenv').config();
 module.exports = (on, config) => {
 	// `on` is used to hook into various events Cypress emits
 	// `config` is the resolved Cypress config
@@ -24,5 +25,7 @@ module.exports = (on, config) => {
 		'file:preprocessor',
 		require('@cypress/code-coverage/use-browserify-istanbul')
 	);
+	config.env.MAILGUN_API_KEY = process.env.MAILGUN_API_KEY;
+	config.env.MAILGUN_DOMAIN = process.env.MAILGUN_DOMAIN;
 	return config;
 };

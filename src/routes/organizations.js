@@ -11,6 +11,7 @@ import {
 	parsePageQuery
 } from '../utils/query';
 import {sendEmail} from '../utils/mail';
+import {shareResource} from '../utils/sendMail';
 import {Organization} from '../mongoose';
 
 export const getOrgs = async (req, res) => {
@@ -319,5 +320,22 @@ export let sendOrgOwnerStatus = async (req, res, next) => {
 		await next();
 	} catch (e) {
 		await next(e);
+	}
+};
+
+export const shareOrganization = async (req, res) => {
+	const {orgId} = req?.params;
+	const {email, shareType, shareUrl} = req?.body;
+	if (!email || !shareType || !shareUrl || !orgId) {
+		return handleBadRequest(res);
+	}
+	try {
+		const org = await Organization.findById(orgId);
+		if (!org) {
+			return handleNotFound(res);
+		}
+		return shareResource(email, shareType, shareUrl, org, res);
+	} catch (error) {
+		handleErr(error, res);
 	}
 };

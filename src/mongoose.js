@@ -4,9 +4,10 @@ import {model, Schema} from 'mongoose';
 
 const created_at = {type: Date, default: Date.now};
 const is_published = {type: Boolean, default: true};
-const schmeaOptions = {
+const schemaOptions = {
 	timestamps: {createdAt: 'created_at', updatedAt: 'updated_at'}
 };
+const ObjectId = Schema.Types.ObjectId;
 
 const ServiceSchema = new Schema({
 	created_at,
@@ -124,7 +125,7 @@ const OrganizationSchema = new Schema(
 		website: String,
 		website_ES: String
 	},
-	schmeaOptions
+	schemaOptions
 );
 
 export const Organization = model('Organization', OrganizationSchema);
@@ -142,7 +143,7 @@ const CommentSchema = new Schema(
 			}
 		]
 	},
-	schmeaOptions
+	schemaOptions
 );
 
 export const Comment = model('Comment', CommentSchema);
@@ -160,7 +161,7 @@ const RatingSchema = new Schema(
 			}
 		]
 	},
-	schmeaOptions
+	schemaOptions
 );
 
 export const Rating = model('Rating', RatingSchema);
@@ -174,7 +175,7 @@ const ReviewSchema = new Schema(
 		rating: Number,
 		source: {type: String, default: 'catalog'}
 	},
-	schmeaOptions
+	schemaOptions
 );
 
 export const Review = model('Review', ReviewSchema);
@@ -187,7 +188,7 @@ const SuggestionSchema = new Schema(
 		userEmail: String,
 		value: String
 	},
-	schmeaOptions
+	schemaOptions
 );
 
 export const Suggestion = model('Suggestion', SuggestionSchema);
@@ -214,7 +215,13 @@ const UserSchema = new Schema(
 		lists: [
 			{
 				name: String,
-				items: [{fetchable_id: String, orgId: String}]
+				items: [{fetchable_id: String, orgId: String}],
+				visibility: {
+					type: String,
+					default: 'private',
+					enum: ['private', 'shared', 'public']
+				},
+				shared_with: [{user_id: {type: ObjectId, ref: 'User'}, email: String}]
 			}
 		],
 		name: {type: String, required: true},
@@ -224,7 +231,7 @@ const UserSchema = new Schema(
 		reasonForJoining: String,
 		salt: {type: String, required: true}
 	},
-	schmeaOptions
+	schemaOptions
 );
 
 UserSchema.methods.setPassword = function (password) {

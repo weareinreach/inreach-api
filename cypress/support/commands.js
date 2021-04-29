@@ -404,7 +404,9 @@ Cypress.Commands.add('deleteOrgsIfExist', () => {
 		url: compoundURL,
 		failOnStatusCode: false
 	}).then((response) => {
-		if (!response.body.notFound) cy.deleteOrgById(response.body._id);
+		if (!response.body.notFound) {
+			cy.deleteOrgById(response.body._id);
+		}
 	});
 });
 

@@ -425,6 +425,67 @@ describe('Organization Routers', () => {
 		});
 	});
 
+	it('POST - /v1/organizations/:orgId/share - Share Organization - Good Data', () => {
+		cy.fixture('user_share_resource.json').then((share_user) => {
+			cy.get('@organization').then((org) => {
+				cy.addOrg(org).then((createdOrgResponse) => {
+					compoundURL = Cypress.env('baseUrl').concat(
+						Cypress.env('version'),
+						Cypress.env('route_organizations'),
+						`/${createdOrgResponse.body.organization._id}`,
+						Cypress.env('route_share')
+					);
+					cy.request({
+						method: 'POST',
+						url: compoundURL,
+						body: {
+							email: `${share_user.email}`,
+							shareType: 'resource',
+							shareUrl: `cool-org`
+						}
+					}).should((response) => {
+						expect(response.status).to.be.eq(200);
+						expect(response.body.updated).to.be.an('boolean');
+						expect(response.body.updated).to.be.eq(true);
+						expect(response.body.sent).to.be.an('boolean');
+						expect(response.body.sent).to.be.eq(true);
+						expect(response.body.resource).to.exist;
+						expect(response.body.resource._id).to.eq(
+							createdOrgResponse.body.organization._id
+						);
+					});
+				});
+			});
+		});
+	});
+
+	it('POST - /v1/organizations/:orgId/share - Share Organization - Bad Data', () => {
+		cy.fixture('user_share_resource.json').then((share_user) => {
+			cy.get('@organization').then((org) => {
+				cy.addOrg(org).then((createdOrgResponse) => {
+					compoundURL = Cypress.env('baseUrl').concat(
+						Cypress.env('version'),
+						Cypress.env('route_organizations'),
+						`/${createdOrgResponse.body.organization._id}`,
+						Cypress.env('route_share')
+					);
+					cy.request({
+						method: 'POST',
+						url: compoundURL,
+						body: {
+							email: `${share_user.email}`
+						},
+						failOnStatusCode: false
+					}).should((response) => {
+						expect(response.status).to.be.eq(400);
+						expect(response.body.error).to.be.an('boolean');
+						expect(response.body.error).to.be.eq(true);
+					});
+				});
+			});
+		});
+	});
+
 	after(() => {
 		cy.exec('rm -fr '.concat(Cypress.env('filePath')));
 	});
