@@ -354,14 +354,14 @@ Cypress.Commands.add('addSuggestion', (suggestion) => {
 });
 
 //Delete Suggestion by Id
-Cypress.Commands.add('v', (id) => {
+Cypress.Commands.add('deleteSuggestionById', (id) => {
 	compoundURL = Cypress.env('baseUrl').concat(
 		Cypress.env('version'),
 		Cypress.env('route_suggestions'),
 		`/${id}`
 	);
 	cy.request({
-		method: 'POST',
+		method: 'DELETE',
 		url: compoundURL
 	});
 });
