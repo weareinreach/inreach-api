@@ -79,7 +79,7 @@ describe('Services Routers', () => {
 			failOnStatusCode: false,
 			body: {}
 		}).should((response) => {
-			expect(response.status).to.be.eq(500);
+			expect(response.status).to.be.eq(400);
 		});
 	});
 
@@ -303,7 +303,7 @@ describe('Services Routers', () => {
 					body: {},
 					failOnStatusCode: false
 				}).should((response) => {
-					expect(response.status).to.be.eq(500);
+					expect(response.status).to.be.eq(400);
 				});
 			});
 		});

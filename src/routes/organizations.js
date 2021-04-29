@@ -2,7 +2,8 @@ import {
 	handleBadRequest,
 	handleErr,
 	handleNotFound,
-	orderServices
+	orderServices,
+	isBodyEmpty
 } from '../utils';
 import {
 	ITEM_PAGE_LIMIT,
@@ -131,7 +132,7 @@ export const createOrg = async (req, res) => {
 	const body = req?.body;
 	const org = new Organization(body);
 
-	if (!body) {
+	if (isBodyEmpty(body)) {
 		return handleBadRequest(res);
 	}
 
@@ -174,7 +175,7 @@ export const updateOrg = async (req, res) => {
 	const body = req?.body;
 	const updated_at = Date.now();
 
-	if (!body) {
+	if (isBodyEmpty(body)) {
 		return handleBadRequest(res);
 	}
 

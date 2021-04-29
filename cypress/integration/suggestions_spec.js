@@ -14,6 +14,7 @@ describe('Suggestion Routes', () => {
 		//Do the clean up
 		cy.deleteUsersIfExist();
 		cy.deleteOrgsIfExist();
+		cy.deleteAutomationSuggestions();
 	});
 	it('GET - /v1/suggestions - Get Suggestions', () => {
 		compoundURL = Cypress.env('baseUrl').concat(

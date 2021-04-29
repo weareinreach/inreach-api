@@ -4,6 +4,7 @@ import {
 	handleBadRequest,
 	handleErr,
 	handleNotFound,
+	isBodyEmpty,
 	removeUserInfo,
 	verifyJWT
 } from '../utils';
@@ -80,7 +81,7 @@ export const createUser = async (req, res) => {
 	try {
 		const {password, ...body} = req?.body;
 
-		if (!body || !password) {
+		if (isBodyEmpty(body) || !password) {
 			return handleBadRequest(res);
 		}
 		// query if user already exists
@@ -133,7 +134,7 @@ export const updateUser = async (req, res) => {
 	const body = req?.body;
 	const updated_at = Date.now();
 
-	if (!body) {
+	if (isBodyEmpty(body)) {
 		return handleBadRequest(res);
 	}
 
@@ -176,7 +177,7 @@ export const createUserList = async (req, res) => {
 	const {userId} = req?.params;
 	const {name} = req?.body;
 
-	if (!name || !userId) {
+	if (isBodyEmpty(name) || !userId) {
 		return handleBadRequest(res);
 	}
 
