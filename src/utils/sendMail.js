@@ -48,9 +48,8 @@ export const generatePasswordResetMail = async (req, res) => {
 
 const genereateEmailContent = (shareUrl, resourceType) => {
 	return ` <p>Hello, Bonjour, Hola!</p>
-	<p>This notification is on behalf of AsylumConnect to let you know that someone has shared a ${resourceType} with you. You can view the ${resourceType} 
+	<p>This notification is on behalf of AsylumConnect to let you know that someone has shared ${resourceType} with you. You can view the ${resourceType} 
 	<a href=${shareUrl} target="_blank">here</a>.</p>
-	<p>Thank you, Merci, Gracias!</p>
 	<p>The AsylumConnect Team</p>`;
 };
 
@@ -58,15 +57,15 @@ export const shareUserList = (
 	email = null,
 	shareType = null,
 	shareUrl = null,
-	list = null,
+	resource = null,
 	res = null
 ) => {
 	try {
-		if (!email || !shareType || !shareUrl || !list || !res) {
+		if (!email || !shareType || !shareUrl || !res) {
 			return handleBadRequest();
 		}
 		const resourceType =
-			shareType === 'collection' ? 'list of resources' : 'resource';
+			shareType === 'collection' ? 'a list of resources' : 'an organization';
 		const html = genereateEmailContent(shareUrl, resourceType);
 		const data = {
 			from: 'AsylumConnect Support <catalog@asylumconnect.org>',
@@ -78,7 +77,7 @@ export const shareUserList = (
 			if (error || !body || !body?.id || !body?.message) {
 				handleErr(error, res);
 			}
-			res.json({updated: true, list, sent: true});
+			res.json({updated: true, resource, sent: true});
 		});
 	} catch (error) {
 		return error;
