@@ -23,7 +23,8 @@ import {
 	getOrgsCount,
 	updateOrg,
 	sendOrgOwnerStatus,
-	getOrgsByName
+	getOrgsByName,
+	shareOrganization
 } from './organizations';
 import {getReviews, createReview} from './reviews';
 import {
@@ -84,6 +85,11 @@ versionOneRouter.post(
 	'/organizations/:orgId/owners',
 	verifyToken,
 	createOrgOwner
+);
+versionOneRouter.post(
+	'/organizations/:orgId/share',
+	verifyToken,
+	shareOrganization
 );
 versionOneRouter.get(
 	'/organizations/:orgId/owners/:userId/approve',

@@ -53,7 +53,7 @@ const genereateEmailContent = (shareUrl, resourceType) => {
 	<p>The AsylumConnect Team</p>`;
 };
 
-export const shareUserList = (
+export const shareResource = (
 	email = null,
 	shareType = null,
 	shareUrl = null,

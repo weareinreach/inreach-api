@@ -8,7 +8,7 @@ import {
 	verifyJWT
 } from '../utils';
 import {ITEM_PAGE_LIMIT, getUserQuery, parsePageQuery} from '../utils/query';
-import {shareUserList} from '../utils/sendMail';
+import {shareResource} from '../utils/sendMail';
 
 export const authUser = async (req, res) => {
 	const {email, password} = req?.body;
@@ -299,7 +299,7 @@ export const addSharedUser = async (req, res) => {
 		list.visibility = 'shared';
 
 		await user.save();
-		return shareUserList(email, shareType, shareUrl, list, res);
+		return shareResource(email, shareType, shareUrl, list, res);
 	} catch (err) {
 		handleErr(err, res);
 	}
