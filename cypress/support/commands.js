@@ -354,7 +354,7 @@ Cypress.Commands.add('addSuggestion', (suggestion) => {
 });
 
 //Delete Suggestion by Id
-Cypress.Commands.add('deleteSuggestionById', (id) => {
+Cypress.Commands.add('v', (id) => {
 	compoundURL = Cypress.env('baseUrl').concat(
 		Cypress.env('version'),
 		Cypress.env('route_suggestions'),
@@ -442,7 +442,7 @@ Cypress.Commands.add('deleteAutomationSuggestions', () => {
 	}).then((response) => {
 		let suggestionArray = response.body;
 		suggestionArray.forEach((suggestion) => {
-			cy.deleteReviewById(suggestion._id);
+			cy.deleteSuggestionById(suggestion._id);
 		});
 	});
 });
