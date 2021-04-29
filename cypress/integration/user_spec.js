@@ -340,6 +340,9 @@ describe('Users Routers', () => {
 						expect(response.status).to.be.eq(200);
 						expect(response.body.created).to.be.an('boolean');
 						expect(response.body.created).to.be.eq(true);
+						const {list} = response.body;
+						expect(list).to.haveOwnProperty('visibility').to.equal('private');
+						expect(list).to.haveOwnProperty('shared_with').with.lengthOf(0);
 						cy.getUser(addedUserResponse.body.userInfo._id).then((response) => {
 							expect(response.body.lists[0].name).to.be.an('string');
 							expect(response.body.lists[0].name).to.be.eq(new_user_list.name);
@@ -479,6 +482,86 @@ describe('Users Routers', () => {
 											expect(response.body.updated).to.be.eq(true);
 										});
 									});
+								});
+							});
+						}
+					);
+				});
+			});
+		});
+	});
+
+	it('POST - /v1/users/:userId/lists/:listId/share - Share List via Email - Good Payload', () => {
+		cy.fixture('user_share_resource.json').then((share_user) => {
+			cy.get('@new_user').then((new_user) => {
+				cy.addUser(new_user).then((addedUserResponse) => {
+					cy.get('@new_user_list').then((new_user_list) => {
+						cy.addList(addedUserResponse.body.userInfo._id, new_user_list).then(
+							() => {
+								cy.getUser(addedUserResponse.body.userInfo._id).then((user) => {
+									compoundURL = Cypress.env('baseUrl').concat(
+										Cypress.env('version'),
+										Cypress.env('route_users'),
+										`/${user.body._id}`,
+										Cypress.env('route_users_list'),
+										`/${user.body.lists[0]._id}`,
+										`/share`
+									);
+									cy.request({
+										method: 'POST',
+										url: compoundURL,
+										body: {
+											email: `${share_user.email}`,
+											shareType: 'collection',
+											shareUrl: `cool-org`
+										}
+									}).should((response) => {
+										expect(response.status).to.be.eq(200);
+										expect(response.body.updated).to.be.an('boolean');
+										expect(response.body.updated).to.be.eq(true);
+										expect(response.body.sent).to.be.an('boolean');
+										expect(response.body.sent).to.be.eq(true);
+										expect(response.body.resource).to.exist;
+										expect(
+											response.body.resource.shared_with
+										).to.exist.and.have.lengthOf(1);
+										expect(response.body.resource.visibility).to.eq('shared');
+										expect(response.body.resource.shared_with[0].email).to.eq(
+											share_user.email
+										);
+									});
+								});
+							}
+						);
+					});
+				});
+			});
+		});
+	});
+	it('POST - /v1/users/:userId/lists/:listId/share - Share List via Email - Bad Payload', () => {
+		cy.get('@new_user').then((new_user) => {
+			cy.addUser(new_user).then((addedUserResponse) => {
+				cy.get('@new_user_list').then((new_user_list) => {
+					cy.addList(addedUserResponse.body.userInfo._id, new_user_list).then(
+						() => {
+							cy.getUser(addedUserResponse.body.userInfo._id).then((user) => {
+								compoundURL = Cypress.env('baseUrl').concat(
+									Cypress.env('version'),
+									Cypress.env('route_users'),
+									`/${user.body._id}`,
+									Cypress.env('route_users_list'),
+									`/${user.body.lists[0]._id}`,
+									Cypress.env('route_share')
+								);
+								cy.request({
+									method: 'POST',
+									url: compoundURL,
+									body: {},
+									failOnStatusCode: false
+								}).should((response) => {
+									expect(response.status).to.be.eq(400);
+									expect(response.body.error).to.be.an('boolean');
+									expect(response.body.error).to.be.eq(true);
 								});
 							});
 						}
