@@ -291,6 +291,81 @@ Cypress.Commands.add('addListItem', (user, itemId) => {
 	});
 });
 
+//GET Reviews
+Cypress.Commands.add('getReviews', () => {
+	compoundURL = Cypress.env('baseUrl').concat(
+		Cypress.env('version'),
+		Cypress.env('route_reviews')
+	);
+	cy.request({
+		method: 'GET',
+		url: compoundURL
+	});
+});
+
+//Add Review
+Cypress.Commands.add('addReview', (review) => {
+	compoundURL = Cypress.env('baseUrl').concat(
+		Cypress.env('version'),
+		Cypress.env('route_reviews')
+	);
+	cy.request({
+		method: 'POST',
+		url: compoundURL,
+		body: review
+	});
+});
+//Delete Review by Id
+Cypress.Commands.add('deleteReviewById', (id) => {
+	compoundURL = Cypress.env('baseUrl').concat(
+		Cypress.env('version'),
+		Cypress.env('route_reviews'),
+		`/${id}`
+	);
+	cy.request({
+		method: 'DELETE',
+		url: compoundURL
+	});
+});
+
+//GET Suggestions
+Cypress.Commands.add('getSuggestions', () => {
+	compoundURL = Cypress.env('baseUrl').concat(
+		Cypress.env('version'),
+		Cypress.env('route_suggestions')
+	);
+	cy.request({
+		method: 'GET',
+		url: compoundURL
+	});
+});
+
+//Add Suggestion
+Cypress.Commands.add('addSuggestion', (suggestion) => {
+	compoundURL = Cypress.env('baseUrl').concat(
+		Cypress.env('version'),
+		Cypress.env('route_suggestions')
+	);
+	cy.request({
+		method: 'DELETE',
+		url: compoundURL,
+		body: suggestion
+	});
+});
+
+//Delete Suggestion by Id
+Cypress.Commands.add('deleteSuggestionById', (id) => {
+	compoundURL = Cypress.env('baseUrl').concat(
+		Cypress.env('version'),
+		Cypress.env('route_suggestions'),
+		`/${id}`
+	);
+	cy.request({
+		method: 'POST',
+		url: compoundURL
+	});
+});
+
 // -------------- Cleaning Functions ------------------
 //Users
 Cypress.Commands.add('deleteUsersIfExist', () => {
@@ -333,4 +408,42 @@ Cypress.Commands.add('deleteOrgsIfExist', () => {
 	});
 });
 
-//Need Reviews and Comments and Ratings
+//Reviews
+Cypress.Commands.add('deleteAutomationReviews', () => {
+	cy.log('Cleaning Reviews...');
+	compoundURL = Cypress.env('baseUrl').concat(
+		Cypress.env('version'),
+		Cypress.env('route_reviews')
+	);
+	cy.request({
+		method: 'GET',
+		url: compoundURL
+	}).then((response) => {
+		let reviewsArray = response.body.reviews;
+		reviewsArray.forEach((review) => {
+			if (review.comment == 'Automated Comment') {
+				cy.deleteReviewById(review._id);
+			}
+		});
+	});
+});
+
+//Suggestions
+Cypress.Commands.add('deleteAutomationSuggestions', () => {
+	cy.log('Cleaning Suggestions...');
+	compoundURL = Cypress.env('baseUrl').concat(
+		Cypress.env('version'),
+		Cypress.env('route_suggestions'),
+		'/automation@gmail.com'
+	);
+	cy.request({
+		method: 'GET',
+		url: compoundURL
+	}).then((response) => {
+		let suggestionArray = response.body;
+		suggestionArray.forEach((suggestion) => {
+			cy.deleteReviewById(suggestion._id);
+		});
+	});
+});
+//Need Comments

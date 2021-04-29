@@ -57,6 +57,21 @@ describe('Users Routers', () => {
 		});
 	});
 
+	it('POST - /v1/users - Create User - New User - No Body', () => {
+		compoundURL = Cypress.env('baseUrl').concat(
+			Cypress.env('version'),
+			Cypress.env('route_users')
+		);
+		cy.request({
+			method: 'POST',
+			url: compoundURL,
+			body: {},
+			failOnStatusCode: false
+		}).should((response) => {
+			expect(response.status).to.be.eq(400);
+		});
+	});
+
 	it('POST - /v1/users - Create User - New User - Good Data', () => {
 		compoundURL = Cypress.env('baseUrl').concat(
 			Cypress.env('version'),
