@@ -6,7 +6,8 @@ const mongoURI = process.env.DB_URI || '';
 mongoose.connect(mongoURI, {
 	useFindAndModify: false,
 	useNewUrlParser: true,
-	useUnifiedTopology: true
+	useUnifiedTopology: true,
+	useCreateIndex: true
 });
 
 const db = mongoose.connection;

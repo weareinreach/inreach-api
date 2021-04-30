@@ -53,7 +53,8 @@ import {
 	removeUserListItem,
 	updateUser,
 	updateUserPassword,
-	addSharedUser
+	addSharedUser,
+	getuserList
 } from './users';
 import swaggerDocument from '../swagger.json';
 import verifyToken from '../middleware/verifyToken';
@@ -213,6 +214,7 @@ versionOneRouter.delete(
 	verifyToken,
 	removeUserListItem
 );
+versionOneRouter.get('/users/lists/:listId', verifyToken, getuserList);
 versionOneRouter.post('/users/forgotPassword', generatePasswordResetMail);
 
 //Reporting- Automation Tested
