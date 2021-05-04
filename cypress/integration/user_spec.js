@@ -553,6 +553,7 @@ describe('Users Routers', () => {
 			});
 		});
 	});
+
 	it('POST - /v1/users/:userId/lists/:listId/share - Share List via Email - Bad Payload', () => {
 		cy.get('@new_user').then((new_user) => {
 			cy.addUser(new_user).then((addedUserResponse) => {
@@ -577,6 +578,66 @@ describe('Users Routers', () => {
 									expect(response.status).to.be.eq(400);
 									expect(response.body.error).to.be.an('boolean');
 									expect(response.body.error).to.be.eq(true);
+								});
+							});
+						}
+					);
+				});
+			});
+		});
+	});
+
+	it('GET - /v1/users/lists/:listId - Get User List - Good List Item ID', () => {
+		cy.get('@new_user').then((new_user) => {
+			cy.addUser(new_user).then((addedUserResponse) => {
+				cy.get('@new_user_list').then((new_user_list) => {
+					cy.addList(addedUserResponse.body.userInfo._id, new_user_list).then(
+						() => {
+							cy.getUser(addedUserResponse.body.userInfo._id).then((user) => {
+								compoundURL = Cypress.env('baseUrl').concat(
+									Cypress.env('version'),
+									Cypress.env('route_users'),
+									Cypress.env('route_users_list'),
+									`/${user.body.lists[0]._id}`
+								);
+								cy.request({
+									method: 'GET',
+									url: compoundURL
+								}).should((response) => {
+									expect(response.status).to.be.eq(200);
+									expect(response.body.list).to.exist;
+									expect(response.body.list._id).to.be.eq(
+										user.body.lists[0]._id
+									);
+								});
+							});
+						}
+					);
+				});
+			});
+		});
+	});
+
+	it('GET - /v1/users/lists/:listId - Get User List - Bad List Item ID', () => {
+		cy.get('@new_user').then((new_user) => {
+			cy.addUser(new_user).then((addedUserResponse) => {
+				cy.get('@new_user_list').then((new_user_list) => {
+					cy.addList(addedUserResponse.body.userInfo._id, new_user_list).then(
+						() => {
+							cy.getUser(addedUserResponse.body.userInfo._id).then((user) => {
+								compoundURL = Cypress.env('baseUrl').concat(
+									Cypress.env('version'),
+									Cypress.env('route_users'),
+									Cypress.env('route_users_list'),
+									`/BadListId`
+								);
+								cy.request({
+									method: 'GET',
+									url: compoundURL,
+									failOnStatusCode: false
+								}).should((response) => {
+									expect(response.status).to.be.eq(500);
+									expect(response.body.list).to.not.exist;
 								});
 							});
 						}

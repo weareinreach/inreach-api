@@ -10,6 +10,8 @@ import {
 } from '../utils';
 import {ITEM_PAGE_LIMIT, getUserQuery, parsePageQuery} from '../utils/query';
 import {shareResource} from '../utils/sendMail';
+import mongoose from 'mongoose';
+const ObjectId = mongoose.Types.ObjectId;
 
 export const authUser = async (req, res) => {
 	const {email, password} = req?.body;
@@ -339,4 +341,21 @@ export const removeUserListItem = async (req, res) => {
 				.catch((err) => handleErr(err, res));
 		})
 		.catch((err) => handleErr(err, res));
+};
+
+export const getuserList = async (req, res) => {
+	try {
+		const {listId} = req.params;
+		if (!listId) {
+			return handleBadRequest(res);
+		}
+		const {lists} = await User.findOne({'lists._id': ObjectId(listId)});
+		if (!lists) {
+			return handleNotFound(res);
+		}
+		const list = lists.find((l) => l._id == listId);
+		res.json({list});
+	} catch (err) {
+		handleErr(err, res);
+	}
 };
