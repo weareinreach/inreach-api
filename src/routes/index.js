@@ -8,7 +8,9 @@ import {
 	getComments,
 	getRatings,
 	getSuggestions,
+	getUserSuggestionsByEmail,
 	updateComments,
+	deleteCommentById,
 	updateRatings
 } from './entity';
 import {
@@ -23,9 +25,10 @@ import {
 	getOrgsCount,
 	updateOrg,
 	sendOrgOwnerStatus,
-	getOrgsByName
+	getOrgsByName,
+	shareOrganization
 } from './organizations';
-import {getReviews, createReview} from './reviews';
+import {getReviews, createReview, deleteReviewById} from './reviews';
 import {
 	createService,
 	deleteService,
@@ -49,7 +52,9 @@ import {
 	getUsersCount,
 	removeUserListItem,
 	updateUser,
-	updateUserPassword
+	updateUserPassword,
+	addSharedUser,
+	getuserList
 } from './users';
 import swaggerDocument from '../swagger.json';
 import verifyToken from '../middleware/verifyToken';
@@ -83,6 +88,11 @@ versionOneRouter.post(
 	'/organizations/:orgId/owners',
 	verifyToken,
 	createOrgOwner
+);
+versionOneRouter.post(
+	'/organizations/:orgId/share',
+	verifyToken,
+	shareOrganization
 );
 versionOneRouter.get(
 	'/organizations/:orgId/owners/:userId/approve',
@@ -123,12 +133,16 @@ versionOneRouter.get(
 	getServiceBySlug
 );
 
-// Comments - Automation tested
+// Comments - Partially Automation tested
 versionOneRouter.get('/organizations/:orgId/comments', getComments);
 versionOneRouter.patch(
 	'/organizations/:orgId/comments',
 	verifyToken,
 	updateComments
+);
+versionOneRouter.delete(
+	'/organizations/:orgId/comments/:commentId',
+	deleteCommentById
 );
 versionOneRouter.get(
 	'/organizations/:orgId/services/:serviceId/comments',
@@ -138,6 +152,10 @@ versionOneRouter.patch(
 	'/organizations/:orgId/services/:serviceId/comments',
 	verifyToken,
 	updateComments
+);
+versionOneRouter.delete(
+	'/organizations/:orgId/services/:serviceId/comments/:commentId',
+	deleteCommentById
 );
 
 // Ratings - Automation tested
@@ -161,6 +179,7 @@ versionOneRouter.patch(
 versionOneRouter.get('/suggestions', getSuggestions);
 versionOneRouter.post('/suggestions', createSuggestions);
 versionOneRouter.delete('/suggestions/:suggestionId', deleteSuggestion);
+versionOneRouter.get('/suggestions/:email', getUserSuggestionsByEmail);
 
 // Users - Automated Tested
 versionOneRouter.get('/users', verifyToken, getUsers);
@@ -185,11 +204,17 @@ versionOneRouter.post(
 	verifyToken,
 	addUserListItem
 );
+versionOneRouter.post(
+	'/users/:userId/lists/:listId/share',
+	verifyToken,
+	addSharedUser
+);
 versionOneRouter.delete(
 	'/users/:userId/lists/:listId/items/:itemId',
 	verifyToken,
 	removeUserListItem
 );
+versionOneRouter.get('/users/lists/:listId', verifyToken, getuserList);
 versionOneRouter.post('/users/forgotPassword', generatePasswordResetMail);
 
 //Reporting- Automation Tested
@@ -202,9 +227,10 @@ versionOneRouter.get(
 	getServicesCountryCount
 );
 
-// Reviews - Automation Tested - Missing Delete Review endpoint
+// Reviews - Partially Automation Tested
 versionOneRouter.get('/reviews', getReviews);
 versionOneRouter.post('/reviews', createReview);
+versionOneRouter.delete('/reviews/:reviewId', deleteReviewById);
 
-// Static - Partially Automation Tested
+// Static -  Automation Tested
 versionOneRouter.get('/static/:pageId', getStaticPage);

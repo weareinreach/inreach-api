@@ -54,6 +54,23 @@ Cypress.Commands.add('addOrg', (org) => {
 	});
 });
 
+Cypress.Commands.add('addOrgOwner', (orgId, userId, userEmail) => {
+	compoundURL = Cypress.env('baseUrl').concat(
+		Cypress.env('version'),
+		Cypress.env('route_organizations'),
+		`/${orgId}`,
+		Cypress.env('route_organizations_owners')
+	);
+	cy.request({
+		method: 'POST',
+		url: compoundURL,
+		body: {
+			email: userEmail,
+			userId: userId
+		}
+	});
+});
+
 //Get Org By ID
 Cypress.Commands.add('getOrgById', (id) => {
 	compoundURL = Cypress.env('baseUrl').concat(
@@ -92,6 +109,97 @@ Cypress.Commands.add('addServiceToOrg', (orgId, service) => {
 		method: 'POST',
 		url: compoundURL,
 		body: service
+	});
+});
+
+//Add Rating to Org
+Cypress.Commands.add('addRatingToOrg', (orgId, rating) => {
+	compoundURL = Cypress.env('baseUrl').concat(
+		Cypress.env('version'),
+		Cypress.env('route_organizations'),
+		`/${orgId}`,
+		Cypress.env('route_ratings')
+	);
+	cy.request({
+		method: 'PATCH',
+		url: compoundURL,
+		body: rating
+	});
+});
+
+//Add Comment to Org
+Cypress.Commands.add('addCommentToOrg', (orgId, comment) => {
+	compoundURL = Cypress.env('baseUrl').concat(
+		Cypress.env('version'),
+		Cypress.env('route_organizations'),
+		`/${orgId}`,
+		Cypress.env('route_comments')
+	);
+	cy.request({
+		method: 'PATCH',
+		url: compoundURL,
+		body: comment
+	});
+});
+
+//Add Suggestion to Org
+Cypress.Commands.add('addSuggestionToOrg', (suggestion) => {
+	compoundURL = Cypress.env('baseUrl').concat(
+		Cypress.env('version'),
+		Cypress.env('route_suggestions')
+	);
+	cy.request({
+		method: 'POST',
+		url: compoundURL,
+		body: suggestion
+	});
+});
+
+//Get Suggestions from Org ID - Consider making this return all the suggestions for the org
+Cypress.Commands.add('getSuggestionByOrgId', () => {
+	compoundURL = Cypress.env('baseUrl').concat(
+		Cypress.env('version'),
+		Cypress.env('route_suggestions')
+	);
+	cy.request({
+		method: 'GET',
+		url: compoundURL
+	});
+});
+
+//Add Comment to Service
+Cypress.Commands.add('addCommentToService', (orgId, serviceId, comment) => {
+	compoundURL = Cypress.env('baseUrl').concat(
+		Cypress.env('version'),
+		Cypress.env('route_organizations'),
+		`/${orgId}`,
+		Cypress.env('route_services'),
+		`/${serviceId}`,
+		Cypress.env('route_comments')
+	);
+
+	cy.request({
+		method: 'PATCH',
+		url: compoundURL,
+		body: comment
+	});
+});
+
+//Add Rating to Service
+Cypress.Commands.add('addRatingToService', (orgId, serviceId, rating) => {
+	compoundURL = Cypress.env('baseUrl').concat(
+		Cypress.env('version'),
+		Cypress.env('route_organizations'),
+		`/${orgId}`,
+		Cypress.env('route_services'),
+		`/${serviceId}`,
+		Cypress.env('route_ratings')
+	);
+
+	cy.request({
+		method: 'PATCH',
+		url: compoundURL,
+		body: rating
 	});
 });
 
@@ -151,9 +259,193 @@ Cypress.Commands.add('addList', (user_id, list) => {
 
 //Delete Favorites List
 Cypress.Commands.add('deleteListById', (user_id, list_id) => {
-	compoundURL = `http://localhost:8080/v1/users/${user_id}/lists/${list_id}`;
+	compoundURL = Cypress.env('baseUrl').concat(
+		Cypress.env('version'),
+		Cypress.env('route_users'),
+		`/${user_id}`,
+		Cypress.env('route_users_list'),
+		`/${list_id}`
+	);
 	cy.request({
 		method: 'DELETE',
 		url: compoundURL
 	});
 });
+
+//Add Item to Favorites List
+Cypress.Commands.add('addListItem', (user, itemId) => {
+	compoundURL = Cypress.env('baseUrl').concat(
+		Cypress.env('version'),
+		Cypress.env('route_users'),
+		`/${user._id}`,
+		Cypress.env('route_users_list'),
+		`/${user.lists[0]._id}`,
+		Cypress.env('route_users_items')
+	);
+	cy.request({
+		method: 'POST',
+		url: compoundURL,
+		body: {
+			itemId: `${itemId}`
+		}
+	});
+});
+
+//GET Reviews
+Cypress.Commands.add('getReviews', () => {
+	compoundURL = Cypress.env('baseUrl').concat(
+		Cypress.env('version'),
+		Cypress.env('route_reviews')
+	);
+	cy.request({
+		method: 'GET',
+		url: compoundURL
+	});
+});
+
+//Add Review
+Cypress.Commands.add('addReview', (review) => {
+	compoundURL = Cypress.env('baseUrl').concat(
+		Cypress.env('version'),
+		Cypress.env('route_reviews')
+	);
+	cy.request({
+		method: 'POST',
+		url: compoundURL,
+		body: review
+	});
+});
+//Delete Review by Id
+Cypress.Commands.add('deleteReviewById', (id) => {
+	compoundURL = Cypress.env('baseUrl').concat(
+		Cypress.env('version'),
+		Cypress.env('route_reviews'),
+		`/${id}`
+	);
+	cy.request({
+		method: 'DELETE',
+		url: compoundURL
+	});
+});
+
+//GET Suggestions
+Cypress.Commands.add('getSuggestions', () => {
+	compoundURL = Cypress.env('baseUrl').concat(
+		Cypress.env('version'),
+		Cypress.env('route_suggestions')
+	);
+	cy.request({
+		method: 'GET',
+		url: compoundURL
+	});
+});
+
+//Add Suggestion
+Cypress.Commands.add('addSuggestion', (suggestion) => {
+	compoundURL = Cypress.env('baseUrl').concat(
+		Cypress.env('version'),
+		Cypress.env('route_suggestions')
+	);
+	cy.request({
+		method: 'DELETE',
+		url: compoundURL,
+		body: suggestion
+	});
+});
+
+//Delete Suggestion by Id
+Cypress.Commands.add('deleteSuggestionById', (id) => {
+	compoundURL = Cypress.env('baseUrl').concat(
+		Cypress.env('version'),
+		Cypress.env('route_suggestions'),
+		`/${id}`
+	);
+	cy.request({
+		method: 'DELETE',
+		url: compoundURL
+	});
+});
+
+// -------------- Cleaning Functions ------------------
+//Users
+Cypress.Commands.add('deleteUsersIfExist', () => {
+	cy.log('Cleaning Users...');
+	compoundURL = Cypress.env('baseUrl').concat(
+		Cypress.env('version'),
+		Cypress.env('route_users')
+	);
+	cy.request({
+		method: 'GET',
+		url: compoundURL
+	}).then((response) => {
+		let usersArray = response.body.users;
+		usersArray.forEach((user) => {
+			//Regular User
+			if (
+				user.email === 'automation@gmail.com' ||
+				user.email === 'automation-updated@gmail.com'
+			) {
+				cy.deleteUser(user._id);
+			}
+		});
+	});
+});
+
+//Organizations
+Cypress.Commands.add('deleteOrgsIfExist', () => {
+	cy.log('Cleaning Orgs...');
+	compoundURL = Cypress.env('baseUrl').concat(
+		Cypress.env('version'),
+		Cypress.env('route_slug_organizations'),
+		'/surprisingly-unique-organizations-slug'
+	);
+	cy.request({
+		method: 'GET',
+		url: compoundURL,
+		failOnStatusCode: false
+	}).then((response) => {
+		if (!response.body.notFound) {
+			cy.deleteOrgById(response.body._id);
+		}
+	});
+});
+
+//Reviews
+Cypress.Commands.add('deleteAutomationReviews', () => {
+	cy.log('Cleaning Reviews...');
+	compoundURL = Cypress.env('baseUrl').concat(
+		Cypress.env('version'),
+		Cypress.env('route_reviews')
+	);
+	cy.request({
+		method: 'GET',
+		url: compoundURL
+	}).then((response) => {
+		let reviewsArray = response.body.reviews;
+		reviewsArray.forEach((review) => {
+			if (review.comment == 'Automated Comment') {
+				cy.deleteReviewById(review._id);
+			}
+		});
+	});
+});
+
+//Suggestions
+Cypress.Commands.add('deleteAutomationSuggestions', () => {
+	cy.log('Cleaning Suggestions...');
+	compoundURL = Cypress.env('baseUrl').concat(
+		Cypress.env('version'),
+		Cypress.env('route_suggestions'),
+		'/automation@gmail.com'
+	);
+	cy.request({
+		method: 'GET',
+		url: compoundURL
+	}).then((response) => {
+		let suggestionArray = response.body;
+		suggestionArray.forEach((suggestion) => {
+			cy.deleteSuggestionById(suggestion._id);
+		});
+	});
+});
+//Need Comments

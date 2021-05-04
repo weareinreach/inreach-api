@@ -7,19 +7,19 @@ import config from './config';
 const {tokenSignature} = config;
 
 export const formatService = (service, org) => {
-  // eslint-disable-next-line no-unused-vars
-  const {services, ...restOrg} = org;
-  const formattedService = {
-    ...service,
-    organization: {...restOrg},
-  };
+	// eslint-disable-next-line no-unused-vars
+	const {services, ...restOrg} = org;
+	const formattedService = {
+		...service,
+		organization: {...restOrg}
+	};
 
-  return formattedService;
+	return formattedService;
 };
 
 export const orderServices = (services) => {
-  // TODO: places orgs with no value first
-  return _orderBy(services, ['updated_at'], ['desc']);
+	// TODO: places orgs with no value first
+	return _orderBy(services, ['updated_at'], ['desc']);
 };
 
 /**
@@ -28,7 +28,7 @@ export const orderServices = (services) => {
  * @return {Object} Sanitized user info
  */
 export const removeUserInfo = (user) => {
-  return _omit(user, ['hash', 'password', 'salt']);
+	return _omit(user, ['hash', 'password', 'salt']);
 };
 
 /**
@@ -37,7 +37,7 @@ export const removeUserInfo = (user) => {
  * @return {???} Returns the express function
  */
 export const handleBadRequest = (res) => {
-  return res.status(400).json({error: true});
+	return res.status(400).json({error: true});
 };
 
 /**
@@ -46,7 +46,7 @@ export const handleBadRequest = (res) => {
  * @return {???} Returns the express function
  */
 export const handleNotFound = (res) => {
-  return res.status(404).json({notFound: true});
+	return res.status(404).json({notFound: true});
 };
 
 /**
@@ -56,10 +56,10 @@ export const handleNotFound = (res) => {
  * @return {???} Returns the express function
  */
 export const handleErr = (err, res) => {
-  // eslint-disable-next-line
-  console.error(err);
+	// eslint-disable-next-line
+	console.error(err);
 
-  return res.status(500).json({error: true});
+	return res.status(500).json({error: true});
 };
 
 /**
@@ -68,18 +68,18 @@ export const handleErr = (err, res) => {
  * @return {String} jwt
  */
 export const generateJWT = (user) => {
-  const today = new Date();
-  const expDate = new Date(today);
+	const today = new Date();
+	const expDate = new Date(today);
 
-  expDate.setDate(today.getDate() + 14);
+	expDate.setDate(today.getDate() + 14);
 
-  return jwt.sign(
-    {
-      ...user,
-      exp: parseInt(expDate.getTime() / 1000),
-    },
-    tokenSignature
-  );
+	return jwt.sign(
+		{
+			...user,
+			exp: parseInt(expDate.getTime() / 1000)
+		},
+		tokenSignature
+	);
 };
 
 /**
@@ -88,13 +88,22 @@ export const generateJWT = (user) => {
  * @return {Promise} Returns a promise since jwt.verify is async
  */
 export const verifyJWT = (token) => {
-  return new Promise((resolve) => {
-    jwt.verify(token, tokenSignature, (err, decoded) => {
-      if (err) {
-        resolve({valid: false});
-      }
+	return new Promise((resolve) => {
+		jwt.verify(token, tokenSignature, (err, decoded) => {
+			if (err) {
+				resolve({valid: false});
+			}
 
-      resolve({user: decoded, valid: true});
-    });
-  });
+			resolve({user: decoded, valid: true});
+		});
+	});
+};
+
+/**
+ * Verify payload body is empty
+ * @param {} body payload body object to verify if empty or not
+ * @return {true|false} returns boolean, either is empty or not
+ */
+export const isBodyEmpty = (body) => {
+	return Object.keys(body).length === 0;
 };

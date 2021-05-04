@@ -4,10 +4,14 @@ import {
 	handleBadRequest,
 	handleErr,
 	handleNotFound,
+	isBodyEmpty,
 	removeUserInfo,
 	verifyJWT
 } from '../utils';
 import {ITEM_PAGE_LIMIT, getUserQuery, parsePageQuery} from '../utils/query';
+import {shareResource} from '../utils/sendMail';
+import mongoose from 'mongoose';
+const ObjectId = mongoose.Types.ObjectId;
 
 export const authUser = async (req, res) => {
 	const {email, password} = req?.body;
@@ -79,7 +83,7 @@ export const createUser = async (req, res) => {
 	try {
 		const {password, ...body} = req?.body;
 
-		if (!body || !password) {
+		if (isBodyEmpty(body) || !password) {
 			return handleBadRequest(res);
 		}
 		// query if user already exists
@@ -132,7 +136,7 @@ export const updateUser = async (req, res) => {
 	const body = req?.body;
 	const updated_at = Date.now();
 
-	if (!body) {
+	if (isBodyEmpty(body)) {
 		return handleBadRequest(res);
 	}
 
@@ -175,7 +179,7 @@ export const createUserList = async (req, res) => {
 	const {userId} = req?.params;
 	const {name} = req?.body;
 
-	if (!name || !userId) {
+	if (isBodyEmpty(name) || !userId) {
 		return handleBadRequest(res);
 	}
 
@@ -272,6 +276,38 @@ export const addUserListItem = async (req, res) => {
 		.catch((err) => handleErr(err, res));
 };
 
+export const addSharedUser = async (req, res) => {
+	const {listId, userId} = req?.params;
+	const {email, shareType, shareUrl} = req?.body;
+	if (!email || !shareType || !shareUrl || !listId || !userId) {
+		return handleBadRequest(res);
+	}
+	try {
+		const user = await User.findById(userId);
+		if (!user) {
+			return handleNotFound(res);
+		}
+		const list = user.lists.id(listId);
+
+		if (!list) {
+			return handleNotFound(res);
+		}
+		const newUser = {user_id: null, email: email};
+
+		if (list.shared_with) {
+			list.shared_with.push(newUser);
+		} else {
+			list.shared_with = [newUser];
+		}
+		list.visibility = 'shared';
+
+		await user.save();
+		return shareResource(email, shareType, shareUrl, list, res);
+	} catch (err) {
+		handleErr(err, res);
+	}
+};
+
 export const removeUserListItem = async (req, res) => {
 	const {itemId, listId, userId} = req?.params;
 	if (!itemId || !listId || !userId) {
@@ -305,4 +341,21 @@ export const removeUserListItem = async (req, res) => {
 				.catch((err) => handleErr(err, res));
 		})
 		.catch((err) => handleErr(err, res));
+};
+
+export const getuserList = async (req, res) => {
+	try {
+		const {listId} = req.params;
+		if (!listId) {
+			return handleBadRequest(res);
+		}
+		const {lists} = await User.findOne({'lists._id': ObjectId(listId)});
+		if (!lists) {
+			return handleNotFound(res);
+		}
+		const list = lists.find((l) => l._id == listId);
+		res.json({list});
+	} catch (err) {
+		handleErr(err, res);
+	}
 };

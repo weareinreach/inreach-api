@@ -4,32 +4,25 @@
 //compound url
 let compoundURL = null;
 
-//Routes constants
-const route_services = '/services';
-const route_services_count = '/services/count';
-const route_organizations = '/organizations';
-
 //Test Suite
 describe('Services Routers', () => {
-	before(() => {
-		cy.fixture('org_good_format.json').then((org) => {
-			//Add Automation Org
-			cy.addOrg(org).then((response) => {
-				cy.writeFile(
-					Cypress.env('filePath').concat('/org_created.json'),
-					response.body
-				);
-			});
-		});
+	beforeEach(() => {
+		cy.fixture('org_good_format.json').as('organization');
+		cy.fixture('org_services.json').as('service');
+		cy.fixture('org_services_update.json').as('service_update');
 	});
-
+	afterEach(() => {
+		//Do the clean up
+		cy.deleteUsersIfExist();
+		cy.deleteOrgsIfExist();
+	});
 	it('GET - /v1/organizations/:orgId/services - Get Organization Services - Good Org ID', () => {
-		cy.readFile(Cypress.env('filePath').concat('/org_created.json')).then(
-			(org) => {
+		cy.get('@organization').then((org) => {
+			cy.addOrg(org).then((createdOrgResponse) => {
 				compoundURL = Cypress.env('baseUrl').concat(
 					Cypress.env('version'),
 					Cypress.env('route_organizations'),
-					`/${org.organization._id}`,
+					`/${createdOrgResponse.body.organization._id}`,
 					Cypress.env('route_services')
 				);
 				cy.request({
@@ -38,8 +31,8 @@ describe('Services Routers', () => {
 				}).should((response) => {
 					expect(response.status).to.be.eq(200);
 				});
-			}
-		);
+			});
+		});
 	});
 
 	it('GET - /v1/organizations/:orgId/services - Get Organization Services - Bad Org ID', () => {
@@ -86,98 +79,117 @@ describe('Services Routers', () => {
 			failOnStatusCode: false,
 			body: {}
 		}).should((response) => {
-			expect(response.status).to.be.eq(500);
+			expect(response.status).to.be.eq(400);
 		});
 	});
 
-	it('POST - /v1/organzizations/:orgId/services - Add Services to a Organizations - Good Org Id', () => {
-		cy.readFile(Cypress.env('filePath').concat('/org_created.json')).then(
-			(org) => {
-				cy.fixture('org_services.json').then((org_service) => {
+	it('POST - /v1/organizations/:orgId/services - Add Services to a Organizations - Good Org Id', () => {
+		cy.get('@organization').then((organization) => {
+			cy.addOrg(organization).then((createdOrgResponse) => {
+				cy.get('@service').then((service) => {
 					compoundURL = Cypress.env('baseUrl').concat(
 						Cypress.env('version'),
 						Cypress.env('route_organizations'),
-						`/${org.organization._id}`,
+						`/${createdOrgResponse.body.organization._id}`,
 						Cypress.env('route_services')
 					);
 					cy.request({
 						method: 'POST',
 						url: compoundURL,
-						body: org_service
+						body: service
 					}).should((response) => {
 						expect(response.status).to.be.eq(200);
 						expect(response.body.created).to.be.an('boolean');
 						expect(response.body.created).to.be.eq(true);
 					});
 					//verify Services were added
-					cy.getOrgById(org.organization._id).then((response) => {
-						expect(response.body.services).to.be.an('array');
-						expect(response.body.services[0].name).to.be.eq(org_service.name);
-						expect(response.body.services[0].description).to.be.eq(
-							org_service.description
-						);
-						//Update Org
-						cy.writeFile(
-							Cypress.env('filePath').concat('/org_created.json'),
-							response.body
-						);
-					});
+					cy.getOrgById(createdOrgResponse.body.organization._id).then(
+						(response) => {
+							expect(response.body.services).to.be.an('array');
+							expect(response.body.services[0].name).to.be.eq(service.name);
+							expect(response.body.services[0].description).to.be.eq(
+								service.description
+							);
+						}
+					);
 				});
-			}
-		);
+			});
+		});
 	});
 
 	it('GET - /v1/organizations/:orgId/services/:serviceId - Good Org ID and Service ID', () => {
-		cy.fixture('org_services.json').then((org_service) => {
-			cy.readFile(Cypress.env('filePath').concat('/org_created.json')).then(
-				(org) => {
-					compoundURL = Cypress.env('baseUrl').concat(
-						Cypress.env('version'),
-						Cypress.env('route_organizations'),
-						`/${org._id}`,
-						Cypress.env('route_services'),
-						`/${org.services[0]._id}`
-					);
-					cy.request({
-						method: 'GET',
-						url: compoundURL
-					}).should((response) => {
-						expect(response.status).to.be.eq(200);
-						expect(response.body.name).to.be.eq(org_service.name);
-						expect(response.body.description).to.be.eq(org_service.description);
+		cy.get('@organization').then((organization) => {
+			cy.addOrg(organization).then((createdOrgResponse) => {
+				cy.get('@service').then((service) => {
+					cy.addServiceToOrg(
+						createdOrgResponse.body.organization._id,
+						service
+					).then(() => {
+						cy.getOrgById(createdOrgResponse.body.organization._id).then(
+							(retrievedOrgResponse) => {
+								compoundURL = Cypress.env('baseUrl').concat(
+									Cypress.env('version'),
+									Cypress.env('route_organizations'),
+									`/${retrievedOrgResponse.body._id}`,
+									Cypress.env('route_services'),
+									`/${retrievedOrgResponse.body.services[0]._id}`
+								);
+								cy.request({
+									method: 'GET',
+									url: compoundURL
+								}).should((response) => {
+									expect(response.status).to.be.eq(200);
+									expect(response.body.name).to.be.eq(service.name);
+									expect(response.body.description).to.be.eq(
+										service.description
+									);
+								});
+							}
+						);
 					});
-				}
-			);
+				});
+			});
 		});
 	});
 
 	it('GET - /v1/organizations/:orgId/services/:serviceId - Bad Org ID and Good Service ID', () => {
-		cy.readFile(Cypress.env('filePath').concat('/org_created.json')).then(
-			(org) => {
-				compoundURL = Cypress.env('baseUrl').concat(
-					Cypress.env('version'),
-					Cypress.env('route_organizations'),
-					'/BADOORGID',
-					`/${org.services[0]._id}`
-				);
-				cy.request({
-					method: 'GET',
-					url: compoundURL,
-					failOnStatusCode: false
-				}).should((response) => {
-					expect(response.status).to.be.eq(404);
+		cy.get('@organization').then((organization) => {
+			cy.addOrg(organization).then((createdOrgResponse) => {
+				cy.get('@service').then((service) => {
+					cy.addServiceToOrg(
+						createdOrgResponse.body.organization._id,
+						service
+					).then(() => {
+						cy.getOrgById(createdOrgResponse.body.organization._id).then(
+							(retrievedOrgResponse) => {
+								compoundURL = Cypress.env('baseUrl').concat(
+									Cypress.env('version'),
+									Cypress.env('route_organizations'),
+									'/BADOORGID',
+									`/${retrievedOrgResponse.body.services[0]._id}`
+								);
+								cy.request({
+									method: 'GET',
+									url: compoundURL,
+									failOnStatusCode: false
+								}).should((response) => {
+									expect(response.status).to.be.eq(404);
+								});
+							}
+						);
+					});
 				});
-			}
-		);
+			});
+		});
 	});
 
 	it('GET - /v1/organizations/:orgId/services/:serviceId - Good Org ID and Bad Service ID', () => {
-		cy.readFile(Cypress.env('filePath').concat('/org_created.json')).then(
-			(org) => {
+		cy.get('@organization').then((organization) => {
+			cy.addOrg(organization).then((createdOrgResponse) => {
 				compoundURL = Cypress.env('baseUrl').concat(
 					Cypress.env('version'),
 					Cypress.env('route_organizations'),
-					`/${org._id}`,
+					`/${createdOrgResponse.body.organization._id}`,
 					Cypress.env('route_services'),
 					'/BADSERVICEID'
 				);
@@ -188,81 +200,100 @@ describe('Services Routers', () => {
 				}).should((response) => {
 					expect(response.status).to.be.eq(404);
 				});
-			}
-		);
+			});
+		});
 	});
 
 	it('PATCH - /v1/organizations/:orgId/services/:serviceId - Update a Service Information - Good Org and Services', () => {
-		cy.fixture('org_services_update.json').then((org_service_updated) => {
-			cy.readFile(Cypress.env('filePath').concat('/org_created.json')).then(
-				(org) => {
-					compoundURL = Cypress.env('baseUrl').concat(
-						Cypress.env('version'),
-						Cypress.env('route_organizations'),
-						`/${org._id}`,
-						Cypress.env('route_services'),
-						`/${org.services[0]._id}`
-					);
-					cy.request({
-						method: 'PATCH',
-						url: compoundURL,
-						body: org_service_updated
-					}).should((response) => {
-						expect(response.status).to.be.eq(200);
-						expect(response.body.updated).to.be.an('boolean');
-						expect(response.body.updated).to.be.eq(true);
-						//Get Organization and verify it was updated
-						cy.getOrgById(org._id).then((response) => {
-							expect(response.body.services).to.be.an('array');
-							expect(response.body.services[0].name).to.be.eq(
-								org_service_updated.name
-							);
-							expect(response.body.services[0].description).to.be.eq(
-								org_service_updated.description
-							);
-							//Update Org
-							cy.writeFile(
-								Cypress.env('filePath').concat('/org_created.json'),
-								response.body
-							);
-						});
+		cy.get('@organization').then((organization) => {
+			cy.addOrg(organization).then((createdOrgResponse) => {
+				cy.get('@service').then((service) => {
+					cy.addServiceToOrg(
+						createdOrgResponse.body.organization._id,
+						service
+					).then(() => {
+						cy.getOrgById(createdOrgResponse.body.organization._id).then(
+							(retrievedOrgResponse) => {
+								cy.get('@service_update').then((service_update) => {
+									compoundURL = Cypress.env('baseUrl').concat(
+										Cypress.env('version'),
+										Cypress.env('route_organizations'),
+										`/${retrievedOrgResponse.body._id}`,
+										Cypress.env('route_services'),
+										`/${retrievedOrgResponse.body.services[0]._id}`
+									);
+									cy.request({
+										method: 'PATCH',
+										url: compoundURL,
+										body: service_update
+									}).should((response) => {
+										expect(response.status).to.be.eq(200);
+										expect(response.body.updated).to.be.an('boolean');
+										expect(response.body.updated).to.be.eq(true);
+										//Get Organization and verify it was updated
+										cy.getOrgById(retrievedOrgResponse.body._id).then(
+											(response) => {
+												expect(response.body.services).to.be.an('array');
+												expect(response.body.services[0].name).to.be.eq(
+													service_update.name
+												);
+												expect(response.body.services[0].description).to.be.eq(
+													service_update.description
+												);
+											}
+										);
+									});
+								});
+							}
+						);
 					});
-				}
-			);
+				});
+			});
 		});
 	});
 
 	it('PATCH - /v1/organizations/:orgId/services/:serviceId - Update a Service Information - Bad Org and Good Services', () => {
-		cy.readFile(Cypress.env('filePath').concat('/org_created.json')).then(
-			(org) => {
-				cy.fixture('org_services_update.json').then((org_service_updated) => {
-					compoundURL = Cypress.env('baseUrl').concat(
-						Cypress.env('version'),
-						Cypress.env('route_organizations'),
-						'/BADORGID',
-						Cypress.env('route_services'),
-						`/${org.services[0]._id}`
-					);
-					cy.request({
-						method: 'PATCH',
-						url: compoundURL,
-						body: org_service_updated,
-						failOnStatusCode: false
-					}).should((response) => {
-						expect(response.status).to.be.eq(500);
+		cy.get('@organization').then((organization) => {
+			cy.addOrg(organization).then((createdOrgResponse) => {
+				cy.get('@service').then((service) => {
+					cy.addServiceToOrg(
+						createdOrgResponse.body.organization._id,
+						service
+					).then(() => {
+						cy.getOrgById(createdOrgResponse.body.organization._id).then(
+							(retrievedOrgResponse) => {
+								cy.get('@service_update').then((service_update) => {
+									compoundURL = Cypress.env('baseUrl').concat(
+										Cypress.env('version'),
+										Cypress.env('route_organizations'),
+										'/BADORGID',
+										Cypress.env('route_services'),
+										`/${retrievedOrgResponse.body.services[0]._id}`
+									);
+									cy.request({
+										method: 'PATCH',
+										url: compoundURL,
+										body: service_update,
+										failOnStatusCode: false
+									}).should((response) => {
+										expect(response.status).to.be.eq(500);
+									});
+								});
+							}
+						);
 					});
 				});
-			}
-		);
+			});
+		});
 	});
 
 	it('PATCH - /v1/organizations/:orgId/services/:serviceId - Update a Service Information - Good Org and Bad Services', () => {
-		cy.readFile(Cypress.env('filePath').concat('/org_created.json')).then(
-			(org) => {
+		cy.get('@organization').then((organization) => {
+			cy.addOrg(organization).then((createdOrgResponse) => {
 				compoundURL = Cypress.env('baseUrl').concat(
 					Cypress.env('version'),
 					Cypress.env('route_organizations'),
-					`/${org._id}`,
+					`/${createdOrgResponse.body.organization._id}`,
 					Cypress.env('route_services'),
 					'/BADSERVICESID'
 				);
@@ -272,45 +303,53 @@ describe('Services Routers', () => {
 					body: {},
 					failOnStatusCode: false
 				}).should((response) => {
-					expect(response.status).to.be.eq(500);
+					expect(response.status).to.be.eq(400);
 				});
-			}
-		);
+			});
+		});
 	});
 	it('DELETE - /v1/organization/:orgId/services/:serviceId - Delete Service from Org', () => {
-		cy.readFile(Cypress.env('filePath').concat('/org_created.json')).then(
-			(org) => {
-				compoundURL = Cypress.env('baseUrl').concat(
-					Cypress.env('version'),
-					Cypress.env('route_organizations'),
-					`/${org._id}`,
-					Cypress.env('route_services'),
-					`/${org.services[0]._id}`
-				);
-				cy.request({
-					method: 'DELETE',
-					url: compoundURL
-				}).should((response) => {
-					expect(response.status).to.be.eq(200);
-					expect(response.body.deleted).to.be.an('boolean');
-					expect(response.body.deleted).to.be.eq(true);
-					//Get Organization and verify it was updated
-					cy.getOrgById(org._id).then((response) => {
-						expect(response.body.services).to.be.an('array');
-						expect(response.body.services).to.have.lengthOf(0);
+		cy.get('@organization').then((organization) => {
+			cy.addOrg(organization).then((createdOrgResponse) => {
+				cy.get('@service').then((service) => {
+					cy.addServiceToOrg(
+						createdOrgResponse.body.organization._id,
+						service
+					).then(() => {
+						cy.getOrgById(createdOrgResponse.body.organization._id).then(
+							(retrievedOrgResponse) => {
+								compoundURL = Cypress.env('baseUrl').concat(
+									Cypress.env('version'),
+									Cypress.env('route_organizations'),
+									`/${retrievedOrgResponse.body._id}`,
+									Cypress.env('route_services'),
+									`/${retrievedOrgResponse.body.services[0]._id}`
+								);
+								cy.request({
+									method: 'DELETE',
+									url: compoundURL
+								}).should((response) => {
+									expect(response.status).to.be.eq(200);
+									expect(response.body.deleted).to.be.an('boolean');
+									expect(response.body.deleted).to.be.eq(true);
+									//Get Organization and verify it was updated
+									cy.getOrgById(retrievedOrgResponse.body._id).then(
+										(response) => {
+											expect(response.body.services).to.be.an('array');
+											expect(response.body.services).to.have.lengthOf(0);
+										}
+									);
+								});
+							}
+						);
 					});
 				});
-			}
-		);
+			});
+		});
 	});
 
 	after(() => {
-		cy.readFile(Cypress.env('filePath').concat('/org_created.json')).then(
-			(org) => {
-				cy.deleteOrgById(org._id);
-				//Delete temp_data folder
-				cy.exec('rm -fr '.concat(Cypress.env('filePath')));
-			}
-		);
+		//Delete temp_data folder
+		cy.exec('rm -fr '.concat(Cypress.env('filePath')));
 	});
 });
