@@ -90,7 +90,7 @@ export const getOrgs = async (req, res) => {
 			verified_at: {$lte: new Date(query.lastVerified)}
 		});
 	}
-	//
+
 	if (query.lastUpdated) {
 		dbQuery = Object.assign(dbQuery, {
 			updated_at: {$lte: new Date(query.lastUpdated)}
