@@ -16,13 +16,14 @@ import {Organization} from '../mongoose';
 
 export const getOrgs = async (req, res) => {
 	const {limit, offset} = parsePageQuery(req?.query?.page);
-	const query = getOrganizationQuery(req?.query);
+	const {query} = req;
+	let dbQuery = getOrganizationQuery(query);
 	var sortObjectArray = '';
 	var obj = {};
 
-	if (query['services']) {
-		if (query['services']['$elemMatch']['$or']) {
-			sortObjectArray = query['services']['$elemMatch']['$or'];
+	if (dbQuery['services']) {
+		if (dbQuery['services']['$elemMatch']['$or']) {
+			sortObjectArray = dbQuery['services']['$elemMatch']['$or'];
 
 			var nestedNameArray = sortObjectArray.map(function (el) {
 				return Object.getOwnPropertyNames(el);
@@ -52,8 +53,8 @@ export const getOrgs = async (req, res) => {
 			for (const key of prioritySort) {
 				obj[key] = -1;
 			}
-		} else if (query['services']['$elemMatch']['$and']) {
-			sortObjectArray = query['services']['$elemMatch']['$and'][0]['$or'];
+		} else if (dbQuery['services']['$elemMatch']['$and']) {
+			sortObjectArray = dbQuery['services']['$elemMatch']['$and'][0]['$or'];
 			var nestedTagNameArray = sortObjectArray.map(function (el) {
 				return Object.getOwnPropertyNames(el);
 			});
@@ -84,8 +85,12 @@ export const getOrgs = async (req, res) => {
 			}
 		}
 	}
-
-	await Organization.find(query)
+	if (query.lastVerified) {
+		dbQuery = Object.assign(dbQuery, {
+			verified_at: {$lte: new Date(query.lastVerified)}
+		});
+	}
+	await Organization.find(dbQuery)
 		.sort(obj)
 		.skip(offset)
 		.limit(limit)
