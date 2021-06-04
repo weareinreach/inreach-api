@@ -95,6 +95,7 @@ const OrganizationSchema = new Schema(
 				show_on_organization: Boolean
 			}
 		],
+		photos: [],
 		properties: {},
 		schedules: [
 			{
@@ -122,6 +123,7 @@ const OrganizationSchema = new Schema(
 		slug_ES: {type: String, unique: true},
 		source: String,
 		verified_at: Date,
+		venue_id: String,
 		website: String,
 		website_ES: String
 	},
