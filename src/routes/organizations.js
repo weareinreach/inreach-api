@@ -13,6 +13,7 @@ import {
 import {sendEmail} from '../utils/mail';
 import {shareResource} from '../utils/sendMail';
 import {Organization} from '../mongoose';
+import {auditEdit} from './editLogs';
 
 export const getOrgs = async (req, res) => {
 	const {limit, offset} = parsePageQuery(req?.query?.page);
@@ -130,6 +131,11 @@ export const getOrgsCount = async (req, res) => {
 
 export const createOrg = async (req, res) => {
 	const body = req?.body;
+	const {userId, organization} = body;
+	if (userId && organization) {
+		return createOrgAudit(req, res);
+	}
+
 	const org = new Organization(body);
 
 	if (isBodyEmpty(body)) {
@@ -144,11 +150,33 @@ export const createOrg = async (req, res) => {
 		.catch((err) => handleErr(err, res));
 };
 
+const createOrgAudit = async (req, res) => {
+	const body = req?.body;
+	const {userId, organization} = body;
+
+	if (isBodyEmpty(organization)) {
+		return handleBadRequest(res);
+	}
+
+	const org = new Organization(organization);
+	await org
+		.save()
+		.then((organization) => {
+			auditEdit(userId, 'ORGANIZATION', {}, organization, 'ADDED');
+			return res.json({created: true, organization});
+		})
+		.catch((err) => handleErr(err, res));
+};
+
 export const deleteOrg = async (req, res) => {
 	const {orgId} = req?.params;
+	const {userId} = req?.body;
 
 	await Organization.findByIdAndDelete(orgId)
-		.then(() => {
+		.then((deletedOrg) => {
+			if (deletedOrg && userId) {
+				auditEdit(userId, 'ORGANIZATION', deletedOrg, {}, 'DELETED');
+			}
 			return res.json({deleted: true});
 		})
 		.catch((err) => handleErr(err, res));
@@ -173,10 +201,15 @@ export const getOrg = async (req, res) => {
 export const updateOrg = async (req, res) => {
 	const {orgId} = req?.params;
 	const body = req?.body;
+	const {userId, updates} = body;
 	const updated_at = Date.now();
 
 	if (isBodyEmpty(body)) {
 		return handleBadRequest(res);
+	}
+
+	if (userId && updates) {
+		return updateOrgAudit(req, res);
 	}
 
 	await Organization.findOneAndUpdate(
@@ -188,6 +221,34 @@ export const updateOrg = async (req, res) => {
 				return handleNotFound(res);
 			}
 
+			return res.json({updated: true});
+		})
+		.catch((err) => handleErr(err, res));
+};
+
+const updateOrgAudit = async (req, res) => {
+	const {orgId} = req?.params;
+
+	const {userId, updates} = req?.body;
+	const updated_at = Date.now();
+
+	if (isBodyEmpty(updates)) {
+		return handleBadRequest(res);
+	}
+
+	await Organization.findById(orgId)
+		.then(async (organization) => {
+			if (!organization) {
+				return handleNotFound(res);
+			}
+
+			await Organization.findOneAndUpdate(
+				{_id: orgId},
+				{$set: {...updates, updated_at}},
+				{new: true}
+			).then((updatedOrg) => {
+				auditEdit(userId, 'ORGANIZATION', organization, updatedOrg, 'UPDATED');
+			});
 			return res.json({updated: true});
 		})
 		.catch((err) => handleErr(err, res));
@@ -210,7 +271,7 @@ export const getOrgBySlug = async (req, res) => {
 export const createOrgOwner = async (req, res) => {
 	try {
 		const {orgId} = req?.params;
-		const {email, userId} = req?.body;
+		const {email, userId, authorId} = req?.body;
 
 		if (!email || !userId) {
 			return handleBadRequest(res);
@@ -232,7 +293,10 @@ export const createOrgOwner = async (req, res) => {
 
 		const newOwner = {email, isApproved: false, userId};
 		organization.owners.push(newOwner);
-		await organization.save();
+		const saveResult = await organization.save();
+		if (authorId) {
+			auditEdit(authorId, 'ORGANIZATION', organization, saveResult, 'UPDATED');
+		}
 		return res.json({created: true});
 	} catch (err) {
 		handleErr(err, res);
@@ -241,6 +305,7 @@ export const createOrgOwner = async (req, res) => {
 
 export const approveOrgOwner = async (req, res) => {
 	const {orgId, userId} = req?.params;
+	const {authorId} = req?.body;
 
 	await Organization.findById(orgId)
 		.then(async (organization) => {
@@ -260,7 +325,18 @@ export const approveOrgOwner = async (req, res) => {
 
 			await organization
 				.save()
-				.then(() => res.json({updated: true}))
+				.then((saveResult) => {
+					if (authorId) {
+						auditEdit(
+							authorId,
+							'ORGANIZATION',
+							organization,
+							saveResult,
+							'UPDATED'
+						);
+					}
+					return res.json({updated: true});
+				})
 				.catch((err) => handleErr(err, res));
 		})
 		.catch((err) => handleErr(err, res));
@@ -268,6 +344,7 @@ export const approveOrgOwner = async (req, res) => {
 
 export const deleteOrgOwner = async (req, res) => {
 	const {orgId, userId} = req?.params;
+	const {authorId} = req?.body;
 
 	await Organization.findById(orgId)
 		.then(async (organization) => {
@@ -287,7 +364,18 @@ export const deleteOrgOwner = async (req, res) => {
 
 			await organization
 				.save()
-				.then(() => res.json({deleted: true}))
+				.then((saveResult) => {
+					if (authorId) {
+						auditEdit(
+							authorId,
+							'ORGANIZATION',
+							organization,
+							saveResult,
+							'UPDATED'
+						);
+					}
+					return res.json({deleted: true});
+				})
 				.catch((err) => handleErr(err, res));
 		})
 		.catch((err) => handleErr(err, res));
@@ -305,7 +393,7 @@ export let sendOrgOwnerStatus = async (req, res, next) => {
 	switch (ownerStatus) {
 		case 'approve':
 			subject = `You are now affiliated with ${org} on AsylumConnect`;
-			message = `Thank you for requesting to join ${org} on the AsylumConnect Catalog (https://asylumconnect.org). Our team has approved your request and your AsylumConnect user account is now connected to ${org}\'s profile page on AsylumConnect.\n\nBest,\nThe AsylumConnect Team`;
+			message = `Thank you for requesting to join ${org} on the AsylumConnect Catalog (https://asylumconnect.org). Our team has approved your request and your AsylumConnect user account is now connected to ${org}'s profile page on AsylumConnect.\n\nBest,\nThe AsylumConnect Team`;
 			html = `<html>Thank you for requesting to join ${org} on the <a href='https://asylumconnect.org'>AsylumConnect Catalog</a>. Our team has approved your request and your AsylumConnect user account is now connected to ${org}'s profile page on AsylumConnect.<br/><br/>Best,<br/>The AsylumConnect Team</html>`;
 			break;
 		case 'deny':

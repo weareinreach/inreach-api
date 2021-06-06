@@ -7,9 +7,9 @@
 ```
 $ cd to catalog-api
 
-$ npm i
+$ yarn i
 
-$ npm start
+$ yarn run start
 ```
 
 In order to run the app you need a [.env][https://www.npmjs.com/package/dotenv] file with a valid `MONGODB_URI` value for the mongodb connection string.
@@ -46,17 +46,15 @@ Project uses both Unit Testing and E2E Testing to ensure quality and coverage st
 - [Istanbul](https://istanbul.js.org/)
 
 - Running Unit Testing
-Run these package.json scripts:
- - pre-unit-test
- - unit-test
- 
+  Run these package.json scripts:
+- pre-unit-test
+- unit-test
 
 - Running E2E
-Run these package.json scripts:
- - pre-e2e-test
- - e2e or e2eUI
- - post-e2e-test
-
+  Run these package.json scripts:
+- pre-e2e-test
+- e2e or e2eUI
+- post-e2e-test
 
 CI/CD
 CircleCI is being used to enforce Code quality in all pull requests. Passed status checks are necessary in order to merge a PR.

@@ -249,3 +249,15 @@ UserSchema.methods.validPassword = function (password) {
 };
 
 export const User = model('User', UserSchema);
+
+const EditLogSchema = new Schema({
+	userId: String,
+	updatedOn: {type: Date, default: Date.now},
+	entityType: String,
+	entityId: String,
+	previousValue: Object,
+	newValue: Object,
+	action: String
+});
+
+export const EditLog = model('edit_logs', EditLogSchema);

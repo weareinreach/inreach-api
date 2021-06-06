@@ -63,6 +63,7 @@ import {
 	getVerifiedOrgsCountryCount,
 	getServicesCountryCount
 } from './reporting';
+import {getLogs} from './editLogs';
 export const baseRouter = Router();
 export const versionOneRouter = Router();
 
@@ -94,11 +95,17 @@ versionOneRouter.post(
 	verifyToken,
 	shareOrganization
 );
+// TODO: delete this GET approve owner route because it should just be patch
 versionOneRouter.get(
 	'/organizations/:orgId/owners/:userId/approve',
 	verifyToken,
 	approveOrgOwner
 ); //This should be a patch, not a get
+versionOneRouter.patch(
+	'/organizations/:orgId/owners/:userId/approve',
+	verifyToken,
+	approveOrgOwner
+);
 versionOneRouter.delete(
 	'/organizations/:orgId/owners/:userId',
 	verifyToken,
@@ -125,6 +132,10 @@ versionOneRouter.delete(
 	verifyToken,
 	deleteService
 );
+
+// audited editing logs
+versionOneRouter.get('/organizations/:orgId/logs', getLogs);
+versionOneRouter.get('/organizations/:orgId/services/:serviceId/logs', getLogs);
 
 // Slug - Automation tested
 versionOneRouter.get('/slug/organizations/:orgSlug', getOrgBySlug);
