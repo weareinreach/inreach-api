@@ -85,27 +85,17 @@ export const getOrgs = async (req, res) => {
 			}
 		}
 	}
-	// if (query.lastVerified) {
-	// 	dbQuery = Object.assign(dbQuery, {
-	// 		verified_at: {$lte: new Date(query.lastVerified)}
-	// 	});
-	// }
 
 	if (query.lastVerified) {
 		if (query.lastVerifiedEnd) {
+			const lastVerifiedDateString = JSON.stringify(query.lastVerified);
+			const lastVerifiedEndDateString = JSON.stringify(query.lastVerifiedEnd);
+
 			dbQuery = Object.assign(dbQuery, {
-				$and: [
-					{
-						verified_at: {
-							$lte: new Date(query.lastVerifiedEnd)
-						}
-					},
-					{
-						verified_at: {
-							$gte: new Date(query.lastVerified)
-						}
-					}
-				]
+				verified_at: {
+					$gte: JSON.parse(lastVerifiedDateString),
+					$lte: JSON.parse(lastVerifiedEndDateString)
+				}
 			});
 		} else {
 			dbQuery = Object.assign(dbQuery, {
@@ -115,10 +105,41 @@ export const getOrgs = async (req, res) => {
 	}
 
 	if (query.lastUpdated) {
-		dbQuery = Object.assign(dbQuery, {
-			updated_at: {$lte: new Date(query.lastUpdated)}
-		});
+		if (query.lastUpdatedEnd) {
+			const lastUpdatedDateString = JSON.stringify(query.lastUpdated);
+			const lastUpdatedEndDateString = JSON.stringify(query.lastUpdatedEnd);
+
+			dbQuery = Object.assign(dbQuery, {
+				updated_at: {
+					$gte: JSON.parse(lastUpdatedDateString),
+					$lte: JSON.parse(lastUpdatedEndDateString)
+				}
+			});
+		} else {
+			dbQuery = Object.assign(dbQuery, {
+				updated_at: {$lte: new Date(query.lastUpdated)}
+			});
+		}
 	}
+
+	if (query.createdAt) {
+		if (query.createdAtEnd) {
+			const createdAtDateString = JSON.stringify(query.createdAt);
+			const createdAtEndDateString = JSON.stringify(query.createdAtEnd);
+
+			dbQuery = Object.assign(dbQuery, {
+				created_at: {
+					$gte: JSON.parse(createdAtDateString),
+					$lte: JSON.parse(createdAtEndDateString)
+				}
+			});
+		} else {
+			dbQuery = Object.assign(dbQuery, {
+				created_at: {$lte: new Date(query.createdAt)}
+			});
+		}
+	}
+
 	console.log(dbQuery);
 
 	await Organization.find(dbQuery)
