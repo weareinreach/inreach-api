@@ -28,6 +28,10 @@ const ServiceSchema = new Schema({
 	location_id: String,
 	name: {type: String, required: true},
 	name_ES: {type: String},
+	notes: {
+		notes: String,
+		updated_at: Date
+	},
 	phone_id: String,
 	properties: {},
 	schedule_id: String,
