@@ -121,6 +121,7 @@ const OrganizationSchema = new Schema(
 		services: [ServiceSchema],
 		slug: {type: String, unique: true},
 		slug_ES: {type: String, unique: true},
+		social_media: [{name: String, url: String}],
 		source: String,
 		verified_at: Date,
 		venue_id: String,
