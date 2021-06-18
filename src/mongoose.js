@@ -79,6 +79,10 @@ const OrganizationSchema = new Schema(
 				zip_code: String
 			}
 		],
+		notes: {
+			notes: String,
+			updated_at: Date
+		},
 		owners: [
 			{
 				email: String,
