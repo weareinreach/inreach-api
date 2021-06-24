@@ -11,6 +11,7 @@ describe('Organization Routers', () => {
 		cy.fixture('user_new.json').as('new_user');
 		cy.fixture('org_good_format.json').as('organization');
 		cy.fixture('org_good_format_update.json').as('organization_updated');
+		cy.fixture('note.json').as('note');
 	});
 	afterEach(() => {
 		//Do the clean up
@@ -480,6 +481,109 @@ describe('Organization Routers', () => {
 						expect(response.status).to.be.eq(400);
 						expect(response.body.error).to.be.an('boolean');
 						expect(response.body.error).to.be.eq(true);
+					});
+				});
+			});
+		});
+	});
+
+	it('PATCH - /v1/organizations/:orgId - Can add note', () => {
+		cy.get('@note').then((note) => {
+			cy.get('@organization').then((org) => {
+				cy.addOrg(org).then((createdOrgResponse) => {
+					compoundURL = Cypress.env('baseUrl').concat(
+						Cypress.env('version'),
+						Cypress.env('route_organizations'),
+						`/${createdOrgResponse.body.organization._id}`
+					);
+					const updateDate = Date.now();
+					cy.request({
+						method: 'PATCH',
+						url: compoundURL,
+						body: {
+							notes: {
+								...note,
+								updated_at: updateDate
+							}
+						},
+						failOnStatusCode: false
+					}).should((response) => {
+						expect(response.status).to.be.eq(200);
+						expect(response.body.updated).to.be.eq(true);
+					});
+
+					cy.request({
+						method: 'GET',
+						url: compoundURL,
+						failOnStatusCode: false
+					}).should((response) => {
+						expect(response.status).to.be.eq(200);
+						expect(response.body.notes).to.exist;
+						expect(response.body.notes.notes).to.be.eq(note.notes);
+						expect(response.body.notes.updated_at).to.exist;
+						expect(response.body.notes.updated_at).to.be.eq(
+							new Date(updateDate).toISOString()
+						);
+					});
+				});
+			});
+		});
+	});
+
+	it('PATCH - /v1/organizations/:orgId - Can edit note', () => {
+		cy.get('@note').then((note) => {
+			cy.get('@organization').then((org) => {
+				cy.addOrg(org).then((createdOrgResponse) => {
+					compoundURL = Cypress.env('baseUrl').concat(
+						Cypress.env('version'),
+						Cypress.env('route_organizations'),
+						`/${createdOrgResponse.body.organization._id}`
+					);
+					let updateDate = Date.now();
+					cy.request({
+						method: 'PATCH',
+						url: compoundURL,
+						body: {
+							notes: {
+								...note,
+								updated_at: updateDate
+							}
+						},
+						failOnStatusCode: false
+					}).should((response) => {
+						expect(response.status).to.be.eq(200);
+						expect(response.body.updated).to.be.eq(true);
+					});
+
+					updateDate = Date.now();
+					const newNote = 'This is an updated note';
+					cy.request({
+						method: 'PATCH',
+						url: compoundURL,
+						body: {
+							notes: {
+								notes: newNote,
+								updated_at: updateDate
+							}
+						},
+						failOnStatusCode: false
+					}).should((response) => {
+						expect(response.status).to.be.eq(200);
+						expect(response.body.updated).to.be.eq(true);
+					});
+
+					cy.request({
+						method: 'GET',
+						url: compoundURL,
+						failOnStatusCode: false
+					}).should((response) => {
+						expect(response.status).to.be.eq(200);
+						expect(response.body.notes).to.exist;
+						expect(response.body.notes.notes).to.be.eq(newNote);
+						expect(response.body.notes.updated_at).to.exist;
+						expect(response.body.notes.updated_at).to.be.eq(
+							new Date(updateDate).toISOString()
+						);
 					});
 				});
 			});
