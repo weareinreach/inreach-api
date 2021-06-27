@@ -71,6 +71,12 @@ describe('Organization Routers', () => {
 					expect(response.body.organizations[0].name).to.be.eq(
 						createdOrgResponse.body.organization.name
 					);
+					expect(response.body.organizations[0].website).to.be.eq(
+						createdOrgResponse.body.organization.website
+					);
+					expect(response.body.organizations[0].is_published).to.be.eq(
+						createdOrgResponse.body.organization.is_published
+					);
 				});
 			});
 		});
