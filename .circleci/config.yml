@@ -67,10 +67,14 @@ jobs:
       - run:
           name: Install Packages
           command: npm install
+      - run:
+          name: Install Cypress
+          command: cypress install
       #save cache for use next tests
       - save_cache:
          paths:
           - node_modules
+          - "~/.cache/Cypress"
          key: v1-dependencies-{{ checksum "package.json" }}
       #Unit Testing
       - run: 
@@ -109,10 +113,14 @@ jobs:
       - run:
           name: Install NYC
           command: npm i nyc
+      - run:
+          name: Install Cypress
+          command: cypress install
       #save cache for use next tests
       - save_cache:
          paths:
           - node_modules
+          - "~/.cache/Cypress"
          key: v1-dependencies-{{ checksum "package.json" }}
       #Recreate .env file from CircleCI Project Env Vars
       - run:
@@ -165,6 +173,7 @@ jobs:
       - save_cache:
          paths:
           - node_modules
+          - "~/.cache/Cypress"
          key: v1-dependencies-{{ checksum "package.json" }}
       #Run linting
       - run:
