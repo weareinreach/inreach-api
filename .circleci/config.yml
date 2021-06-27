@@ -26,7 +26,7 @@ jobs:
           command: npm install
       - run:
           name: Install Cypress
-          command: cypress install
+          command: npm i cypress
       #save cache for use next tests
       - save_cache:
          paths:
@@ -69,7 +69,7 @@ jobs:
           command: npm install
       - run:
           name: Install Cypress
-          command: cypress install
+          command: npm i cypress
       #save cache for use next tests
       - save_cache:
          paths:
@@ -115,7 +115,7 @@ jobs:
           command: npm i nyc
       - run:
           name: Install Cypress
-          command: cypress install
+          command: npm i cypress
       #save cache for use next tests
       - save_cache:
          paths:
