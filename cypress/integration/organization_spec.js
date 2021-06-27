@@ -40,6 +40,40 @@ describe('Organization Routers', () => {
 		});
 	});
 
+	it('GET - /v1/organizations?query - Get Organizations Query', () => {
+		compoundURL = Cypress.env('baseUrl').concat(
+			Cypress.env('version'),
+			Cypress.env('route_organizations'),
+			Cypress.env('query_organizations')
+		);
+		cy.request({
+			method: 'GET',
+			url: compoundURL
+		}).should((response) => {
+			expect(response.status).to.be.eq(200);
+			expect(response.body).to.not.be.empty;
+			expect(response.body.organizations).to.be.an('array');
+			expect(response.body.organizations).to.be.an('array').that.is.not.empty;
+			//Check required fields in an org object
+			expect(response.body.organizations[0]._id).to.be.an('string');
+			expect(response.body.organizations[0].is_published).to.be.an('boolean');
+			expect(response.body.organizations[0].name).to.be.an('string');
+			expect(response.body.organizations[0].verified_at).to.be.an('string');
+			expect(response.body.organizations[0].website).to.be.an('string');
+			//Check for the query
+			expect(
+				response.body.organizations[0].services[0].tags.united_states.Medical[
+					'Trans health'
+				]
+			).to.be.an('string');
+			expect(
+				response.body.organizations[0].services[0].tags.united_states.Medical[
+					'Trans health'
+				]
+			).to.be.eq('true');
+		});
+	});
+
 	it('GET - /v1/Organizations/count - Get Organizations Count', () => {
 		compoundURL = Cypress.env('baseUrl').concat(
 			Cypress.env('version'),
