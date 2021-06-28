@@ -138,7 +138,6 @@ export const getOrgs = async (req, res) => {
 				created_at: {$lte: new Date(query.createdAt)}
 			});
 		}
-	}
 
 	await Organization.find(dbQuery)
 		.sort(obj)
