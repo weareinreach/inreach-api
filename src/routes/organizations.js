@@ -140,8 +140,6 @@ export const getOrgs = async (req, res) => {
 		}
 	}
 
-	console.log(dbQuery);
-
 	await Organization.find(dbQuery)
 		.sort(obj)
 		.skip(offset)
