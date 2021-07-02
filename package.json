@@ -22,7 +22,7 @@
 		"e2eUI": "yarn cypress:dev",
 		"dev": "nyc yarn start",
 		"dev-background": "(nyc yarn start&)",
-		"start": "backpack",
+		"start": "nyc backpack",
 		"build": "backpack build",
 		"serve": "node ./build/main.js",
 		"lint": "eslint ./src/*.js"
