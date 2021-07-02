@@ -20,7 +20,7 @@
 		"unit-test": "jest",
 		"e2e": "yarn cypress:ci",
 		"e2eUI": "yarn cypress:dev",
-		"dev": "nyc yarn start",
+		"dev": "nyc backpack",
 		"dev-background": "(nyc yarn start&)",
 		"start": "backpack",
 		"build": "backpack build",
