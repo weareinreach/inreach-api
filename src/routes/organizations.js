@@ -96,6 +96,13 @@ export const getOrgs = async (req, res) => {
 			updated_at: {$lte: new Date(query.lastUpdated)}
 		});
 	}
+
+	if (query.createdAt) {
+		dbQuery = Object.assign(dbQuery, {
+			created_at: {$lte: new Date(query.createdAt)}
+		});
+	}
+
 	await Organization.find(dbQuery)
 		.sort(obj)
 		.skip(offset)
