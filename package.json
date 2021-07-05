@@ -4,7 +4,7 @@
 	"scripts": {
 		"cypress:dev": "",
 		"cypress:open": "cypress open --config-file ./cypress.json",
-		"cypress:run": "cypress run --config-file ./cypress.json",
+		"cypress:run": "nyc cypress run --config-file ./cypress.json",
 		"clean:reports": "rm -R -f ./mochawesome-report && rm -R -f ./.nyc_output &&rm -R -f ./jestCoverage && rm -R -f ./coverageReports && rm -R -f ./cypressCoverage && rm -R -f ./reports",
 		"combine-reports": "mkdir ./reports && mochawesome-merge mochawesome-report/*.json > ./reports/reporte2e.json",
 		"generate-report": "marge ./reports/reporte2e.json -f e2e-report -o ./reports",
@@ -17,7 +17,7 @@
 		"report:combined": "npx nyc report --reporter lcov --reporter html --reporter text --report-dir coverageReports",
 		"combine:unit-e2e": "yarn copy:reports && yarn report:combined && yarn report:combined",
 		"unit-test": "jest",
-		"e2e": "start-server-and-test 'nyc yarn start' http://localhost:8080 'yarn cypress:run'",
+		"e2e": "start-server-and-test 'yarn start' http://localhost:8080 'yarn cypress:run'",
 		"e2eUI": "start-server-and-test 'nyc yarn start' http://localhost:8080 'yarn cypress:open'",
 		"start": "backpack",
 		"build": "backpack build",
