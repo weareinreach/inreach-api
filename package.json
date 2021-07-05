@@ -16,7 +16,7 @@
 		"report:combined": "npx nyc report --reporter lcov --reporter html --reporter text --report-dir coverageReports",
 		"combine:unit-e2e": "yarn copy:reports && yarn report:combined && yarn report:combined",
 		"unit-test": "jest",
-		"e2e": "start-server-and-test 'yarn start' http://localhost:8080 'yarn cypress:run'",
+		"e2e": "start-server-and-test 'yarn run' http://localhost:8080 'yarn cypress:run'",
 		"e2eUI": "start-server-and-test 'yarn run' http://localhost:8080 'yarn cypress:open'",
 		"start": "backpack",
 		"run": "yarn build && nyc yarn serve",
