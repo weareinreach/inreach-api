@@ -133,9 +133,6 @@ jobs:
            SHEETS_API_KEY=$SHEETS_API_KEY
            EOF
       #Testing
-      - run:
-          name: "Check nyc"
-          command: cd .nyc_output && ls
       - run: 
           name: "E2E Automation"
           command: "yarn pre-e2e-test && yarn e2e"
