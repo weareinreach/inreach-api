@@ -59,8 +59,7 @@
 		"mochawesome-merge": "^4.2.0",
 		"nyc": "^15.1.0",
 		"prettier": "^2.0.5",
-		"start-server-and-test": "^1.12.1",
-		"wait-on": "^5.2.1"
+		"start-server-and-test": "^1.12.1"
 	},
 	"nyc": {
 		"sourceMap": false,
