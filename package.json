@@ -19,9 +19,9 @@
 		"e2e": "start-server-and-test 'yarn build-and-serve' http://localhost:8080 'yarn cypress:run'",
 		"e2eUI": "start-server-and-test 'yarn build-and-serve' http://localhost:8080 'yarn cypress:open'",
 		"start": "backpack",
-		"build-and-serve": "yarn build && nyc yarn serve",
+		"build-and-serve": "yarn build && yarn serve",
 		"build": "backpack build",
-		"serve": "node ./build/main.js",
+		"serve": "nyc node ./build/main.js",
 		"lint": "eslint ./src/*.js"
 	},
 	"dependencies": {
