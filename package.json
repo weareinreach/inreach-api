@@ -5,7 +5,7 @@
 		"cypress:dev": "start-server-and-test start http://localhost:8080 cypress:open",
 		"cypress:ci": "start-server-and-test start http://localhost:8080 cypress:run",
 		"cypress:open": "cypress open --config-file ./cypress.json",
-		"cypress:run": "nyc cypress run --config-file ./cypress.json",
+		"cypress:run": "cypress run --config-file ./cypress.json",
 		"clean:reports": "rm -R -f ./mochawesome-report && rm -R -f ./.nyc_output &&rm -R -f ./jestCoverage && rm -R -f ./coverageReports && rm -R -f ./cypressCoverage && rm -R -f ./reports",
 		"combine-reports": "mkdir ./reports && mochawesome-merge mochawesome-report/*.json > ./reports/reporte2e.json",
 		"generate-report": "marge ./reports/reporte2e.json -f e2e-report -o ./reports",
