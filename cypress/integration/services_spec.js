@@ -368,15 +368,17 @@ describe('Services Routers', () => {
 										`/${retrievedorgresponse.body.services[0]._id}`
 									);
 
-									const updateDate = Date.now();
+									const createDate = Date.now();
 									cy.request({
 										method: 'PATCH',
 										url: compoundURL,
 										body: {
-											notes: {
-												...note,
-												updated_at: updateDate
-											}
+											notes_log: [
+												{
+													...note,
+													created_at: createDate
+												}
+											]
 										},
 										failOnStatusCode: false
 									}).should((response) => {
@@ -389,11 +391,12 @@ describe('Services Routers', () => {
 										url: compoundURL
 									}).should((response) => {
 										expect(response.status).to.be.eq(200);
-										expect(response.body.notes).to.exist;
-										expect(response.body.notes.notes).to.be.eq(note.notes);
-										expect(response.body.notes.updated_at).to.exist;
-										expect(response.body.notes.updated_at).to.be.eq(
-											new Date(updateDate).toISOString()
+										expect(response.body.notes_log).to.exist;
+										expect(response.body.notes_log).to.have.length(1);
+										expect(response.body.notes_log[0].note).to.be.eq(note.note);
+										expect(response.body.notes_log[0].created_at).to.exist;
+										expect(response.body.notes_log[0].created_at).to.be.eq(
+											new Date(createDate).toISOString()
 										);
 									});
 								}
@@ -405,7 +408,7 @@ describe('Services Routers', () => {
 		});
 	});
 
-	it('PATCH - /v1/organizations/:orgid/services/:serviceid - Can edit note', () => {
+	it('PATCH - /v1/organizations/:orgid/services/:serviceid - Can delete note', () => {
 		cy.get('@note').then((note) => {
 			cy.get('@organization').then((organization) => {
 				cy.addOrg(organization).then((createdorgresponse) => {
@@ -416,6 +419,20 @@ describe('Services Routers', () => {
 						).then(() => {
 							cy.getOrgById(createdorgresponse.body.organization._id).then(
 								(retrievedorgresponse) => {
+									const deleteNote = 'To be deleted';
+									cy.addNoteToService(
+										note.note,
+										Date.now(),
+										retrievedorgresponse.body._id,
+										retrievedorgresponse.body.services[0]._id
+									);
+									cy.addNoteToService(
+										deleteNote,
+										Date.now(),
+										retrievedorgresponse.body._id,
+										retrievedorgresponse.body.services[0]._id
+									);
+
 									compoundURL = Cypress.env('baseUrl').concat(
 										Cypress.env('version'),
 										Cypress.env('route_organizations'),
@@ -424,50 +441,39 @@ describe('Services Routers', () => {
 										`/${retrievedorgresponse.body.services[0]._id}`
 									);
 
-									let updateDate = Date.now();
 									cy.request({
-										method: 'PATCH',
+										method: 'GET',
 										url: compoundURL,
-										body: {
-											notes: {
-												...note,
-												updated_at: updateDate
-											}
-										},
 										failOnStatusCode: false
-									}).should((response) => {
-										expect(response.status).to.be.eq(200);
-										expect(response.body.updated).to.be.eq(true);
-									});
-
-									updateDate = Date.now();
-									const newNote = 'This is an updated note';
-									cy.request({
-										method: 'PATCH',
-										url: compoundURL,
-										body: {
-											notes: {
-												notes: newNote,
-												updated_at: updateDate
-											}
-										},
-										failOnStatusCode: false
-									}).should((response) => {
-										expect(response.status).to.be.eq(200);
-										expect(response.body.updated).to.be.eq(true);
-									});
-
-									cy.request({
-										method: 'get',
-										url: compoundURL
-									}).should((response) => {
-										expect(response.status).to.be.eq(200);
-										expect(response.body.notes).to.exist;
-										expect(response.body.notes.notes).to.be.eq(newNote);
-										expect(response.body.notes.updated_at).to.exist;
-										expect(response.body.notes.updated_at).to.be.eq(
-											new Date(updateDate).toISOString()
+									}).then((response) => {
+										let notes_log = response.body.notes_log.filter(
+											(n) => n.note != deleteNote
 										);
+										cy.request({
+											method: 'PATCH',
+											url: compoundURL,
+											body: {
+												notes_log: notes_log
+											},
+											failOnStatusCode: false
+										}).should((patchResponse) => {
+											expect(patchResponse.status).to.be.eq(200);
+											expect(patchResponse.body.updated).to.be.eq(true);
+										});
+
+										cy.request({
+											method: 'GET',
+											url: compoundURL
+										}).should((getResponse) => {
+											expect(getResponse.status).to.be.eq(200);
+											expect(getResponse.body.notes_log).to.exist;
+											expect(getResponse.body.notes_log).to.have.length(1);
+											expect(
+												getResponse.body.notes_log.filter(
+													(n) => n.note == deleteNote
+												)
+											).to.be.empty;
+										});
 									});
 								}
 							);

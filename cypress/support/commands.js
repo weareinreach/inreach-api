@@ -366,6 +366,63 @@ Cypress.Commands.add('deleteSuggestionById', (id) => {
 	});
 });
 
+Cypress.Commands.add('addNoteToOrg', (note, created_at, orgId) => {
+	compoundURL = Cypress.env('baseUrl').concat(
+		Cypress.env('version'),
+		Cypress.env('route_organizations'),
+		`/${orgId}`
+	);
+	cy.request({
+		method: 'GET',
+		url: compoundURL
+	}).then((response) => {
+		cy.request({
+			method: 'PATCH',
+			url: compoundURL,
+			body: {
+				notes_log: [
+					...response.body.notes_log,
+					{
+						note: note,
+						created_at: created_at
+					}
+				]
+			}
+		});
+	});
+});
+
+Cypress.Commands.add(
+	'addNoteToService',
+	(note, created_at, orgId, serviceId) => {
+		compoundURL = Cypress.env('baseUrl').concat(
+			Cypress.env('version'),
+			Cypress.env('route_organizations'),
+			`/${orgId}`,
+			Cypress.env('route_services'),
+			`/${serviceId}`
+		);
+		cy.request({
+			method: 'GET',
+			url: compoundURL
+		}).then((response) => {
+			cy.request({
+				method: 'PATCH',
+				url: compoundURL,
+				body: {
+					notes_log: [
+						...response.body.notes_log,
+						{
+							note: note,
+							created_at: created_at
+						}
+					]
+				}
+			});
+		});
+	}
+);
+
 // -------------- Cleaning Functions ------------------
 //Users
 Cypress.Commands.add('deleteUsersIfExist', () => {
