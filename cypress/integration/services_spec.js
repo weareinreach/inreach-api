@@ -10,6 +10,7 @@ describe('Services Routers', () => {
 		cy.fixture('org_good_format.json').as('organization');
 		cy.fixture('org_services.json').as('service');
 		cy.fixture('org_services_update.json').as('service_update');
+		cy.fixture('note.json').as('note');
 	});
 	afterEach(() => {
 		//Do the clean up
@@ -117,25 +118,25 @@ describe('Services Routers', () => {
 		});
 	});
 
-	it('GET - /v1/organizations/:orgId/services/:serviceId - Good Org ID and Service ID', () => {
+	it('get - /v1/organizations/:orgid/services/:serviceid - good org id and service id', () => {
 		cy.get('@organization').then((organization) => {
-			cy.addOrg(organization).then((createdOrgResponse) => {
+			cy.addOrg(organization).then((createdorgresponse) => {
 				cy.get('@service').then((service) => {
 					cy.addServiceToOrg(
-						createdOrgResponse.body.organization._id,
+						createdorgresponse.body.organization._id,
 						service
 					).then(() => {
-						cy.getOrgById(createdOrgResponse.body.organization._id).then(
-							(retrievedOrgResponse) => {
+						cy.getOrgById(createdorgresponse.body.organization._id).then(
+							(retrievedorgresponse) => {
 								compoundURL = Cypress.env('baseUrl').concat(
 									Cypress.env('version'),
 									Cypress.env('route_organizations'),
-									`/${retrievedOrgResponse.body._id}`,
+									`/${retrievedorgresponse.body._id}`,
 									Cypress.env('route_services'),
-									`/${retrievedOrgResponse.body.services[0]._id}`
+									`/${retrievedorgresponse.body.services[0]._id}`
 								);
 								cy.request({
-									method: 'GET',
+									method: 'get',
 									url: compoundURL
 								}).should((response) => {
 									expect(response.status).to.be.eq(200);
@@ -342,6 +343,141 @@ describe('Services Routers', () => {
 								});
 							}
 						);
+					});
+				});
+			});
+		});
+	});
+
+	it('PATCH - /v1/organizations/:orgid/services/:serviceid - Can add note', () => {
+		cy.get('@note').then((note) => {
+			cy.get('@organization').then((organization) => {
+				cy.addOrg(organization).then((createdorgresponse) => {
+					cy.get('@service').then((service) => {
+						cy.addServiceToOrg(
+							createdorgresponse.body.organization._id,
+							service
+						).then(() => {
+							cy.getOrgById(createdorgresponse.body.organization._id).then(
+								(retrievedorgresponse) => {
+									compoundURL = Cypress.env('baseUrl').concat(
+										Cypress.env('version'),
+										Cypress.env('route_organizations'),
+										`/${retrievedorgresponse.body._id}`,
+										Cypress.env('route_services'),
+										`/${retrievedorgresponse.body.services[0]._id}`
+									);
+
+									const createDate = Date.now();
+									cy.request({
+										method: 'PATCH',
+										url: compoundURL,
+										body: {
+											notes_log: [
+												{
+													...note,
+													created_at: createDate
+												}
+											]
+										},
+										failOnStatusCode: false
+									}).should((response) => {
+										expect(response.status).to.be.eq(200);
+										expect(response.body.updated).to.be.eq(true);
+									});
+
+									cy.request({
+										method: 'get',
+										url: compoundURL
+									}).should((response) => {
+										expect(response.status).to.be.eq(200);
+										expect(response.body.notes_log).to.exist;
+										expect(response.body.notes_log).to.have.length(1);
+										expect(response.body.notes_log[0].note).to.be.eq(note.note);
+										expect(response.body.notes_log[0].created_at).to.exist;
+										expect(response.body.notes_log[0].created_at).to.be.eq(
+											new Date(createDate).toISOString()
+										);
+									});
+								}
+							);
+						});
+					});
+				});
+			});
+		});
+	});
+
+	it('PATCH - /v1/organizations/:orgid/services/:serviceid - Can delete note', () => {
+		cy.get('@note').then((note) => {
+			cy.get('@organization').then((organization) => {
+				cy.addOrg(organization).then((createdorgresponse) => {
+					cy.get('@service').then((service) => {
+						cy.addServiceToOrg(
+							createdorgresponse.body.organization._id,
+							service
+						).then(() => {
+							cy.getOrgById(createdorgresponse.body.organization._id).then(
+								(retrievedorgresponse) => {
+									const deleteNote = 'To be deleted';
+									cy.addNoteToService(
+										note.note,
+										Date.now(),
+										retrievedorgresponse.body._id,
+										retrievedorgresponse.body.services[0]._id
+									);
+									cy.addNoteToService(
+										deleteNote,
+										Date.now(),
+										retrievedorgresponse.body._id,
+										retrievedorgresponse.body.services[0]._id
+									);
+
+									compoundURL = Cypress.env('baseUrl').concat(
+										Cypress.env('version'),
+										Cypress.env('route_organizations'),
+										`/${retrievedorgresponse.body._id}`,
+										Cypress.env('route_services'),
+										`/${retrievedorgresponse.body.services[0]._id}`
+									);
+
+									cy.request({
+										method: 'GET',
+										url: compoundURL,
+										failOnStatusCode: false
+									}).then((response) => {
+										let notes_log = response.body.notes_log.filter(
+											(n) => n.note != deleteNote
+										);
+										cy.request({
+											method: 'PATCH',
+											url: compoundURL,
+											body: {
+												notes_log: notes_log
+											},
+											failOnStatusCode: false
+										}).should((patchResponse) => {
+											expect(patchResponse.status).to.be.eq(200);
+											expect(patchResponse.body.updated).to.be.eq(true);
+										});
+
+										cy.request({
+											method: 'GET',
+											url: compoundURL
+										}).should((getResponse) => {
+											expect(getResponse.status).to.be.eq(200);
+											expect(getResponse.body.notes_log).to.exist;
+											expect(getResponse.body.notes_log).to.have.length(1);
+											expect(
+												getResponse.body.notes_log.filter(
+													(n) => n.note == deleteNote
+												)
+											).to.be.empty;
+										});
+									});
+								}
+							);
+						});
 					});
 				});
 			});

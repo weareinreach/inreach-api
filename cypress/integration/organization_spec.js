@@ -11,6 +11,7 @@ describe('Organization Routers', () => {
 		cy.fixture('user_new.json').as('new_user');
 		cy.fixture('org_good_format.json').as('organization');
 		cy.fixture('org_good_format_update.json').as('organization_updated');
+		cy.fixture('note.json').as('note');
 	});
 	afterEach(() => {
 		//Do the clean up
@@ -522,6 +523,110 @@ describe('Organization Routers', () => {
 						expect(response.status).to.be.eq(400);
 						expect(response.body.error).to.be.an('boolean');
 						expect(response.body.error).to.be.eq(true);
+					});
+				});
+			});
+		});
+	});
+
+	it('PATCH - /v1/organizations/:orgId - Can add note', () => {
+		cy.get('@note').then((note) => {
+			cy.get('@organization').then((org) => {
+				cy.addOrg(org).then((createdOrgResponse) => {
+					compoundURL = Cypress.env('baseUrl').concat(
+						Cypress.env('version'),
+						Cypress.env('route_organizations'),
+						`/${createdOrgResponse.body.organization._id}`
+					);
+					const createDate = Date.now();
+					cy.request({
+						method: 'PATCH',
+						url: compoundURL,
+						body: {
+							notes_log: [
+								{
+									...note,
+									created_at: createDate
+								}
+							]
+						},
+						failOnStatusCode: false
+					}).should((response) => {
+						expect(response.status).to.be.eq(200);
+						expect(response.body.updated).to.be.eq(true);
+					});
+
+					cy.request({
+						method: 'GET',
+						url: compoundURL,
+						failOnStatusCode: false
+					}).should((response) => {
+						expect(response.status).to.be.eq(200);
+						expect(response.body.notes_log).to.exist;
+						expect(response.body.notes_log).to.have.length(1);
+						expect(response.body.notes_log[0].note).to.be.eq(note.note);
+						expect(response.body.notes_log[0].created_at).to.exist;
+						expect(response.body.notes_log[0].created_at).to.be.eq(
+							new Date(createDate).toISOString()
+						);
+					});
+				});
+			});
+		});
+	});
+
+	it('PATCH - /v1/organizations/:orgId - Can delete note', () => {
+		cy.get('@note').then((note) => {
+			cy.get('@organization').then((org) => {
+				cy.addOrg(org).then((createdOrgResponse) => {
+					const deleteNote = 'To be deleted';
+					cy.addNoteToOrg(
+						note.note,
+						Date.now(),
+						createdOrgResponse.body.organization._id
+					);
+					cy.addNoteToOrg(
+						deleteNote,
+						Date.now(),
+						createdOrgResponse.body.organization._id
+					);
+					compoundURL = Cypress.env('baseUrl').concat(
+						Cypress.env('version'),
+						Cypress.env('route_organizations'),
+						`/${createdOrgResponse.body.organization._id}`
+					);
+
+					cy.request({
+						method: 'GET',
+						url: compoundURL,
+						failOnStatusCode: false
+					}).then((response) => {
+						let notes_log = response.body.notes_log.slice();
+						notes_log = notes_log.filter((n) => n.note != deleteNote);
+						cy.request({
+							method: 'PATCH',
+							url: compoundURL,
+							body: {
+								notes_log: notes_log
+							},
+							failOnStatusCode: false
+						}).should((patchResponse) => {
+							expect(patchResponse.status).to.be.eq(200);
+							expect(patchResponse.body.updated).to.be.eq(true);
+						});
+
+						cy.request({
+							method: 'GET',
+							url: compoundURL,
+							failOnStatusCode: false
+						}).should((getResponse) => {
+							expect(getResponse.status).to.be.eq(200);
+							expect(getResponse.body.notes_log).to.exist;
+							expect(getResponse.body.notes_log).to.have.length(1);
+							expect(
+								getResponse.body.notes_log.filter((n) => n.note == deleteNote)
+							).to.be.empty;
+						});
 					});
 				});
 			});
