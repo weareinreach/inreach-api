@@ -4,7 +4,7 @@
 //compound url
 let compoundURL = null;
 
-describe('Comments Routers', () => {
+describe('Ratings Routers', () => {
 	beforeEach(() => {
 		cy.fixture('org_good_format.json').as('organization');
 		cy.fixture('user_new.json').as('new_user');
@@ -51,7 +51,7 @@ describe('Comments Routers', () => {
 						);
 						let rating = {
 							userId: addedUserResponse.body.userInfo._id,
-							rating: 9,
+							rating: 5,
 							source: 'Test Source'
 						};
 						cy.request({
@@ -69,6 +69,55 @@ describe('Comments Routers', () => {
 		});
 	});
 
+	it('DELETE - /v1/organizations/ratings/ratingId - Delete Ratings - Good Ratings', () => {
+		cy.get('@new_user').then((new_user) => {
+			cy.addUser(new_user).then((addedUserResponse) => {
+				cy.get('@organization').then((organization) => {
+					cy.addOrg(organization).then((createdOrgResponse) => {
+						//define the rating
+						let rating = {
+							userId: addedUserResponse.body.userInfo._id,
+							rating: 5,
+							source: 'Test Source'
+						};
+						//add the rating
+						cy.addRatingToOrg(
+							createdOrgResponse.body.organization._id,
+							rating
+						).then(() => {
+							compoundURL = Cypress.env('baseUrl').concat(
+								Cypress.env('version'),
+								Cypress.env('route_organizations'),
+								`/${createdOrgResponse.body.organization._id}`,
+								Cypress.env('route_ratings')
+							);
+							cy.request({
+								method: 'GET',
+								url: compoundURL
+							}).then((response) => {
+								// Delete Rating based of Id
+								compoundURL = Cypress.env('baseUrl').concat(
+									Cypress.env('version'),
+									Cypress.env('route_organizations'),
+									Cypress.env('route_ratings'),
+									`/${response.body.ratings[0]._id}`
+								);
+								cy.request({
+									method: 'DELETE',
+									url: compoundURL
+								}).should((response) => {
+									expect(response.status).to.be.eq(200);
+									expect(response.body.deleted).to.be.an('boolean');
+									expect(response.body.deleted).to.be.eq(true);
+								});
+							});
+						});
+					});
+				});
+			});
+		});
+	});
+
 	it('GET - /v1/organizations/:orgId/ratings - Get Organization ratings', () => {
 		cy.get('@new_user').then((new_user) => {
 			cy.addUser(new_user).then((addedUserResponse) => {
@@ -77,7 +126,7 @@ describe('Comments Routers', () => {
 						//define the rating
 						let rating = {
 							userId: addedUserResponse.body.userInfo._id,
-							rating: 9,
+							rating: 5,
 							source: 'Test Source'
 						};
 						//add the rating

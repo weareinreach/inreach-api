@@ -71,6 +71,18 @@ export const getRatings = async (req, res) => {
 		.catch((err) => handleErr(err, res));
 };
 
+export const deleteRatingById = async (req, res) => {
+	const {ratingId} = req?.params;
+
+	await Rating.findByIdAndDelete(ratingId)
+		.then(() => {
+			return res.json({deleted: true});
+		})
+		.catch((err) => {
+			handleErr(err, res);
+		});
+};
+
 export const updateRatings = async (req, res) => {
 	const {orgId, serviceId} = req?.params;
 	const {rating, source, userId} = req?.body;
