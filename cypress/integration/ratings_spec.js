@@ -99,6 +99,7 @@ describe('Ratings Routers', () => {
 								compoundURL = Cypress.env('baseUrl').concat(
 									Cypress.env('version'),
 									Cypress.env('route_organizations'),
+									`/${response.body.organizationId}`,
 									Cypress.env('route_ratings'),
 									`/${response.body.ratings[0]._id}`
 								);

@@ -161,7 +161,10 @@ versionOneRouter.delete(
 
 // Ratings - Automation tested
 versionOneRouter.get('/organizations/:orgId/ratings', getRatings);
-versionOneRouter.delete('/organizations/ratings/:ratingId', deleteRatingById);
+versionOneRouter.delete(
+	'/organizations/:orgId/ratings/:ratingId',
+	deleteRatingById
+);
 versionOneRouter.patch(
 	'/organizations/:orgId/ratings',
 	verifyToken,

@@ -72,14 +72,22 @@ export const getRatings = async (req, res) => {
 };
 
 export const deleteRatingById = async (req, res) => {
-	const {ratingId} = req?.params;
+	const {orgId, ratingId} = req?.params;
+	const query = getEntityQuery({organizationId: orgId});
 
-	await Rating.findByIdAndDelete(ratingId)
-		.then(() => {
-			return res.json({deleted: true});
+	await Rating.findOne(query)
+		.then((ratings) => {
+			ratings.ratings.id(ratingId).remove();
+			ratings
+				.save()
+				.then(() => {
+					return res.json({deleted: true});
+				})
+				.catch((err) => handleErr(err, res));
 		})
 		.catch((err) => {
-			handleErr(err, res);
+			console.log(err);
+			return handleNotFound(res);
 		});
 };
 
