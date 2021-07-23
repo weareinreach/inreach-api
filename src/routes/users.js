@@ -117,7 +117,9 @@ export const deleteUser = async (req, res) => {
 
 export const getUser = async (req, res) => {
 	const {userId} = req?.params;
-
+	if (userId === null || userId === 'undefined') {
+		return handleBadRequest(res);
+	}
 	await User.findById(userId)
 		.then((userDoc) => {
 			if (!userDoc) {
