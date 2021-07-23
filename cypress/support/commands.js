@@ -128,6 +128,34 @@ Cypress.Commands.add('addRatingToOrg', (orgId, rating) => {
 });
 
 //Add Comment to Org
+Cypress.Commands.add('getOrgComments', (orgId) => {
+	compoundURL = Cypress.env('baseUrl').concat(
+		Cypress.env('version'),
+		Cypress.env('route_organizations'),
+		`/${orgId}`,
+		Cypress.env('route_comments')
+	);
+	cy.request({
+		method: 'GET',
+		url: compoundURL
+	});
+});
+
+Cypress.Commands.add('getServiceOrgComments', (orgId, serviceId) => {
+	compoundURL = Cypress.env('baseUrl').concat(
+		Cypress.env('version'),
+		Cypress.env('route_organizations'),
+		`/${orgId}`,
+		Cypress.env('route_services'),
+		`/${serviceId}`,
+		Cypress.env('route_comments')
+	);
+	cy.request({
+		method: 'GET',
+		url: compoundURL
+	});
+});
+
 Cypress.Commands.add('addCommentToOrg', (orgId, comment) => {
 	compoundURL = Cypress.env('baseUrl').concat(
 		Cypress.env('version'),

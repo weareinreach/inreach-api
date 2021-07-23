@@ -16,8 +16,8 @@ export const getComments = async (req, res) => {
 };
 
 export const deleteCommentById = async (req, res) => {
-	const {orgId, commentId} = req?.params;
-	const query = getEntityQuery({organizationId: orgId});
+	const {orgId, serviceId, commentId} = req?.params;
+	const query = getEntityQuery({organizationId: orgId, serviceId: serviceId});
 
 	await Comment.findOne(query)
 		.then((comments) => {
@@ -80,8 +80,8 @@ export const getRatings = async (req, res) => {
 };
 
 export const deleteRatingById = async (req, res) => {
-	const {orgId, ratingId} = req?.params;
-	const query = getEntityQuery({organizationId: orgId});
+	const {orgId, serviceId, ratingId} = req?.params;
+	const query = getEntityQuery({organizationId: orgId, serviceId: serviceId});
 
 	await Rating.findOne(query)
 		.then((ratings) => {

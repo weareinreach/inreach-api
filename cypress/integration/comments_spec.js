@@ -70,8 +70,43 @@ describe('Comments Routers', () => {
 						expect(response.body.updated).to.be.an('boolean');
 						expect(response.body.updated).to.be.eq(true);
 					});
-					//Delete Org
-					cy.deleteOrgById(createOrgResponse.body.organization._id);
+				});
+			});
+		});
+	});
+
+	it('DELETE - /v1/organizations/:orgId/comments - Delete Org Comments - Good Comment', () => {
+		//Get Comment
+		cy.get('@comment').then((comment) => {
+			//Add Organization
+			cy.get('@organization').then((org) => {
+				//Add Automation Org
+				cy.addOrg(org).then((createOrgResponse) => {
+					cy.addCommentToOrg(
+						createOrgResponse.body.organization._id,
+						comment
+					).then(() => {
+						//Get Comments
+						cy.getOrgComments(createOrgResponse.body.organization._id).then(
+							(response) => {
+								compoundURL = Cypress.env('baseUrl').concat(
+									Cypress.env('version'),
+									Cypress.env('route_organizations'),
+									`/${createOrgResponse.body.organization._id}`,
+									Cypress.env('route_comments'),
+									`/${response.body.comments[0]._id}`
+								);
+								cy.request({
+									method: 'DELETE',
+									url: compoundURL
+								}).should((response) => {
+									expect(response.status).to.be.eq(200);
+									expect(response.body.deleted).to.be.an('boolean');
+									expect(response.body.deleted).to.be.eq(true);
+								});
+							}
+						);
+					});
 				});
 			});
 		});
@@ -149,9 +184,6 @@ describe('Comments Routers', () => {
 									expect(response.body.error).to.be.an('boolean');
 									expect(response.body.error).to.be.eq(true);
 								});
-
-								//Delete Org
-								cy.deleteOrgById(createOrgResponse.body.organization._id);
 							}
 						);
 					});
@@ -196,8 +228,6 @@ describe('Comments Routers', () => {
 										expect(response.body.updated).to.be.eq(true);
 									});
 								});
-								//Delete Org
-								cy.deleteOrgById(createOrgResponse.body.organization._id);
 							}
 						);
 					});
@@ -265,10 +295,59 @@ describe('Comments Routers', () => {
 										});
 									});
 								});
-								//Delete Org
-								cy.deleteOrgById(createOrgResponse.body.organization._id);
 							}
 						);
+					});
+				});
+			});
+		});
+	});
+
+	it('DELETE - /v1/organizations/:orgId/services/:serviceId/comments - Delete Org Service Comments - Good Comment', () => {
+		//Get Comment
+		cy.get('@comment').then((comment) => {
+			//Add Organization
+			cy.get('@organization').then((org) => {
+				//Add Automation Org
+				cy.addOrg(org).then((createOrgResponse) => {
+					cy.get('@services').then((service) => {
+						//Add it to Org
+						cy.addServiceToOrg(
+							createOrgResponse.body.organization._id,
+							service
+						).then(() => {
+							//Get Org
+							cy.getOrgById(createOrgResponse.body.organization._id).then(
+								(orgResponse) => {
+									cy.addCommentToService(
+										orgResponse.body._id,
+										orgResponse.body.services[0]._id,
+										comment
+									).then(() => {
+										cy.getServiceOrgComments(
+											orgResponse.body._id,
+											orgResponse.body.services[0]._id
+										).then((response) => {
+											compoundURL = Cypress.env('baseUrl').concat(
+												Cypress.env('version'),
+												Cypress.env('route_organizations'),
+												`/${orgResponse.body._id}`,
+												Cypress.env('route_comments'),
+												`/${response.body.comments[0]._id}`
+											);
+											cy.request({
+												method: 'DELETE',
+												url: compoundURL
+											}).should((response) => {
+												expect(response.status).to.be.eq(200);
+												expect(response.body.deleted).to.be.an('boolean');
+												expect(response.body.deleted).to.be.eq(true);
+											});
+										});
+									});
+								}
+							);
+						});
 					});
 				});
 			});
