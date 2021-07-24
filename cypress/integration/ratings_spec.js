@@ -119,6 +119,57 @@ describe('Ratings Routers', () => {
 		});
 	});
 
+	it('DELETE - /v1/organizations/ratings/ratingId - Delete Ratings - Bad Org Id Ratings', () => {
+		cy.get('@new_user').then((new_user) => {
+			cy.addUser(new_user).then((addedUserResponse) => {
+				cy.get('@organization').then((organization) => {
+					cy.addOrg(organization).then((createdOrgResponse) => {
+						//define the rating
+						let rating = {
+							userId: addedUserResponse.body.userInfo._id,
+							rating: 5,
+							source: 'Test Source'
+						};
+						//add the rating
+						cy.addRatingToOrg(
+							createdOrgResponse.body.organization._id,
+							rating
+						).then(() => {
+							compoundURL = Cypress.env('baseUrl').concat(
+								Cypress.env('version'),
+								Cypress.env('route_organizations'),
+								`/${createdOrgResponse.body.organization._id}`,
+								Cypress.env('route_ratings')
+							);
+							cy.request({
+								method: 'GET',
+								url: compoundURL
+							}).then((response) => {
+								// Delete Rating based of Id
+								compoundURL = Cypress.env('baseUrl').concat(
+									Cypress.env('version'),
+									Cypress.env('route_organizations'),
+									`/BA-ORG-ID`,
+									Cypress.env('route_ratings'),
+									`/${response.body.ratings[0]._id}`
+								);
+								cy.request({
+									method: 'DELETE',
+									url: compoundURL,
+									failOnStatusCode: false
+								}).should((response) => {
+									expect(response.status).to.be.eq(404);
+									expect(response.body.notFound).to.be.an('boolean');
+									expect(response.body.notFound).to.be.eq(true);
+								});
+							});
+						});
+					});
+				});
+			});
+		});
+	});
+
 	it('GET - /v1/organizations/:orgId/ratings - Get Organization ratings', () => {
 		cy.get('@new_user').then((new_user) => {
 			cy.addUser(new_user).then((addedUserResponse) => {
