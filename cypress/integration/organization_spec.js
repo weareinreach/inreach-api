@@ -40,14 +40,15 @@ describe('Organization Routers', () => {
 		});
 	});
 
-	it('GET - /v1/organizations?query - Get Organizations Query', () => {
+	it.only('GET - /v1/organizations?query - Get Organizations Query', () => {
 		cy.get('@organization').then((org) => {
 			cy.addOrg(org).then((createdOrgResponse) => {
 				compoundURL = Cypress.env('baseUrl').concat(
 					Cypress.env('version'),
 					Cypress.env('route_organizations'),
-					`?ids=${createdOrgResponse.body.organization._id}&name=${createdOrgResponse.body.organization.name}`
+					`?name=${createdOrgResponse.body.organization.name}&pending&services=Medical`
 				);
+				cy.log(compoundURL);
 				cy.request({
 					method: 'GET',
 					url: compoundURL

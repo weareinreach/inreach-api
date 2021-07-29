@@ -476,4 +476,105 @@ Cypress.Commands.add('deleteAutomationSuggestions', () => {
 		});
 	});
 });
-//Need Comments
+
+//Comments
+Cypress.Commands.add('deleteCommentsOrgsIfExist', () => {
+	cy.log('Cleaning Org Comments...');
+	compoundURL = Cypress.env('baseUrl').concat(
+		Cypress.env('version'),
+		Cypress.env('route_slug_organizations'),
+		'/surprisingly-unique-organizations-slug'
+	);
+	cy.request({
+		method: 'GET',
+		url: compoundURL,
+		failOnStatusCode: false
+	}).then((response) => {
+		if (!response.body.notFound) {
+			cy.deleteCommentsIfExist(response.body._id);
+		}
+	});
+});
+
+Cypress.Commands.add('deleteCommentsIfExist', (orgId) => {
+	cy.log('Cleaning Comments...');
+	compoundURL = Cypress.env('baseUrl').concat(
+		Cypress.env('version'),
+		Cypress.env('route_organizations'),
+		`/${orgId}`,
+		Cypress.env('route_comments')
+	);
+	cy.request({
+		method: 'GET',
+		url: compoundURL
+	}).then((response) => {
+		response.body.comments.forEach((comment) => {
+			cy.deleteCommentById(orgId, comment._id);
+		});
+	});
+});
+
+Cypress.Commands.add('deleteCommentById', (orgId, commentId) => {
+	compoundURL = Cypress.env('baseUrl').concat(
+		Cypress.env('version'),
+		Cypress.env('route_organizations'),
+		`/${orgId}`,
+		Cypress.env('route_comments'),
+		`/${commentId}`
+	);
+	cy.request({
+		method: 'DELETE',
+		url: compoundURL
+	});
+});
+
+//Ratings
+Cypress.Commands.add('deleteRatingsOrgsIfExist', () => {
+	cy.log('Cleaning Org Ratings...');
+	compoundURL = Cypress.env('baseUrl').concat(
+		Cypress.env('version'),
+		Cypress.env('route_slug_organizations'),
+		'/surprisingly-unique-organizations-slug'
+	);
+	cy.request({
+		method: 'GET',
+		url: compoundURL,
+		failOnStatusCode: false
+	}).then((response) => {
+		if (!response.body.notFound) {
+			cy.deleteRatingsIfExist(response.body._id);
+		}
+	});
+});
+
+Cypress.Commands.add('deleteRatingsIfExist', (orgId) => {
+	cy.log('Cleaning Ratings...');
+	compoundURL = Cypress.env('baseUrl').concat(
+		Cypress.env('version'),
+		Cypress.env('route_organizations'),
+		`/${orgId}`,
+		Cypress.env('route_ratings')
+	);
+	cy.request({
+		method: 'GET',
+		url: compoundURL
+	}).then((response) => {
+		response.body.ratings.forEach((rating) => {
+			cy.deleteRatingById(orgId, rating._id);
+		});
+	});
+});
+
+Cypress.Commands.add('deleteRatingById', (orgId, ratingId) => {
+	compoundURL = Cypress.env('baseUrl').concat(
+		Cypress.env('version'),
+		Cypress.env('route_organizations'),
+		`/${orgId}`,
+		Cypress.env('route_ratings'),
+		`/${ratingId}`
+	);
+	cy.request({
+		method: 'DELETE',
+		url: compoundURL
+	});
+});

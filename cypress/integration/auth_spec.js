@@ -10,6 +10,7 @@ describe('Authentication Routers', () => {
 		//Load the necessary fixtures
 		cy.fixture('user_new.json').as('new_user');
 		cy.fixture('auth_user_bad_creds.json').as('bad_credentials');
+		cy.fixture('auth_user_no_password.json').as('no_password_credentials');
 		cy.fixture('auth_user_good_creds.json').as('good_credentials');
 	});
 
@@ -33,6 +34,38 @@ describe('Authentication Routers', () => {
 				expect(response.status).to.be.eq(404);
 				expect(response.body.notFound).to.be.an('boolean');
 				expect(response.body.notFound).to.be.eq(true);
+			});
+		});
+	});
+
+	it('POST - /v1/auth - Authentication Page - No Password Credentials', () => {
+		//Get User Info
+		cy.get('@new_user').then((new_user) => {
+			//Add the User
+			cy.addUser(new_user).then((add_user_response) => {
+				compoundURL = Cypress.env('baseUrl').concat(
+					Cypress.env('version'),
+					Cypress.env('route_auth')
+				);
+				compoundURL = Cypress.env('baseUrl').concat(
+					Cypress.env('version'),
+					Cypress.env('route_auth')
+				);
+
+				cy.get('@no_password_credentials').then((no_password_credentials) => {
+					cy.request({
+						method: 'POST',
+						url: compoundURL,
+						failOnStatusCode: false,
+						body: no_password_credentials
+					}).should((response) => {
+						expect(response.status).to.be.eq(400);
+						expect(response.body).to.be.eq('Please provide a valid password.');
+						cy.log(response);
+						//expect(response.body.notFound).to.be.an('boolean');
+						//expect(response.body.notFound).to.be.eq(true);
+					});
+				});
 			});
 		});
 	});

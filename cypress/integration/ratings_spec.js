@@ -13,7 +13,9 @@ describe('Ratings Routers', () => {
 	afterEach(() => {
 		//Do the clean up
 		cy.deleteUsersIfExist();
-		cy.deleteOrgsIfExist();
+		cy.deleteRatingsOrgsIfExist().then(() => {
+			cy.deleteOrgsIfExist();
+		});
 	});
 	it('PATCH - /v1/organizations/:orgId/ratings - Add Ratings - Bad Ratings No Body', () => {
 		cy.get('@organization').then((org) => {
@@ -69,7 +71,7 @@ describe('Ratings Routers', () => {
 		});
 	});
 
-	it('DELETE - /v1/organizations/ratings/ratingId - Delete Ratings - Good Ratings', () => {
+	it('DELETE - /v1/organizations/:orgId/ratings/:ratingId - Delete Ratings - Good Ratings', () => {
 		cy.get('@new_user').then((new_user) => {
 			cy.addUser(new_user).then((addedUserResponse) => {
 				cy.get('@organization').then((organization) => {
@@ -119,7 +121,7 @@ describe('Ratings Routers', () => {
 		});
 	});
 
-	it('DELETE - /v1/organizations/ratings/ratingId - Delete Ratings - Bad Org Id Ratings', () => {
+	it('DELETE - /v1/organizations/:orgId/ratings/:ratingId - Delete Ratings - Bad Org Id Ratings', () => {
 		cy.get('@new_user').then((new_user) => {
 			cy.addUser(new_user).then((addedUserResponse) => {
 				cy.get('@organization').then((organization) => {

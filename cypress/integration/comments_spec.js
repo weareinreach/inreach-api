@@ -20,7 +20,9 @@ describe('Comments Routers', () => {
 	afterEach(() => {
 		//Do the clean up
 		cy.deleteUsersIfExist();
-		cy.deleteOrgsIfExist();
+		cy.deleteCommentsOrgsIfExist().then(() => {
+			cy.deleteOrgsIfExist();
+		});
 	});
 
 	it('PATCH - /v1/organizations/:orgId/comments - Add Comments - Bad Comment No Body', () => {
@@ -75,7 +77,7 @@ describe('Comments Routers', () => {
 		});
 	});
 
-	it('DELETE - /v1/organizations/:orgId/comments - Delete Org Comments - Good Comment', () => {
+	it('DELETE - /v1/organizations/:orgId/comments/:commentId - Delete Org Comments - Good Comment', () => {
 		//Get Comment
 		cy.get('@comment').then((comment) => {
 			//Add Organization
@@ -112,7 +114,7 @@ describe('Comments Routers', () => {
 		});
 	});
 
-	it('DELETE - /v1/organizations/:orgId/comments - Delete Org Comments - Bad Org', () => {
+	it('DELETE - /v1/organizations/:orgId/comments/:commentId - Delete Org Comments - Bad Org', () => {
 		//Get Comment
 		cy.get('@comment').then((comment) => {
 			//Add Organization
