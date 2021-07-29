@@ -152,6 +152,44 @@ describe('Comments Routers', () => {
 		});
 	});
 
+	it('DELETE - /v1/organizations/:orgId/comments/:commentId - Delete Org Comments - Bad Comment Id', () => {
+		//Get Comment
+		cy.get('@comment').then((comment) => {
+			//Add Organization
+			cy.get('@organization').then((org) => {
+				//Add Automation Org
+				cy.addOrg(org).then((createOrgResponse) => {
+					cy.addCommentToOrg(
+						createOrgResponse.body.organization._id,
+						comment
+					).then(() => {
+						//Get Comments
+						cy.getOrgComments(createOrgResponse.body.organization._id).then(
+							(response) => {
+								compoundURL = Cypress.env('baseUrl').concat(
+									Cypress.env('version'),
+									Cypress.env('route_organizations'),
+									`/${createOrgResponse.body.organization._id}`,
+									Cypress.env('route_comments'),
+									`/BAD_COMMENT_ID`
+								);
+								cy.request({
+									method: 'DELETE',
+									url: compoundURL,
+									failOnStatusCode: false
+								}).should((response) => {
+									expect(response.status).to.be.eq(500);
+									expect(response.body.error).to.be.an('boolean');
+									expect(response.body.error).to.be.eq(true);
+								});
+							}
+						);
+					});
+				});
+			});
+		});
+	});
+
 	it('GET - /v1/organizations/:orgId/comments - Get Organization comments', () => {
 		//Add Organization
 		cy.get('@organization').then((org) => {
