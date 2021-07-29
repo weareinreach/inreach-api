@@ -20,7 +20,7 @@ export const getOrgs = async (req, res) => {
 	let dbQuery = getOrganizationQuery(query);
 	var sortObjectArray = '';
 	var obj = {};
-	console.log(dbQuery);
+
 	if (dbQuery['services']) {
 		if (dbQuery['services']['$elemMatch']['$or']) {
 			sortObjectArray = dbQuery['services']['$elemMatch']['$or'];
