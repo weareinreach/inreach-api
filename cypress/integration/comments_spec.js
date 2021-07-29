@@ -178,9 +178,9 @@ describe('Comments Routers', () => {
 									url: compoundURL,
 									failOnStatusCode: false
 								}).should((response) => {
-									expect(response.status).to.be.eq(500);
-									expect(response.body.error).to.be.an('boolean');
-									expect(response.body.error).to.be.eq(true);
+									expect(response.status).to.be.eq(404);
+									expect(response.body.notFound).to.be.an('boolean');
+									expect(response.body.notFound).to.be.eq(true);
 								});
 							}
 						);
