@@ -87,21 +87,21 @@ export const getOrgs = async (req, res) => {
 	}
 
 	if (query.lastVerified) {
-		if (query.lastVerifiedEnd) {
-			const lastVerifiedDateString = JSON.stringify(query.lastVerified);
-			const lastVerifiedEndDateString = JSON.stringify(query.lastVerifiedEnd);
+		dbQuery = Object.assign(dbQuery, {
+			verified_at: {$lte: new Date(query.lastVerified)}
+		});
+	}
 
-			dbQuery = Object.assign(dbQuery, {
-				verified_at: {
-					$gte: JSON.parse(lastVerifiedDateString),
-					$lte: JSON.parse(lastVerifiedEndDateString)
-				}
-			});
-		} else {
-			dbQuery = Object.assign(dbQuery, {
-				verified_at: {$lte: new Date(query.lastVerified)}
-			});
-		}
+	if (query.lastVerifiedStart) {
+		const lastVerifiedStartDateString = JSON.stringify(query.lastVerifiedStart);
+		const lastVerifiedEndDateString = JSON.stringify(query.lastVerifiedEnd);
+
+		dbQuery = Object.assign(dbQuery, {
+			verified_at: {
+				$gte: JSON.parse(lastVerifiedStartDateString),
+				$lte: JSON.parse(lastVerifiedEndDateString)
+			}
+		});
 	}
 
 	if (query.lastUpdated) {
