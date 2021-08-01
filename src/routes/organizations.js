@@ -105,39 +105,39 @@ export const getOrgs = async (req, res) => {
 	}
 
 	if (query.lastUpdated) {
-		if (query.lastUpdatedEnd) {
-			const lastUpdatedDateString = JSON.stringify(query.lastUpdated);
-			const lastUpdatedEndDateString = JSON.stringify(query.lastUpdatedEnd);
+		dbQuery = Object.assign(dbQuery, {
+			updated_at: {$lte: new Date(query.lastUpdated)}
+		});
+	}
 
-			dbQuery = Object.assign(dbQuery, {
-				updated_at: {
-					$gte: JSON.parse(lastUpdatedDateString),
-					$lte: JSON.parse(lastUpdatedEndDateString)
-				}
-			});
-		} else {
-			dbQuery = Object.assign(dbQuery, {
-				updated_at: {$lte: new Date(query.lastUpdated)}
-			});
-		}
+	if (query.lastUpdatedStart) {
+		const lastUpdatedStartDateString = JSON.stringify(query.lastUpdatedStart);
+		const lastUpdatedEndDateString = JSON.stringify(query.lastUpdatedEnd);
+
+		dbQuery = Object.assign(dbQuery, {
+			updated_at: {
+				$gte: new Date(query.lastUpdatedStart),
+				$lte: new Date(query.lastUpdatedEnd)
+			}
+		});
 	}
 
 	if (query.createdAt) {
-		if (query.createdAtEnd) {
-			const createdAtDateString = JSON.stringify(query.createdAt);
-			const createdAtEndDateString = JSON.stringify(query.createdAtEnd);
+		dbQuery = Object.assign(dbQuery, {
+			created_at: {$lte: new Date(query.createdAt)}
+		});
+	}
 
-			dbQuery = Object.assign(dbQuery, {
-				created_at: {
-					$gte: JSON.parse(createdAtDateString),
-					$lte: JSON.parse(createdAtEndDateString)
-				}
-			});
-		} else {
-			dbQuery = Object.assign(dbQuery, {
-				created_at: {$lte: new Date(query.createdAt)}
-			});
-		}
+	if (query.createdAtStart) {
+		const createdAtStartDateString = JSON.stringify(query.createdAtStart);
+		const createdAtEndDateString = JSON.stringify(query.createdAtEnd);
+
+		dbQuery = Object.assign(dbQuery, {
+			created_at: {
+				$gte: JSON.parse(createdAtStartDateString),
+				$lte: JSON.parse(createdAtEndDateString)
+			}
+		});
 	}
 
 	await Organization.find(dbQuery)
