@@ -16,14 +16,22 @@ export const getComments = async (req, res) => {
 };
 
 export const deleteCommentById = async (req, res) => {
-	const {commentId} = req?.params;
+	const {orgId, serviceId, commentId} = req?.params;
+	const query = getEntityQuery({organizationId: orgId, serviceId: serviceId});
 
-	Comment.findByIdAndDelete(commentId)
-		.then(() => {
-			return res.json({deleted: true});
+	await Comment.findOne(query)
+		.then((comments) => {
+			comments.comments.id(commentId).remove();
+			comments
+				.save()
+				.then(() => {
+					return res.json({deleted: true});
+				})
+				.catch((err) => handleErr(err, res));
 		})
 		.catch((err) => {
-			handleErr(err, res);
+			console.log(err);
+			return handleNotFound(res);
 		});
 };
 
@@ -69,6 +77,26 @@ export const getRatings = async (req, res) => {
 			return res.json({average_rating: average, ratings});
 		})
 		.catch((err) => handleErr(err, res));
+};
+
+export const deleteRatingById = async (req, res) => {
+	const {orgId, serviceId, ratingId} = req?.params;
+	const query = getEntityQuery({organizationId: orgId, serviceId: serviceId});
+
+	await Rating.findOne(query)
+		.then((ratings) => {
+			ratings.ratings.id(ratingId).remove();
+			ratings
+				.save()
+				.then(() => {
+					return res.json({deleted: true});
+				})
+				.catch((err) => handleErr(err, res));
+		})
+		.catch((err) => {
+			console.log(err);
+			return handleNotFound(res);
+		});
 };
 
 export const updateRatings = async (req, res) => {
