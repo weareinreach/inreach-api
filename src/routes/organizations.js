@@ -85,9 +85,19 @@ export const getOrgs = async (req, res) => {
 			}
 		}
 	}
+
 	if (query.lastVerified) {
 		dbQuery = Object.assign(dbQuery, {
 			verified_at: {$lte: new Date(query.lastVerified)}
+		});
+	}
+
+	if (query.lastVerifiedStart) {
+		dbQuery = Object.assign(dbQuery, {
+			verified_at: {
+				$gte: new Date(query.lastVerifiedStart),
+				$lte: new Date(query.lastVerifiedEnd)
+			}
 		});
 	}
 
@@ -97,9 +107,27 @@ export const getOrgs = async (req, res) => {
 		});
 	}
 
+	if (query.lastUpdatedStart) {
+		dbQuery = Object.assign(dbQuery, {
+			updated_at: {
+				$gte: new Date(query.lastUpdatedStart),
+				$lte: new Date(query.lastUpdatedEnd)
+			}
+		});
+	}
+
 	if (query.createdAt) {
 		dbQuery = Object.assign(dbQuery, {
 			created_at: {$lte: new Date(query.createdAt)}
+		});
+	}
+
+	if (query.createdAtStart) {
+		dbQuery = Object.assign(dbQuery, {
+			created_at: {
+				$gte: new Date(query.createdAtStart),
+				$lte: new Date(query.createdAtEnd)
+			}
 		});
 	}
 
@@ -323,7 +351,7 @@ export let sendOrgOwnerStatus = async (req, res, next) => {
 	switch (ownerStatus) {
 		case 'approve':
 			subject = `You are now affiliated with ${org} on AsylumConnect`;
-			message = `Thank you for requesting to join ${org} on the AsylumConnect Catalog (https://asylumconnect.org). Our team has approved your request and your AsylumConnect user account is now connected to ${org}\'s profile page on AsylumConnect.\n\nBest,\nThe AsylumConnect Team`;
+			message = `Thank you for requesting to join ${org} on the AsylumConnect Catalog (https://asylumconnect.org). Our team has approved your request and your AsylumConnect user account is now connected to ${org}'s profile page on AsylumConnect.\n\nBest,\nThe AsylumConnect Team`;
 			html = `<html>Thank you for requesting to join ${org} on the <a href='https://asylumconnect.org'>AsylumConnect Catalog</a>. Our team has approved your request and your AsylumConnect user account is now connected to ${org}'s profile page on AsylumConnect.<br/><br/>Best,<br/>The AsylumConnect Team</html>`;
 			break;
 		case 'deny':

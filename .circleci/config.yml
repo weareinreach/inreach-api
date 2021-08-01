@@ -23,10 +23,10 @@ jobs:
           command: node --version
       - run:
           name: Install Packages
-          command: npm install
+          command: yarn install
       - run:
           name: Install Cypress
-          command: npm i cypress
+          command: yarn add cypress
       #save cache for use next tests
       - save_cache:
          paths:
@@ -66,10 +66,10 @@ jobs:
           command: node --version
       - run:
           name: Install Packages
-          command: npm install
+          command: yarn install
       - run:
           name: Install Cypress
-          command: npm i cypress
+          command: yarn add cypress
       #save cache for use next tests
       - save_cache:
          paths:
@@ -109,13 +109,13 @@ jobs:
           command: node --version
       - run:
           name: Install Packages
-          command: npm install
+          command: yarn install
       - run:
           name: Install NYC
-          command: npm i nyc
+          command: yarn add nyc
       - run:
           name: Install Cypress
-          command: npm i cypress
+          command: yarn add cypress
       #save cache for use next tests
       - save_cache:
          paths:
@@ -168,7 +168,7 @@ jobs:
           command: node --version
       - run:
           name: Install Packages
-          command: npm install
+          command: yarn install
       #save cache for use next tests
       - save_cache:
          paths:
