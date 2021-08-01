@@ -41,14 +41,15 @@ describe('Organization Routers', () => {
 		});
 	});
 
-	it('GET - /v1/organizations?query - Get Organizations Query', () => {
+	it('GET - /v1/organizations?query - Get Organizations Query - good query', () => {
 		cy.get('@organization').then((org) => {
 			cy.addOrg(org).then((createdOrgResponse) => {
 				compoundURL = Cypress.env('baseUrl').concat(
 					Cypress.env('version'),
 					Cypress.env('route_organizations'),
-					`?ids=${createdOrgResponse.body.organization._id}&name=${createdOrgResponse.body.organization.name}`
+					`?name=${createdOrgResponse.body.organization.name}`
 				);
+				cy.log(compoundURL);
 				cy.request({
 					method: 'GET',
 					url: compoundURL
@@ -78,6 +79,46 @@ describe('Organization Routers', () => {
 					expect(response.body.organizations[0].is_published).to.be.eq(
 						createdOrgResponse.body.organization.is_published
 					);
+				});
+			});
+		});
+	});
+
+	it('GET - /v1/organizations?query - Get Organizations Query - No Result', () => {
+		cy.get('@organization').then((org) => {
+			cy.addOrg(org).then((createdOrgResponse) => {
+				//Test Services OR
+				compoundURL = Cypress.env('baseUrl').concat(
+					Cypress.env('version'),
+					Cypress.env('route_organizations'),
+					`?name=${createdOrgResponse.body.organization.name}&lastVerified=06/05/2021&createdAt=06/05/2021&lastUpdated=06/05/2021&pending=true&pendingOwnership=false&serviceArea=Medical,Legal&tags=Legal`
+				);
+				cy.log(compoundURL);
+				cy.request({
+					method: 'GET',
+					url: compoundURL
+				}).should((response) => {
+					expect(response.status).to.be.eq(200);
+					expect(response.body).to.not.be.empty;
+					expect(response.body.organizations).to.be.an('array');
+					expect(response.body.organizations).to.be.an('array').that.is.empty;
+				});
+
+				//Test Services AND
+				compoundURL = Cypress.env('baseUrl').concat(
+					Cypress.env('version'),
+					Cypress.env('route_organizations'),
+					`?name=${createdOrgResponse.body.organization.name}&lastVerified=06/05/2021&createdAt=06/05/2021&lastUpdated=06/05/2021&pending=true&pendingOwnership=false&serviceArea=Medical,Legal&tags=Legal&tagLocale=US`
+				);
+				cy.log(compoundURL);
+				cy.request({
+					method: 'GET',
+					url: compoundURL
+				}).should((response) => {
+					expect(response.status).to.be.eq(200);
+					expect(response.body).to.not.be.empty;
+					expect(response.body.organizations).to.be.an('array');
+					expect(response.body.organizations).to.be.an('array').that.is.empty;
 				});
 			});
 		});
