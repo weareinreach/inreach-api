@@ -93,13 +93,10 @@ export const getOrgs = async (req, res) => {
 	}
 
 	if (query.lastVerifiedStart) {
-		const lastVerifiedStartDateString = JSON.stringify(query.lastVerifiedStart);
-		const lastVerifiedEndDateString = JSON.stringify(query.lastVerifiedEnd);
-
 		dbQuery = Object.assign(dbQuery, {
 			verified_at: {
-				$gte: JSON.parse(lastVerifiedStartDateString),
-				$lte: JSON.parse(lastVerifiedEndDateString)
+				$gte: new Date(query.lastVerifiedStart),
+				$lte: new Date(query.lastVerifiedEnd)
 			}
 		});
 	}
@@ -111,9 +108,6 @@ export const getOrgs = async (req, res) => {
 	}
 
 	if (query.lastUpdatedStart) {
-		const lastUpdatedStartDateString = JSON.stringify(query.lastUpdatedStart);
-		const lastUpdatedEndDateString = JSON.stringify(query.lastUpdatedEnd);
-
 		dbQuery = Object.assign(dbQuery, {
 			updated_at: {
 				$gte: new Date(query.lastUpdatedStart),
@@ -129,13 +123,10 @@ export const getOrgs = async (req, res) => {
 	}
 
 	if (query.createdAtStart) {
-		const createdAtStartDateString = JSON.stringify(query.createdAtStart);
-		const createdAtEndDateString = JSON.stringify(query.createdAtEnd);
-
 		dbQuery = Object.assign(dbQuery, {
 			created_at: {
-				$gte: JSON.parse(createdAtStartDateString),
-				$lte: JSON.parse(createdAtEndDateString)
+				$gte: new Date(query.createdAtStart),
+				$lte: new Date(query.createdAtEnd)
 			}
 		});
 	}
