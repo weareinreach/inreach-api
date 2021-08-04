@@ -7,6 +7,7 @@ import {
 	deleteSuggestion,
 	getComments,
 	getRatings,
+	deleteRatingById,
 	getSuggestions,
 	getUserSuggestionsByEmail,
 	updateComments,
@@ -171,6 +172,10 @@ versionOneRouter.delete(
 
 // Ratings - Automation tested
 versionOneRouter.get('/organizations/:orgId/ratings', getRatings);
+versionOneRouter.delete(
+	'/organizations/:orgId/ratings/:ratingId',
+	deleteRatingById
+);
 versionOneRouter.patch(
 	'/organizations/:orgId/ratings',
 	verifyToken,

@@ -86,9 +86,19 @@ export const getOrgs = async (req, res) => {
 			}
 		}
 	}
+
 	if (query.lastVerified) {
 		dbQuery = Object.assign(dbQuery, {
 			verified_at: {$lte: new Date(query.lastVerified)}
+		});
+	}
+
+	if (query.lastVerifiedStart) {
+		dbQuery = Object.assign(dbQuery, {
+			verified_at: {
+				$gte: new Date(query.lastVerifiedStart),
+				$lte: new Date(query.lastVerifiedEnd)
+			}
 		});
 	}
 
@@ -97,6 +107,31 @@ export const getOrgs = async (req, res) => {
 			updated_at: {$lte: new Date(query.lastUpdated)}
 		});
 	}
+
+	if (query.lastUpdatedStart) {
+		dbQuery = Object.assign(dbQuery, {
+			updated_at: {
+				$gte: new Date(query.lastUpdatedStart),
+				$lte: new Date(query.lastUpdatedEnd)
+			}
+		});
+	}
+
+	if (query.createdAt) {
+		dbQuery = Object.assign(dbQuery, {
+			created_at: {$lte: new Date(query.createdAt)}
+		});
+	}
+
+	if (query.createdAtStart) {
+		dbQuery = Object.assign(dbQuery, {
+			created_at: {
+				$gte: new Date(query.createdAtStart),
+				$lte: new Date(query.createdAtEnd)
+			}
+		});
+	}
+
 	await Organization.find(dbQuery)
 		.sort(obj)
 		.skip(offset)

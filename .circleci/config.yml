@@ -13,21 +13,25 @@ jobs:
     steps:
       - checkout
       # Download and cache dependencies
-      - restore_cache:
-          keys:
-          - v1-dependencies-{{ checksum "package.json" }}
-          # fallback to using the latest cache if no exact match is found
-          - v1-dependencies-
+    #   - restore_cache:
+    #       keys:
+    #       - v1-dependencies-{{ checksum "package.json" }}
+    #       # fallback to using the latest cache if no exact match is found
+    #       - v1-dependencies-
       - run: 
           name: Check Node Version
           command: node --version
       - run:
           name: Install Packages
-          command: npm install
+          command: yarn install
+      - run:
+          name: Install Cypress
+          command: yarn add cypress
       #save cache for use next tests
       - save_cache:
          paths:
           - node_modules
+          - "~/.cache/Cypress"
          key: v1-dependencies-{{ checksum "package.json" }}
       #Recreate .env file from CircleCI Project Env Vars
       - run:
@@ -52,21 +56,25 @@ jobs:
     steps:
       - checkout
       # Download and cache dependencies
-      - restore_cache:
-          keys:
-          - v1-dependencies-{{ checksum "package.json" }}
-          # fallback to using the latest cache if no exact match is found
-          - v1-dependencies-
+    #   - restore_cache:
+    #       keys:
+    #       - v1-dependencies-{{ checksum "package.json" }}
+    #       # fallback to using the latest cache if no exact match is found
+    #       - v1-dependencies-
       - run: 
           name: Check Node Version
           command: node --version
       - run:
           name: Install Packages
-          command: npm install
+          command: yarn install
+      - run:
+          name: Install Cypress
+          command: yarn add cypress
       #save cache for use next tests
       - save_cache:
          paths:
           - node_modules
+          - "~/.cache/Cypress"
          key: v1-dependencies-{{ checksum "package.json" }}
       #Unit Testing
       - run: 
@@ -91,24 +99,28 @@ jobs:
     steps:
       - checkout
       # Download and cache dependencies
-      - restore_cache:
-          keys:
-          - v1-dependencies-{{ checksum "package.json" }}
-          # fallback to using the latest cache if no exact match is found
-          - v1-dependencies-
+    #   - restore_cache:
+    #       keys:
+    #       - v1-dependencies-{{ checksum "package.json" }}
+    #       # fallback to using the latest cache if no exact match is found
+    #       - v1-dependencies-
       - run: 
           name: Check Node Version
           command: node --version
       - run:
           name: Install Packages
-          command: npm install
+          command: yarn install
       - run:
           name: Install NYC
-          command: npm i nyc
+          command: yarn add nyc
+      - run:
+          name: Install Cypress
+          command: yarn add cypress
       #save cache for use next tests
       - save_cache:
          paths:
           - node_modules
+          - "~/.cache/Cypress"
          key: v1-dependencies-{{ checksum "package.json" }}
       #Recreate .env file from CircleCI Project Env Vars
       - run:
@@ -146,21 +158,22 @@ jobs:
     steps:
       - checkout
       # Download and cache dependencies
-      - restore_cache:
-          keys:
-          - v1-dependencies-{{ checksum "package.json" }}
-          # fallback to using the latest cache if no exact match is found
-          - v1-dependencies-
+    #   - restore_cache:
+    #       keys:
+    #       - v1-dependencies-{{ checksum "package.json" }}
+    #       # fallback to using the latest cache if no exact match is found
+    #       - v1-dependencies-
       - run: 
           name: Check Node Version
           command: node --version
       - run:
           name: Install Packages
-          command: npm install
+          command: yarn install
       #save cache for use next tests
       - save_cache:
          paths:
           - node_modules
+          - "~/.cache/Cypress"
          key: v1-dependencies-{{ checksum "package.json" }}
       #Run linting
       - run:

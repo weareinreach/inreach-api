@@ -28,6 +28,12 @@ const ServiceSchema = new Schema({
 	location_id: String,
 	name: {type: String, required: true},
 	name_ES: {type: String},
+	notes_log: [
+		{
+			note: String,
+			created_at: Date
+		}
+	],
 	phone_id: String,
 	properties: {},
 	schedule_id: String,
@@ -79,6 +85,12 @@ const OrganizationSchema = new Schema(
 				zip_code: String
 			}
 		],
+		notes_log: [
+			{
+				note: String,
+				created_at: Date
+			}
+		],
 		owners: [
 			{
 				email: String,
@@ -121,6 +133,7 @@ const OrganizationSchema = new Schema(
 		services: [ServiceSchema],
 		slug: {type: String, unique: true},
 		slug_ES: {type: String, unique: true},
+		social_media: [{name: String, url: String}],
 		source: String,
 		verified_at: Date,
 		venue_id: String,
