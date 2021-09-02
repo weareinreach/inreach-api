@@ -58,7 +58,7 @@ export const getOrganizationQuery = (params = {}) => {
 	}
 
 	if (name && name.trim() !== '""') {
-		query.$text = {$search: name};
+		query.$text = {$search: name.trim(), $caseSensitive: false};
 	}
 
 	if (owner) {
