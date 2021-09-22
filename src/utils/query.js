@@ -43,6 +43,7 @@ export const getOrganizationQuery = (params = {}) => {
 		name,
 		owner,
 		pending,
+		deleted,
 		pendingOwnership,
 		properties,
 		serviceArea,
@@ -67,6 +68,12 @@ export const getOrganizationQuery = (params = {}) => {
 
 	if (pendingOwnership) {
 		query['owners.isApproved'] = false;
+	}
+
+	if (deleted) {
+		query.is_deleted = true;
+	} else {
+		query.is_deleted = false;
 	}
 
 	if (pending) {

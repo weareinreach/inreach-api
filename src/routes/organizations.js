@@ -3,6 +3,7 @@ import {
 	handleErr,
 	handleNotFound,
 	orderServices,
+	removeDeletedServices,
 	isBodyEmpty
 } from '../utils';
 import {
@@ -212,7 +213,8 @@ export const getOrg = async (req, res) => {
 			if (!organization) {
 				return handleNotFound(res);
 			}
-
+			//Remove Deleted Services
+			organization.services = removeDeletedServices(organization.services);
 			organization.services = orderServices(organization.services);
 
 			return res.json(organization);

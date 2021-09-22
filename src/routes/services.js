@@ -6,6 +6,7 @@ import {
 	handleErr,
 	handleNotFound,
 	orderServices,
+	removeDeletedServices,
 	isBodyEmpty
 } from '../utils';
 import {getOrganizationQuery} from '../utils/query';
@@ -35,6 +36,9 @@ export const getServices = async (req, res) => {
 
 			let services = orgDoc?.services || [];
 
+			//Remove Deleted Services
+			services = removeDeletedServices(services);
+			//Order Services
 			services = orderServices(services);
 
 			return res.json({services});

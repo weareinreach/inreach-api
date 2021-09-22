@@ -22,6 +22,16 @@ export const orderServices = (services) => {
 	return _orderBy(services, ['updated_at'], ['desc']);
 };
 
+export const removeDeletedServices = (services) => {
+	//Remove Services Marked as deleted
+	services.forEach((item, index, service) => {
+		if (item.is_deleted) {
+			service.splice(index, 1);
+		}
+	});
+	return services;
+};
+
 /**
  * Remove sensitive user information
  * @param  {Object} user User info
