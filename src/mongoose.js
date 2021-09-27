@@ -1,3 +1,4 @@
+import {Double} from 'bson';
 import crypto from 'crypto';
 
 import {model, Schema} from 'mongoose';
@@ -82,7 +83,8 @@ const OrganizationSchema = new Schema(
 				state: String,
 				state_ES: String,
 				unit: String,
-				zip_code: String
+				zip_code: String,
+				geolocation: [Double, Double]
 			}
 		],
 		notes_log: [
