@@ -44,6 +44,7 @@ export const getOrganizationQuery = (params = {}) => {
 		owner,
 		pending,
 		deleted,
+		serviceDeleted,
 		pendingOwnership,
 		properties,
 		serviceArea,
@@ -74,6 +75,12 @@ export const getOrganizationQuery = (params = {}) => {
 		query.is_deleted = true;
 	} else {
 		query.is_deleted = false;
+	}
+
+	if (serviceDeleted) {
+		query['services.is_deleted'] = true;
+	} else {
+		query['services.is_deleted'] = false;
 	}
 
 	if (pending) {
