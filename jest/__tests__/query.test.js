@@ -35,8 +35,11 @@ describe('getEntityQuery', () => {
 describe('getOrganizationQuery', () => {
 	it('should check defaults', () => {
 		const result = getOrganizationQuery();
-
-		expect(result).toEqual({is_published: true});
+		expect(result).toEqual({
+			is_published: true,
+			is_deleted: false,
+			'services.is_deleted': false
+		});
 	});
 
 	it('should apply params and match snapshot', () => {
@@ -45,13 +48,14 @@ describe('getOrganizationQuery', () => {
 			name: 'test',
 			owner: 'test@asylumconnect.com',
 			pending: 'true',
+			deleted: 'true',
+			serviceDeleted: 'true',
 			pendingOwnership: 'true',
 			properties: 'hello=true,world=true,foo=$existsFalse,req-id=true',
 			serviceArea: 'city,state,other-place',
 			tagLocale: 'en_us',
 			tags: 'Food,Medical.Check Up,Legal'
 		});
-
 		expect(result).toMatchSnapshot();
 	});
 

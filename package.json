@@ -16,6 +16,7 @@
 		"report:combined": "npx nyc report --reporter lcov --reporter html --reporter text --report-dir coverageReports",
 		"combine:unit-e2e": "yarn copy:reports && yarn report:combined && yarn report:combined",
 		"unit-test": "jest",
+		"update-snapshot":"jest --updateSnapshot",
 		"e2e": "yarn cypress:run",
 		"e2eUI": "yarn cypress:open",
 		"dev": "nyc yarn start",
