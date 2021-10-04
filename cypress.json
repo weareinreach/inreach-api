@@ -6,5 +6,10 @@
 		"html": true,
 		"json": true
 	},
-	"watchForFileChanges": false
+	"watchForFileChanges": false,
+	"retries":{
+        "runMode":3,
+        "openMode":0
+    },
+    "defaultCommandTimeout":10000
 }
