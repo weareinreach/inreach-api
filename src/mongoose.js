@@ -1,4 +1,4 @@
-import {Decimal128} from 'bson';
+import {Decimal128} from 'mongoose';
 import crypto from 'crypto';
 
 import {model, Schema} from 'mongoose';
@@ -84,7 +84,7 @@ const OrganizationSchema = new Schema(
 				state_ES: String,
 				unit: String,
 				zip_code: String,
-				geolocation: [Decimal128, Decimal128]
+				geolocation: [Decimal128]
 			}
 		],
 		notes_log: [
