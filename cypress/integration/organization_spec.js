@@ -41,7 +41,7 @@ describe('Organization Routers', () => {
 		});
 	});
 
-	it.only('GET - /v1/organizations?query - Get Organizations Query - good query', () => {
+	it('GET - /v1/organizations?query - Get Organizations Query - good query', () => {
 		cy.get('@organization').then((org) => {
 			cy.addOrg(org).then((createdOrgResponse) => {
 				compoundURL = Cypress.env('baseUrl').concat(
