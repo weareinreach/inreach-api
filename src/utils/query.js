@@ -1,5 +1,4 @@
 import mongoose from 'mongoose';
-
 const ObjectId = mongoose.Types.ObjectId;
 
 /**
@@ -79,8 +78,6 @@ export const getOrganizationQuery = (params = {}) => {
 
 	if (serviceDeleted) {
 		query['services.is_deleted'] = true;
-	} else {
-		query['services.is_deleted'] = false;
 	}
 
 	if (pending) {

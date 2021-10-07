@@ -41,19 +41,19 @@ describe('Organization Routers', () => {
 		});
 	});
 
-	it('GET - /v1/organizations?query - Get Organizations Query - good query', () => {
+	it.only('GET - /v1/organizations?query - Get Organizations Query - good query', () => {
 		cy.get('@organization').then((org) => {
 			cy.addOrg(org).then((createdOrgResponse) => {
 				compoundURL = Cypress.env('baseUrl').concat(
 					Cypress.env('version'),
 					Cypress.env('route_organizations'),
-					`?name=${createdOrgResponse.body.organization.name}`
+					`?ids=${createdOrgResponse.body.organization._id}`
 				);
-				cy.log(compoundURL);
 				cy.request({
 					method: 'GET',
 					url: compoundURL
 				}).should((response) => {
+					cy.log(response);
 					expect(response.status).to.be.eq(200);
 					expect(response.body).to.not.be.empty;
 					expect(response.body.organizations).to.be.an('array');
@@ -91,9 +91,8 @@ describe('Organization Routers', () => {
 				compoundURL = Cypress.env('baseUrl').concat(
 					Cypress.env('version'),
 					Cypress.env('route_organizations'),
-					`?name=${createdOrgResponse.body.organization.name}&lastVerified=06/05/2021&createdAt=06/05/2021&lastUpdated=06/05/2021&pending=true&pendingOwnership=false&serviceArea=Medical,Legal&tags=Legal`
+					`?name=Surprise&lastVerified=06/05/2021&createdAt=06/05/2021&lastUpdated=06/05/2021&deleted=false&pending=true&pendingOwnership=false&serviceArea=Medical,Legal&tags=Legal`
 				);
-				cy.log(compoundURL);
 				cy.request({
 					method: 'GET',
 					url: compoundURL
@@ -108,9 +107,8 @@ describe('Organization Routers', () => {
 				compoundURL = Cypress.env('baseUrl').concat(
 					Cypress.env('version'),
 					Cypress.env('route_organizations'),
-					`?name=${createdOrgResponse.body.organization.name}&lastVerified=06/05/2021&createdAt=06/05/2021&lastUpdated=06/05/2021&pending=true&pendingOwnership=false&serviceArea=Medical,Legal&tags=Legal&tagLocale=US`
+					`?name=Surprisingly&lastVerified=06/05/2021&createdAt=06/05/2021&lastUpdated=06/05/2021&pending=true&pendingOwnership=false&serviceArea=Medical,Legal&tags=Legal&tagLocale=US`
 				);
-				cy.log(compoundURL);
 				cy.request({
 					method: 'GET',
 					url: compoundURL
