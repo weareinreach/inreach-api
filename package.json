@@ -26,7 +26,8 @@
 		"build": "backpack build",
 		"serve": "node ./build/main.js",
 		"lint": "eslint ./src/*.js",
-		"run-migration": "node $MIGRATION_FILE"
+		"run-migration": "MIGRATION=true node $MIGRATION_FILE",
+		"rollback-migration":"ROLLBACK=true node $MIGRATION_FILE"
 	},
 	"dependencies": {
 		"backpack-core": "^0.8.4",

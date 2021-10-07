@@ -16,38 +16,68 @@ require('babel-register')({
 
 // Import .env file
 //Replace .env with a {.env-prod} file with DB_URI env var pointing to Prod
-require('dotenv').config({path: '.env'});
+require('dotenv').config({
+	path: '.env'
+});
 // Import DB Connection
 require('../../src/db');
 
 var mongoose = require('../../src/mongoose');
 
+if (process.env.MIGRATION) {
+	runMigrationScript();
+}
+
+if (process.env.ROLLBACK) {
+	runRollbackScript();
+}
+
 //Script
-mongoose.Organization.updateMany(
-	{},
-	{$set: {'services.$[].is_deleted': false}},
-	{arrayFilters: []}
-)
-	.then((result) => {
-		console.log('Number of modified rows ' + result.nModified);
-		console.log('Migration executed');
-		process.exit();
-	})
-	.catch((error) => {
-		console.log('Error applying the migration. Failed with error: ' + error);
-		process.exit();
-	});
+function runMigrationScript() {
+	mongoose.Organization.updateMany(
+		{},
+		{
+			$set: {
+				'services.$[].is_deleted': false
+			}
+		},
+		{
+			arrayFilters: []
+		}
+	)
+		.then((result) => {
+			console.log('Number of modified rows ' + result.nModified);
+			console.log('Migration executed');
+			process.exit();
+		})
+		.catch((error) => {
+			console.log('Error applying the migration. Failed with error: ' + error);
+			process.exit();
+		});
+}
 
 //Rollback Script
-// mongoose.Organization.updateMany(
-//     {},
-//     { $unset: { "services.$[].is_deleted" : "" } },
-//     {arrayFilters:[]}
-// ).then((result)=>{
-//     console.log("Number of modified rows "+ result.nModified);
-//     console.log("Rollback executed");
-//     process.exit();
-// }).catch(error=>{
-//     console.log("Error applying the rollback script. Failed with error: "+ error);
-//     process.exit();
-// });
+function runRollbackScript() {
+	mongoose.Organization.updateMany(
+		{},
+		{
+			$unset: {
+				'services.$[].is_deleted': ''
+			}
+		},
+		{
+			arrayFilters: []
+		}
+	)
+		.then((result) => {
+			console.log('Number of modified rows ' + result.nModified);
+			console.log('Rollback executed');
+			process.exit();
+		})
+		.catch((error) => {
+			console.log(
+				'Error applying the rollback script. Failed with error: ' + error
+			);
+			process.exit();
+		});
+}

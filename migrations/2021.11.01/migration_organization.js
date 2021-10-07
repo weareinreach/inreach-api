@@ -14,33 +14,62 @@ require('babel-register')({
 
 // Import .env file
 //Replace .env with a {.env-prod} file with DB_URI env var pointing to Prod
-require('dotenv').config({path: '.env'});
+require('dotenv').config({
+	path: '.env'
+});
 // Import DB Connection
 require('../../src/db');
 
 var mongoose = require('../../src/mongoose');
 
-//Script
-mongoose.Organization.updateMany({}, {$set: {is_deleted: false}})
-	.then((result) => {
-		console.log('Number of modified rows ' + result.nModified);
-		console.log('Migration executed');
-		process.exit();
-	})
-	.catch((error) => {
-		console.log('Error applying the migration. Failed with error: ' + error);
-		process.exit();
-	});
+if (process.env.MIGRATION) {
+	runMigrationScript();
+}
 
-//Rollback Script
-// mongoose.Organization.updateMany(
-//     {},
-//     { $unset: { "is_deleted" : "" } }
-// ).then((result)=>{
-//     console.log("Number of modified rows "+ result.nModified);
-//     console.log("Rollback script executed");
-//     process.exit();
-// }).catch(error=>{
-//     console.log("Error applying the rollback script. Failed with error: "+ error);
-//     process.exit();
-// });
+if (process.env.ROLLBACK) {
+	runRollbackScript();
+}
+
+//Scripts
+function runMigrationScript() {
+	mongoose.Organization.updateMany(
+		{},
+		{
+			$set: {
+				is_deleted: false
+			}
+		}
+	)
+		.then((result) => {
+			console.log('Number of modified rows ' + result.nModified);
+			console.log('Migration executed');
+			process.exit();
+		})
+		.catch((error) => {
+			console.log('Error applying the migration. Failed with error: ' + error);
+			process.exit();
+		});
+}
+
+function runRollbackScript() {
+	//Rollback Script
+	mongoose.Organization.updateMany(
+		{},
+		{
+			$unset: {
+				is_deleted: ''
+			}
+		}
+	)
+		.then((result) => {
+			console.log('Number of modified rows ' + result.nModified);
+			console.log('Rollback script executed');
+			process.exit();
+		})
+		.catch((error) => {
+			console.log(
+				'Error applying the rollback script. Failed with error: ' + error
+			);
+			process.exit();
+		});
+}
