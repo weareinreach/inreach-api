@@ -22,6 +22,7 @@ export const getOrgs = async (req, res) => {
 	var sortObjectArray = '';
 	var obj = {};
 
+	// specifies sorting order
 	if (dbQuery['services']) {
 		if (dbQuery['services']['$elemMatch']['$or']) {
 			sortObjectArray = dbQuery['services']['$elemMatch']['$or'];
@@ -85,6 +86,9 @@ export const getOrgs = async (req, res) => {
 				obj[key] = -1;
 			}
 		}
+	} else if (dbQuery.$text) {
+		// sorts results based on text match score
+		obj = {score: {$meta: 'textScore'}};
 	}
 
 	if (query.lastVerified) {

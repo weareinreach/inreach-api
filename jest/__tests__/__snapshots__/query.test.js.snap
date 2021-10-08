@@ -3,6 +3,7 @@
 exports[`getOrganizationQuery should apply params and match snapshot 1`] = `
 Object {
   "$text": Object {
+    "$caseSensitive": false,
     "$search": "test",
   },
   "_id": Object {
