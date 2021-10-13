@@ -80,6 +80,8 @@ export const getOrganizationQuery = (params = {}) => {
 		query['services.is_deleted'] = true;
 		//Overide deleted to get both deleted and non deleted orgs.
 		query.is_deleted = {$in: [true, false]};
+	} else {
+		query['services.is_deleted'] = false;
 	}
 
 	if (pending) {
