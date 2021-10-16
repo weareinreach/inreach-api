@@ -89,8 +89,11 @@ const createServiceAudit = async (req, res) => {
 				return handleNotFound(res);
 			}
 
+			if (!organization.services) {
+				organization.services = [];
+			}
 			const before = [...organization.services];
-			organization.services.push(body);
+			organization.services.push(service);
 
 			await organization
 				.save()
