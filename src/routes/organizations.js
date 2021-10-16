@@ -208,20 +208,14 @@ export const deleteOrg = async (req, res) => {
 export const getOrg = async (req, res) => {
 	const {orgId} = req?.params;
 
-	await Organization.find({
-		_id: orgId,
-		is_deleted: true || false
-	})
+	await Organization.findById(orgId)
 		.then((organization) => {
 			if (!organization) {
 				return handleNotFound(res);
 			}
 			//Remove Deleted Services
-			organization[0].services = removeDeletedServices(
-				organization[0].services
-			);
-			organization[0].services = orderServices(organization[0].services);
-			console.log(organization);
+			organization.services = removeDeletedServices(organization.services);
+			organization.services = orderServices(organization.services);
 			return res.json(organization);
 		})
 		.catch((err) => handleErr(err, res));
