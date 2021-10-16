@@ -185,6 +185,7 @@ jobs:
       - image: circleci/node:15.6.0
     working_directory: ~/catalog-api
     steps:
+      - checkout
       - run: 
           name: Run migration
           command: "yarn test"
@@ -193,10 +194,23 @@ workflows:
   version: 2
   pull_request:
     jobs:
-      - build
-      - e2e
-      - unit
-      - lint
+      - build:
+          filters:
+            branches:
+              ignore: run-migration-job
+      - e2e:
+          filters:
+            branches:
+              ignore: run-migration-job
+      - unit:
+          filters:
+            branches:
+              ignore: run-migration-job
+      - lint:
+          filters:
+            branches:
+              ignore: run-migration-job
+              
   migration:
     jobs:
       - hold:
