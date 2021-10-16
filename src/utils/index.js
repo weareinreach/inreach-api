@@ -23,6 +23,9 @@ export const orderServices = (services) => {
 };
 
 export const removeDeletedServices = (services) => {
+	//If no services return services
+	if (services.length == 0) return services;
+
 	//Remove Services Marked as deleted
 	services.forEach((item, index, service) => {
 		if (item.is_deleted) {
