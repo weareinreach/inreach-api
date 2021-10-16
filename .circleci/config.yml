@@ -2,6 +2,10 @@
 #Put this file in a .circleci/ folder
 #This file is to be used to run Github Status Checks
 version: 2.1
+parameters:
+  run_migration:
+    default: false
+    type: boolean
 orbs:
   node: circleci/node@3.0.0
   codecov: codecov/codecov@1.1.3
@@ -212,6 +216,7 @@ workflows:
               ignore: run-migration-job
               
   migration:
+    when: << pipeline.parameters.run_migration >>
     jobs:
       - hold:
           type: approval
