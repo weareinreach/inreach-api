@@ -179,12 +179,31 @@ jobs:
       - run:
           name: Run linting
           command: "yarn lint"
+  
+  migration:
+    docker:
+      - image: circleci/node:15.6.0
+    working_directory: ~/catalog-api
+    steps:
+      - run: 
+          name: Run migration
+          command: "yarn test"
 
 workflows:
-  version: 1
+  version: 2
   pull_request:
     jobs:
       - build
       - e2e
       - unit
       - lint
+  migration:
+    jobs:
+      - hold:
+          type: approval
+      - migration:
+          filters:
+            branches:
+              only: run-migration-job
+          requires:
+            - hold
