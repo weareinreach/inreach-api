@@ -210,7 +210,7 @@ jobs:
           command: |
             for i in $FILES; do
               echo $i
-              export $MIGRATION_FILE=$i
+              export MIGRATION_FILE=$i
               yarn test
             done
   
