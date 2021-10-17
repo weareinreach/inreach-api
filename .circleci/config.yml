@@ -10,8 +10,8 @@ parameters:
     default: false
     type: boolean
   files:
-    default: []
-    type: list
+    default: ""
+    type: string
 orbs:
   node: circleci/node@3.0.0
   codecov: codecov/codecov@1.1.3
@@ -208,7 +208,7 @@ jobs:
       - run: 
           name: Run migration
           command: |
-            for $i in $FILES; do
+            for i in $FILES; do
               echo $i
               export $MIGRATION_FILE=$i
               yarn test
