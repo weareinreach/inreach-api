@@ -6,9 +6,12 @@ parameters:
   run_migration:
     default: false
     type: boolean
-  migration_file:
-    default: ""
-    type: string
+  run_rollback:
+    default: false
+    type: boolean
+  files:
+    default: []
+    type: list
 orbs:
   node: circleci/node@3.0.0
   codecov: codecov/codecov@1.1.3
@@ -191,6 +194,8 @@ jobs:
     docker:
       - image: circleci/node:15.6.0
     working_directory: ~/catalog-api
+    environment:
+      FILES: << pipeline.parameters.files>>
     steps:
       - checkout
       #Recreate .env file from CircleCI Project Env Vars
@@ -201,8 +206,29 @@ jobs:
            DB_URI=$DB_URI_PROD
            EOF
       - run: 
-          name: See variable
-          command: "echo $migration_file"
+          name: Run migration
+          command: |
+            for $i in $FILES; do
+              echo $i
+              export $MIGRATION_FILE=$i
+              yarn test
+            done
+  
+  rollback:
+    docker:
+      - image: circleci/node:15.6.0
+    working_directory: ~/catalog-api
+    environment:
+      FILES: << pipeline.parameters.files>>
+    steps:
+      - checkout
+      #Recreate .env file from CircleCI Project Env Vars
+      - run:
+          name: Create .env file
+          command: |
+           cat \<< EOF > ./.env
+           DB_URI=$DB_URI_PROD
+           EOF
       - run: 
           name: Run migration
           command: "yarn test"
@@ -230,6 +256,18 @@ workflows:
               
   migration:
     when: << pipeline.parameters.run_migration >>
+    jobs:
+      - hold:
+          type: approval
+      - migration:
+          filters:
+            branches:
+              only: run-migration-job #to be replaced with main
+          requires:
+            - hold
+  
+  rollback:
+    when: << pipeline.parameters.run_rollback >>
     jobs:
       - hold:
           type: approval
