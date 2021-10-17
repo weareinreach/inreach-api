@@ -201,6 +201,9 @@ jobs:
            DB_URI=$DB_URI_PROD
            EOF
       - run: 
+          name: See variable
+          command: "echo $migration_file"
+      - run: 
           name: Run migration
           command: "yarn test"
 
