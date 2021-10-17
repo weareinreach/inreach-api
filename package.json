@@ -28,7 +28,7 @@
 		"lint": "eslint ./src/*.js",
 		"run-migration": "MIGRATION=true node $MIGRATION_FILE",
 		"rollback-migration":"ROLLBACK=true node $MIGRATION_FILE",
-		"test":"echo Hello this is $MIGRATION_FILE"
+		"test":"echo Hello this is $migration_file"
 	},
 	"dependencies": {
 		"backpack-core": "^0.8.4",
