@@ -199,6 +199,7 @@ jobs:
     steps:
       - checkout
       #Recreate .env file from CircleCI Project Env Vars
+      #Need to add $DB_URI_PROD env var to env variables
       - run:
           name: Create .env file
           command: |
@@ -207,9 +208,10 @@ jobs:
            EOF
       - run: 
           name: Run migration
+          #TO be replaced with accurate invocation
+          #yarn run-migration
           command: |
             for i in $FILES; do
-              echo $i
               export MIGRATION_FILE=$i
               yarn test
             done
@@ -230,8 +232,14 @@ jobs:
            DB_URI=$DB_URI_PROD
            EOF
       - run: 
-          name: Run migration
-          command: "yarn test"
+          #TO be replaced with accurate invocation
+          #yarn run-rollback
+          name: Run rollback
+          command: |
+            for i in $FILES; do
+              export MIGRATION_FILE=$i
+              yarn test
+            done
 
 workflows:
   version: 2
@@ -271,7 +279,7 @@ workflows:
     jobs:
       - hold:
           type: approval
-      - migration:
+      - rollback:
           filters:
             branches:
               only: run-migration-job #to be replaced with main
