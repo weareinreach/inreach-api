@@ -6,7 +6,7 @@ parameters:
   run_migration:
     default: false
     type: boolean
-  MIGRATION_FILE:
+  migration_file:
     default: ""
     type: string
 orbs:
