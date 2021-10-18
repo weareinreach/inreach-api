@@ -1,6 +1,6 @@
-import bodyParser from 'body-parser';
 import cors from 'cors';
 import express from 'express';
+import mongoSanitize from 'express-mongo-sanitize';
 
 // Connect the database client
 import './db';
@@ -13,7 +13,10 @@ const port = process.env.PORT || 8080;
 server.use(cors());
 
 // Accept JSON
-server.use(bodyParser.json());
+server.use(express.json());
+
+// Remove unsafe characters from mongo queries
+server.use(mongoSanitize());
 
 // Set up routes
 server.use(baseRouter);

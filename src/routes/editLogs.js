@@ -2,6 +2,18 @@ import {EditLog} from '../mongoose';
 import {handleBadRequest, handleErr, handleNotFound} from '../utils';
 import {diff} from 'deep-object-diff';
 
+export const generateAuditLogMessage = (
+	userId,
+	entityType,
+	entityId,
+	action,
+	success
+) => {
+	return `${entityType} ${entityId} updated (${action}) by ${userId} ${
+		success ? `and successfully logged it` : `but failed to log it`
+	}`;
+};
+
 export const getLogs = async (req, res) => {
 	const {orgId, serviceId} = req?.params;
 	const query = {entityId: orgId || serviceId};
@@ -47,12 +59,12 @@ export const auditEdit = async (
 	})
 		.then(() => {
 			console.log(
-				`${entityType} ${entityId} updated (${action}) by ${userId} and successfully logged it`
+				generateAuditLogMessage(userId, entityType, entityId, action, true)
 			);
 		})
 		.catch((e) => {
 			console.log(
-				`${entityType} ${entityId} updated (${action}) by ${userId} but failed to log it`,
+				generateAuditLogMessage(userId, entityType, entityId, action, false),
 				e
 			);
 		});
