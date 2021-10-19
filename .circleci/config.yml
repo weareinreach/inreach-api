@@ -236,7 +236,7 @@ jobs:
           #yarn run-rollback
           name: Run rollback
           command: |
-            for i in $FILES; do
+            for i in ${FILES//,/ }; do
               export MIGRATION_FILE=$i
               yarn test
             done
