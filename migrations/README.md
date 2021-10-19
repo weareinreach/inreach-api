@@ -11,6 +11,17 @@ In order to run migration in package.json there are 2 scripts:
 
 In circle CI there are workflows to run migration/rollback. They are triggered by a Postman to CircleCI API when the migration is merged into main branch.
 
+CURL example:
+
+```
+curl --request POST \
+  --url https://circleci.com/api/v2/project/gh/asylum-connect/catalog-api/pipeline \
+  --header 'Circle-Token: ***********************************' \
+  --header 'content-type: application/json' \
+  --data '{"parameters":{"run_rollback": true,
+    "files": "migration_file_1.js,migration_file_2.js,migration_file_3.js"}}'
+```
+
 Postman Example:
 ![Postman](images/postman.png)
 
