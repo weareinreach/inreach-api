@@ -13,7 +13,6 @@ require('babel-register')({
 });
 
 // Import .env file
-//Replace .env with a {.env-prod} file with DB_URI env var pointing to Prod
 require('dotenv').config({
 	path: '.env'
 });

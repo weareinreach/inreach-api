@@ -199,7 +199,6 @@ jobs:
     steps:
       - checkout
       #Recreate .env file from CircleCI Project Env Vars
-      #Need to add $DB_URI_PROD env var to env variables
       - run:
           name: Create .env file
           command: |
@@ -208,12 +207,10 @@ jobs:
            EOF
       - run: 
           name: Run migration
-          #TO be replaced with accurate invocation
-          #yarn run-migration
           command: |
-            for i in $FILES; do
+            for i in ${FILES//,/ }; do
               export MIGRATION_FILE=$i
-              yarn test
+              yarn run-migration
             done
   
   rollback:
@@ -232,13 +229,11 @@ jobs:
            DB_URI=$DB_URI_PROD
            EOF
       - run: 
-          #TO be replaced with accurate invocation
-          #yarn run-rollback
           name: Run rollback
           command: |
             for i in ${FILES//,/ }; do
               export MIGRATION_FILE=$i
-              yarn test
+              yarn run-rollback
             done
 
 workflows:
@@ -248,19 +243,19 @@ workflows:
       - build:
           filters:
             branches:
-              ignore: run-migration-job #to be replaced with main
+              ignore: main
       - e2e:
           filters:
             branches:
-              ignore: run-migration-job #to be replaced with main
+              ignore: main
       - unit:
           filters:
             branches:
-              ignore: run-migration-job #to be replaced with main
+              ignore: main
       - lint:
           filters:
             branches:
-              ignore: run-migration-job #to be replaced with main
+              ignore: main
               
   migration:
     when: << pipeline.parameters.run_migration >>
@@ -270,7 +265,7 @@ workflows:
       - migration:
           filters:
             branches:
-              only: run-migration-job #to be replaced with main
+              only: main
           requires:
             - hold
   
@@ -282,6 +277,6 @@ workflows:
       - rollback:
           filters:
             branches:
-              only: run-migration-job #to be replaced with main
+              only: main
           requires:
             - hold
