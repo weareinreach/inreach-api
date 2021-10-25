@@ -229,6 +229,19 @@ export const updateOrg = async (req, res) => {
 		return handleBadRequest(res);
 	}
 
+	if (body.locations && body.locations.length > 0) {
+		const primaryLocation = body.locations.filter((loc) => loc.is_primary);
+		if (primaryLocation.length > 1) {
+			handleErr(
+				{message: 'Organization can only have one primary location'},
+				res
+			);
+			return;
+		}
+		if (primaryLocation.length === 0) {
+			body.locations[0].is_primary = true;
+		}
+	}
 	await Organization.findOneAndUpdate(
 		{_id: orgId},
 		{$set: {...body, updated_at}}
