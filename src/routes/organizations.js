@@ -274,7 +274,6 @@ export const getOrg = async (req, res) => {
 		}
 	])
 		.then((organization) => {
-			console.log(organization);
 			if (organization.length === 0) {
 				return handleNotFound(res);
 			}

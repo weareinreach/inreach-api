@@ -10,6 +10,8 @@ import {
 } from '../utils';
 import {getOrganizationQuery} from '../utils/query';
 import {Organization} from '../mongoose';
+import mongoose from 'mongoose';
+const ObjectId = mongoose.Types.ObjectId;
 
 export const getServicesCount = async (req, res) => {
 	const query = getOrganizationQuery(req?.query);
