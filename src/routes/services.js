@@ -5,9 +5,8 @@ import {
 	handleBadRequest,
 	handleErr,
 	handleNotFound,
-	orderServices,
-	removeDeletedServices,
-	isBodyEmpty
+	isBodyEmpty,
+	isValidObjectId
 } from '../utils';
 import {getOrganizationQuery} from '../utils/query';
 import {Organization} from '../mongoose';
@@ -25,23 +24,79 @@ export const getServicesCount = async (req, res) => {
 		.catch((err) => handleErr(err, res));
 };
 
+// FIX THIS LIKE ORGS
 export const getServices = async (req, res) => {
 	const {orgId} = req?.params;
 
-	await Organization.findById(orgId)
-		.then((orgDoc) => {
-			if (!orgDoc) {
+	//Validate ObjectId for aggregate use
+	isValidObjectId(orgId)
+		? console.log('Valid objectId')
+		: handleErr('Invalid Object ID format', res);
+
+	Organization.aggregate([
+		{
+			$match: {
+				_id: ObjectId(orgId)
+			}
+		},
+		{
+			$unwind: {
+				path: '$services',
+				preserveNullAndEmptyArrays: true
+			}
+		},
+		{
+			$match: {
+				$or: [
+					{
+						'services.is_deleted': {
+							$exists: false
+						}
+					},
+					{
+						$and: [
+							{
+								'services.is_deleted': {
+									$exists: true
+								}
+							},
+							{
+								'services.is_deleted': false
+							}
+						]
+					}
+				]
+			}
+		},
+		{
+			$group: {
+				_id: '$_id',
+				services: {
+					$push: '$$CURRENT.services'
+				},
+				organization: {
+					$first: '$$ROOT'
+				}
+			}
+		},
+		{
+			$replaceRoot: {
+				newRoot: {
+					$mergeObjects: [
+						'$organization',
+						{
+							services: '$services'
+						}
+					]
+				}
+			}
+		}
+	])
+		.then((organization) => {
+			if (organization.length === 0) {
 				return handleNotFound(res);
 			}
-
-			let services = orgDoc?.services || [];
-
-			//Remove Deleted Services
-			services = removeDeletedServices(services);
-			//Order Services
-			services = orderServices(services);
-
-			return res.json({services});
+			return res.json(organization[0].services);
 		})
 		.catch((err) => handleErr(err, res));
 };
