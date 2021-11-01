@@ -91,7 +91,7 @@ describe('Organization Routers', () => {
 				compoundURL = Cypress.env('baseUrl').concat(
 					Cypress.env('version'),
 					Cypress.env('route_organizations'),
-					`?name=Surprise&lastVerified=06/05/2021&createdAt=06/05/2021&lastUpdated=06/05/2021&deleted=false&pending=true&pendingOwnership=false&serviceArea=Medical,Legal&tags=Legal`
+					`?name=${createdOrgResponse.body.organization.name}&lastVerified=06/05/2021&createdAt=06/05/2021&lastUpdated=06/05/2021&deleted=false&pending=true&pendingOwnership=false&serviceArea=Medical,Legal&tags=Legal`
 				);
 				cy.request({
 					method: 'GET',
