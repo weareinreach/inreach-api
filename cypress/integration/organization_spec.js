@@ -53,7 +53,6 @@ describe('Organization Routers', () => {
 					method: 'GET',
 					url: compoundURL
 				}).should((response) => {
-					cy.log(response);
 					expect(response.status).to.be.eq(200);
 					expect(response.body).to.not.be.empty;
 					expect(response.body.organizations).to.be.an('array');
