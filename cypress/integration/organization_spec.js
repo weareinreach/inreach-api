@@ -1,5 +1,7 @@
 /* eslint-disable no-undef */
 /// <reference types="cypress" />
+import updateLocation from '../fixtures/org_location_update.json';
+import multiplePrimaryLocationUpdate from '../fixtures/org_location_update_bad.json';
 
 //compound url
 let compoundURL = null;
@@ -308,6 +310,46 @@ describe('Organization Routers', () => {
 							expect(retrieved_org.body.website).to.be.not.eq(org.website);
 						}
 					);
+				});
+			});
+		});
+	});
+
+	it.only('PATCH - /v1/organizations - Add Location', () => {
+		cy.get('@organization').then((org) => {
+			cy.addOrg(org).then((createdOrgResponse) => {
+				compoundURL = Cypress.env('baseUrl').concat(
+					Cypress.env('version'),
+					Cypress.env('route_organizations'),
+					`/${createdOrgResponse.body.organization._id}`
+				);
+				cy.request({
+					method: 'PATCH',
+					url: compoundURL,
+					body: {locations: updateLocation}
+				}).should((response) => {
+					expect(response.status).to.be.eq(200);
+					expect(response.body.updated).to.be.an('boolean');
+					expect(response.body.updated).to.be.eq(true);
+				});
+				cy.request({
+					method: 'GET',
+					url: compoundURL
+				}).should((response) => {
+					expect(response.status).to.be.eq(200);
+					expect(response.body).to.be.not.empty;
+					expect(response.body.locations).to.be.an('array');
+					expect(response.body.locations[0].is_primary).to.be.eq(true);
+				});
+				cy.request({
+					method: 'PATCH',
+					url: compoundURL,
+					body: {locations: multiplePrimaryLocationUpdate},
+					failOnStatusCode: false
+				}).should((response) => {
+					expect(response.status).to.be.eq(500);
+					expect(response.body.error).to.be.an('boolean');
+					expect(response.body.error).to.be.eq(true);
 				});
 			});
 		});
