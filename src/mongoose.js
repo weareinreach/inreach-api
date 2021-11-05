@@ -26,6 +26,7 @@ const ServiceSchema = new Schema({
 	description_ES: String,
 	email_id: String,
 	is_published,
+	is_deleted: {type: Boolean, required: true, default: false},
 	location_id: String,
 	name: {type: String, required: true},
 	name_ES: {type: String},
@@ -67,6 +68,7 @@ const OrganizationSchema = new Schema(
 		name: {type: String, required: true},
 		name_ES: {type: String},
 		is_published,
+		is_deleted: {type: Boolean, required: true, default: false},
 		locations: [
 			{
 				address: String,
@@ -151,6 +153,7 @@ const CommentSchema = new Schema(
 	{
 		organizationId: String,
 		serviceId: String,
+		is_deleted: {type: Boolean, required: true, default: false},
 		comments: [
 			{
 				created_at,

@@ -1,6 +1,8 @@
 import jwt from 'jsonwebtoken';
 import _omit from 'lodash/omit';
 import _orderBy from 'lodash/orderBy';
+import mongoose from 'mongoose';
+const ObjectId = mongoose.Types.ObjectId;
 
 import config from './config';
 
@@ -106,4 +108,12 @@ export const verifyJWT = (token) => {
  */
 export const isBodyEmpty = (body) => {
 	return Object.keys(body).length === 0;
+};
+
+/**
+ * Verify that ID passed by is a valid ObjectID
+ *  to be used in aggregate functions
+ */
+export const isValidObjectId = (id) => {
+	return ObjectId.isValid(id);
 };
