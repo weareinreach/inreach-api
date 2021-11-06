@@ -144,8 +144,11 @@ jobs:
            EOF
       #Testing
       - run: 
+          name: "Pre E2E Automation"
+          command: "yarn pre-e2e-test --ignore-engines"
+      - run: 
           name: "E2E Automation"
-          command: "yarn pre-e2e-test && yarn e2e --ignore-engines"
+          command: "yarn e2e --ignore-engines"
       - run:
           name: "Show Coverage"
           command: "yarn show-coverage --ignore-engines"
