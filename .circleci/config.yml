@@ -122,7 +122,7 @@ jobs:
           command: yarn install --ignore-engines
       - run:
           name: Install NYC
-          command: yarn add nyc
+          command: yarn add nyc --ignore-engines
       - run:
           name: Install Cypress
           command: yarn add cypress --ignore-engines
