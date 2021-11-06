@@ -316,7 +316,7 @@ describe('Organization Routers', () => {
 		});
 	});
 
-	it.only('PATCH - /v1/organizations - Add Location', () => {
+	it('PATCH - /v1/organizations - Add Location', () => {
 		cy.get('@organization').then((org) => {
 			cy.addOrg(org).then((createdOrgResponse) => {
 				compoundURL = Cypress.env('baseUrl').concat(
