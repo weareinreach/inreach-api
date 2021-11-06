@@ -125,7 +125,7 @@ jobs:
           command: yarn add nyc
       - run:
           name: Install Cypress
-          command: yarn add cypress
+          command: yarn add cypress --ignore-engines
       #save cache for use next tests
       - save_cache:
          paths:
