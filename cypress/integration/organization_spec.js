@@ -2,6 +2,7 @@
 /// <reference types="cypress" />
 import updateLocation from '../fixtures/org_location_update.json';
 import multiplePrimaryLocationUpdate from '../fixtures/org_location_update_bad.json';
+import multipleLocationUpdate from '../fixtures/org_multiple_location_update_bad.json';
 
 //compound url
 let compoundURL = null;
@@ -350,6 +351,22 @@ describe('Organization Routers', () => {
 					expect(response.status).to.be.eq(500);
 					expect(response.body.error).to.be.an('boolean');
 					expect(response.body.error).to.be.eq(true);
+					expect(response.body.message).to.be.eq(
+						'Organization can only have one primary location'
+					);
+				});
+				cy.request({
+					method: 'PATCH',
+					url: compoundURL,
+					body: {locations: multipleLocationUpdate},
+					failOnStatusCode: false
+				}).should((response) => {
+					expect(response.status).to.be.eq(500);
+					expect(response.body.error).to.be.an('boolean');
+					expect(response.body.error).to.be.eq(true);
+					expect(response.body.message).to.be.eq(
+						'Organization must have a primary location'
+					);
 				});
 			});
 		});
