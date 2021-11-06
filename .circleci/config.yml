@@ -18,7 +18,7 @@ orbs:
 jobs: 
   build:
     docker:
-      - image: circleci/node:15.6.0
+      - image: cimg/node:16.12.0
     working_directory: ~/catalog-api
     steps:
       - checkout
@@ -61,7 +61,7 @@ jobs:
 
   unit:
     docker:
-      - image: circleci/node:15.6.0
+      - image: cimg/node:16.12.0
     working_directory: ~/catalog-api
     steps:
       - checkout
@@ -167,7 +167,7 @@ jobs:
           destination: E2E Coverage Reports
   lint:
     docker:
-      - image: circleci/node:15.6.0
+      - image: cimg/node:16.12.0
     working_directory: ~/catalog-api
     steps:
       - checkout
@@ -196,7 +196,7 @@ jobs:
   
   migration:
     docker:
-      - image: circleci/node:15.6.0
+      - image: cimg/node:16.12.0
     working_directory: ~/catalog-api
     environment:
       FILES: << pipeline.parameters.files>>
@@ -219,7 +219,7 @@ jobs:
   
   rollback:
     docker:
-      - image: circleci/node:15.6.0
+      - image: cimg/node:16.12.0
     working_directory: ~/catalog-api
     environment:
       FILES: << pipeline.parameters.files>>
