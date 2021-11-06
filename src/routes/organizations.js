@@ -237,8 +237,11 @@ export const updateOrg = async (req, res) => {
 				res
 			);
 			return;
+		} else if (primaryLocation.length === 0 && locations.length > 1) {
+			handleErr({message: 'Organization must have a primary location'}, res);
+			return;
 		}
-		if (primaryLocation.length === 0) {
+		if (primaryLocation.length === 0 && locations.length === 1) {
 			body.locations[0].is_primary = true;
 		}
 	}
