@@ -118,14 +118,17 @@ jobs:
           name: Check Node Version
           command: node --version
       - run:
+          name: Ignore Engines
+          command: yarn config set ignore-engines true
+      - run:
           name: Install Packages
-          command: yarn install --ignore-engines
+          command: yarn install
       - run:
           name: Install NYC
-          command: yarn add nyc --ignore-engines
+          command: yarn add nyc
       - run:
           name: Install Cypress
-          command: yarn add cypress --ignore-engines
+          command: yarn add cypress
       #save cache for use next tests
       - save_cache:
          paths:
@@ -145,19 +148,19 @@ jobs:
       #Testing
       - run: 
           name: "Pre E2E Automation"
-          command: "yarn pre-e2e-test --ignore-engines"
+          command: "yarn pre-e2e-test"
       - run: 
           name: "E2E Automation"
-          command: "yarn e2e --ignore-engines"
+          command: "yarn e2e"
       - run:
           name: "Show Coverage"
-          command: "yarn show-coverage --ignore-engines"
+          command: "yarn show-coverage"
       - codecov/upload:
           file: 'cypressCoverage/coverage-final.json'
           flags: 'Integration'
       - run:
           name: "Post E2E tasks"
-          command: "yarn post-e2e-test --ignore-engines"
+          command: "yarn post-e2e-test"
       - store_artifacts:
           path: "reports/"
           destination: E2E Test Reports
