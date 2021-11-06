@@ -2,9 +2,8 @@ import {
 	handleBadRequest,
 	handleErr,
 	handleNotFound,
-	orderServices,
-	removeDeletedServices,
-	isBodyEmpty
+	isBodyEmpty,
+	isValidObjectId
 } from '../utils';
 import {
 	ITEM_PAGE_LIMIT,
@@ -14,6 +13,8 @@ import {
 import {sendEmail} from '../utils/mail';
 import {shareResource} from '../utils/sendMail';
 import {Organization} from '../mongoose';
+import mongoose from 'mongoose';
+const ObjectId = mongoose.Types.ObjectId;
 
 export const getOrgs = async (req, res) => {
 	const {limit, offset} = parsePageQuery(req?.query?.page);
@@ -208,15 +209,75 @@ export const deleteOrg = async (req, res) => {
 export const getOrg = async (req, res) => {
 	const {orgId} = req?.params;
 
-	await Organization.findById(orgId)
+	//Validate ObjectId for aggregate use
+	isValidObjectId(orgId)
+		? console.log('Valid objectId')
+		: handleErr('Invalid Object ID format', res);
+
+	Organization.aggregate([
+		{
+			$match: {
+				_id: new ObjectId(orgId)
+			}
+		},
+		{
+			$unwind: {
+				path: '$services',
+				preserveNullAndEmptyArrays: true
+			}
+		},
+		{
+			$match: {
+				$or: [
+					{
+						'services.is_deleted': {
+							$exists: false
+						}
+					},
+					{
+						$and: [
+							{
+								'services.is_deleted': {
+									$exists: true
+								}
+							},
+							{
+								'services.is_deleted': false
+							}
+						]
+					}
+				]
+			}
+		},
+		{
+			$group: {
+				_id: '$_id',
+				services: {
+					$push: '$$CURRENT.services'
+				},
+				organization: {
+					$first: '$$ROOT'
+				}
+			}
+		},
+		{
+			$replaceRoot: {
+				newRoot: {
+					$mergeObjects: [
+						'$organization',
+						{
+							services: '$services'
+						}
+					]
+				}
+			}
+		}
+	])
 		.then((organization) => {
-			if (!organization) {
+			if (organization.length === 0) {
 				return handleNotFound(res);
 			}
-			//Remove Deleted Services
-			organization.services = removeDeletedServices(organization.services);
-			organization.services = orderServices(organization.services);
-			return res.json(organization);
+			return res.json(organization[0]);
 		})
 		.catch((err) => handleErr(err, res));
 };

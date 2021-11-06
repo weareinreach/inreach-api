@@ -1,3 +1,4 @@
+import {Decimal128} from 'mongoose';
 import crypto from 'crypto';
 
 import {model, Schema} from 'mongoose';
@@ -84,7 +85,8 @@ const OrganizationSchema = new Schema(
 				state: String,
 				state_ES: String,
 				unit: String,
-				zip_code: String
+				zip_code: String,
+				geolocation: [Decimal128]
 			}
 		],
 		notes_log: [
@@ -224,9 +226,9 @@ const UserSchema = new Schema(
 		},
 		ethnicityRace: [String],
 		hash: {type: String, required: true},
-		homeLocation: String,
-		identityPrimary: String,
-		identitySupplimental: [String],
+		countryOfOrigin: String,
+		sogIdentity: String,
+		immigrationStatus: [String],
 		isAdminDataManager: {type: Boolean, default: false},
 		isDataManager: {type: Boolean, default: false},
 		isProfessional: {type: Boolean, default: false},
@@ -243,9 +245,10 @@ const UserSchema = new Schema(
 			}
 		],
 		name: {type: String, required: true},
-		orgAreaOfWork: String,
 		orgId: String,
+		orgName: String,
 		orgPositionTitle: String,
+		orgType: String,
 		reasonForJoining: String,
 		salt: {type: String, required: true}
 	},
