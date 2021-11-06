@@ -1,14 +1,42 @@
 # Migrations
 
----
+## How migrations are run?
+
+In order to run migration in package.json there are 2 scripts:
+
+```
+"run-migration": "MIGRATION=true node $MIGRATION_FILE",
+"rollback-migration":"ROLLBACK=true node $MIGRATION_FILE",
+```
+
+In circle CI there are workflows to run migration/rollback. They are triggered by a Postman to CircleCI API when the migration is merged into main branch.
+
+CURL example:
+
+```
+curl --request POST \
+  --url https://circleci.com/api/v2/project/gh/asylum-connect/catalog-api/pipeline \
+  --header 'Circle-Token: ***********************************' \
+  --header 'content-type: application/json' \
+  --data '{"parameters":{"run_rollback": true,
+    "files": "migration_file_1.js,migration_file_2.js,migration_file_3.js"}}'
+```
+
+Postman Example:
+![Postman](images/postman.png)
+
+[Creating your CircleCI Token](https://circleci.com/docs/2.0/managing-api-tokens/)
+
+## Migration files
 
 This folder will contain all the migrations to the MongoDB. Schema changes that require default values to be set should be addressed with a migration.
 
 release_date format - yyyy.mm.dd
+action can be: update, deleted, insert
 
 We recommend to follow the file pattern:
 
-- {release*date}/migration*{schema}.js
+- migration/{release*date}*{action}\_short_description.js
 
 The file should follow this template:
 
@@ -29,14 +57,20 @@ require('babel-register')({
     presets: ['env']
 });
 
-// Import .env file
-//Replace .env with a {.env-prod} file with DB_URI env var pointing to Prod
 require('dotenv').config({path:'.env'});
 // Import DB Connection
 require('../../src/db');
 
 var mongoose = require('../../src/mongoose');
 
+if (process.env.MIGRATION) {
+	runMigrationScript();
+}
+
+if (process.env.ROLLBACK) {
+	runRollbackScript();
+}
+
 ```
 
-Below the code above add the actual migration to the schema. We recommend adding the rollback script as well and keeping it commented.
+Inside the runMigrationScript/runRollbackScript functions add the actual migration to the schema.
