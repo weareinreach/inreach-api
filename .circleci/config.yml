@@ -145,16 +145,16 @@ jobs:
       #Testing
       - run: 
           name: "E2E Automation"
-          command: "yarn pre-e2e-test && yarn e2e"
+          command: "yarn pre-e2e-test && yarn e2e --ignore-engines"
       - run:
           name: "Show Coverage"
-          command: "yarn show-coverage"
+          command: "yarn show-coverage --ignore-engines"
       - codecov/upload:
           file: 'cypressCoverage/coverage-final.json'
           flags: 'Integration'
       - run:
           name: "Post E2E tasks"
-          command: "yarn post-e2e-test"
+          command: "yarn post-e2e-test --ignore-engines"
       - store_artifacts:
           path: "reports/"
           destination: E2E Test Reports
