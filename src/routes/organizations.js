@@ -223,42 +223,16 @@ export const getOrg = async (req, res) => {
 			}
 		},
 		{
-			$unwind: {
-				path: '$services',
-				preserveNullAndEmptyArrays: true
-			}
-		},
-		{
-			$match: {
-				$or: [
-					{
-						'services.is_deleted': {
-							$exists: false
-						}
-					},
-					{
-						$and: [
-							{
-								'services.is_deleted': {
-									$exists: true
-								}
-							},
-							{
-								'services.is_deleted': false
-							}
-						]
-					}
-				]
-			}
-		},
-		{
-			$group: {
-				_id: '$_id',
+			$project: {
+				org: '$$ROOT',
 				services: {
-					$push: '$$CURRENT.services'
-				},
-				organization: {
-					$first: '$$ROOT'
+					$filter: {
+						input: '$$CURRENT.services',
+						as: 'item',
+						cond: {
+							$eq: ['$$item.is_deleted', false]
+						}
+					}
 				}
 			}
 		},
@@ -266,7 +240,7 @@ export const getOrg = async (req, res) => {
 			$replaceRoot: {
 				newRoot: {
 					$mergeObjects: [
-						'$organization',
+						'$org',
 						{
 							services: '$services'
 						}
