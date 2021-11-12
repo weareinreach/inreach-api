@@ -86,7 +86,7 @@ const OrganizationSchema = new Schema(
 				state_ES: String,
 				unit: String,
 				zip_code: String,
-				geolocation: [Decimal128]
+				geolocation: [Number]
 			}
 		],
 		notes_log: [
