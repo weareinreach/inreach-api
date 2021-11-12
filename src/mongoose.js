@@ -67,15 +67,23 @@ const OrganizationSchema = new Schema(
 		],
 		name: {type: String, required: true},
 		name_ES: {type: String},
-		is_published,
+		is_published: Boolean,
 		is_deleted: {type: Boolean, required: true, default: false},
 		locations: [
 			{
 				address: String,
 				city: String,
 				city_ES: String,
-				country: String,
-				country_ES: String,
+				country: {
+					type: String,
+					required: true,
+					enum: ['USA', 'Canada', 'Mexico']
+				},
+				country_ES: {
+					type: String,
+					required: true,
+					enum: ['USA', 'Canada', 'Mexico']
+				},
 				is_primary: Boolean,
 				lat: String,
 				long: String,
