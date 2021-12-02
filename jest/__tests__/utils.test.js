@@ -53,7 +53,10 @@ describe('handleErr', () => {
 	it('should pass', () => {
 		const result = handleErr(new Error('test error'), testResponse);
 
-		expect(result).toEqual({json: {error: true}, status: 500});
+		expect(result).toEqual({
+			json: {error: true, message: 'test error'},
+			status: 500
+		});
 	});
 });
 
