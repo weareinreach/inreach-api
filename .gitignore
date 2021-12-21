@@ -131,3 +131,8 @@ junit.xml
 
 #linting
 lint/*
+
+
+#Docker
+docker/mongo-volume/
+docker/seedData/
