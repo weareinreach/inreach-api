@@ -44,7 +44,10 @@ export const generateSeedData = async (
 		JSON.stringify(data),
 		'utf8',
 		(err) => {
-			if (err) console.error(`Error writing seed file: ${err}`);
+			if (err) {
+				console.error(`Error writing seed file: ${err}`);
+				process.exit(1);
+			}
 			console.log(`${collection} seeding completed. Exiting...`);
 			process.exit(0);
 		}
@@ -79,4 +82,18 @@ export const getArray = function (max) {
 			max: max
 		})
 	).fill();
+};
+
+export const createIndex = async function (model, indexArray) {
+	indexArray.forEach((index) => {
+		model.schema.index(index);
+	});
+	try {
+		console.log('Creating indexes...');
+		await model.createIndexes();
+		process.exit(0);
+	} catch (err) {
+		console.error(err);
+		process.exit(1);
+	}
 };

@@ -36,6 +36,7 @@
 		"seed:reviews":"node ./docker/seed/generateReviewSeed.js",
 		"seed:ratings":"node ./docker/seed/generateRatingSeed.js",
 		"seed:suggestion":"node ./docker/seed/generateSuggestionSeed.js",
+		"seed:indexes":"node ./docker/seed/addIndexes.js",
 		"seed-docker-db":"yarn run-s seed:*"
 	},
 	"dependencies": {

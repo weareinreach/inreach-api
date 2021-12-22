@@ -13,6 +13,12 @@ const randNumber = seedFunctions.getNumberBetween(3, 1);
 class OrgData {
 	#uniqueOrgID = faker.datatype.number();
 	#uniqueServiceId = faker.datatype.number();
+	#serviceTagsUnitedStates = {
+		Medical: {'HIV and sexual health': 'true'},
+		'Mental Health': {'Support groups': 'true'}
+	};
+	#serviceTagsMexico = {Medical: {'HIV and sexual health': 'true'}};
+	#serviceTagsCanada = {'Mental Health': {'Support groups': 'true'}};
 	constructor(param) {
 		this.is_published = Math.random() < 0.9;
 		this.description = `Organization ${this.#uniqueOrgID} description`;
@@ -30,7 +36,13 @@ class OrgData {
 					is_deleted: Math.random() < 0.5,
 					name: faker.company.companyName(),
 					slug: `service-slug-${this.#uniqueServiceId}`,
-					slug_ES: `service-slug-${this.#uniqueServiceId}`
+					slug_ES: `service-slug-${this.#uniqueServiceId}`,
+					tags: {
+						united_states:
+							Math.random() < 0.5 ? this.#serviceTagsUnitedStates : {},
+						mexico: Math.random() < 0.5 ? this.#serviceTagsMexico : {},
+						canada: Math.random() < 0.5 ? this.#serviceTagsCanada : {}
+					}
 				};
 			}));
 		this.emails = seedFunctions.getArray(randNumber).map(() => {

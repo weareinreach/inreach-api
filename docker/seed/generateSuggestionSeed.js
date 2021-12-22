@@ -14,6 +14,7 @@ class SuggestionData {
 	constructor(param) {
 		(this.organizationId = param.organization_id),
 			(this.serviceId = param.service_id),
+			(this.field = Math.random() < 0.5 ? 'Description' : 'Location'),
 			(this.userEmail = faker.internet.email()),
 			(this.value = faker.lorem.sentences(randNumber));
 	}
