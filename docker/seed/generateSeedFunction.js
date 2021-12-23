@@ -2,7 +2,9 @@ require('babel-register')({
 	presets: ['env']
 });
 require('regenerator-runtime/runtime');
-require('dotenv').config({path: '.env'});
+require('dotenv').config({
+	path: '.env'
+});
 const mongoose = require('../../src/mongoose');
 const fs = require('fs');
 const seedPath = './docker/seedData';
@@ -35,23 +37,27 @@ export const generateSeedData = async (
 		}
 		data.push(seedData);
 	}
-	//Write File
-	console.log('Writing file...');
-	//if path doest exist creates it
-	if (!fs.existsSync(seedPath)) fs.mkdirSync(seedPath);
-	fs.writeFile(
-		`${seedPath}/${collection.toLowerCase()}.json`,
-		JSON.stringify(data),
-		'utf8',
-		(err) => {
-			if (err) {
-				console.error(`Error writing seed file: ${err}`);
-				process.exit(1);
+	//Only write if not in CI
+	if (process.env.PROFILE !== 'CI') {
+		//Write File
+		console.log('Writing file...');
+		//if path doest exist creates it
+		if (!fs.existsSync(seedPath)) fs.mkdirSync(seedPath);
+		fs.writeFile(
+			`${seedPath}/${collection.toLowerCase()}.json`,
+			JSON.stringify(data),
+			'utf8',
+			(err) => {
+				if (err) {
+					console.error(`Error writing seed file: ${err}`);
+					process.exit(1);
+				}
+				console.log(`${collection} seeding completed. Exiting...`);
 			}
-			console.log(`${collection} seeding completed. Exiting...`);
-			process.exit(0);
-		}
-	);
+		);
+	}
+	//Exit Process
+	process.exit(0);
 };
 
 export const getOrgs = async function () {
