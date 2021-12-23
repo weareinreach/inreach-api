@@ -72,7 +72,7 @@ export const getOrgs = async function () {
 		});
 		return final;
 	} catch (err) {
-		console.err(err);
+		console.error(err);
 		process.exit(1);
 	}
 };
