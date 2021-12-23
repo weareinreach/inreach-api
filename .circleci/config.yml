@@ -51,7 +51,6 @@ jobs:
            MAILGUN_API_KEY=$MAILGUN_API_KEY
            MAILGUN_DOMAIN=$MAILGUN_DOMAIN
            DB_URI=$DB_URI
-           TEST_DB_URI=$TEST_DB_URI
            SHEETS_API_KEY=$SHEETS_API_KEY
            EOF
 
@@ -151,6 +150,7 @@ jobs:
            MAILGUN_API_KEY=$MAILGUN_API_KEY
            MAILGUN_DOMAIN=$MAILGUN_DOMAIN
            DB_URI=$DB_URI
+           ENV=TEST
            SHEETS_API_KEY=$SHEETS_API_KEY
            TEST_DB_URI=$TEST_DB_URI
            EOF
