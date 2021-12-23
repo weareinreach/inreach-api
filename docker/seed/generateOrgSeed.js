@@ -8,7 +8,7 @@ const mongoose = require('../../src/mongoose');
 
 //Functions
 const numberOfOrgs = seedFunctions.getNumberBetween(8, 3);
-const randNumber = seedFunctions.getNumberBetween(3, 1);
+const randNumber = seedFunctions.getNumberBetween(4, 2);
 
 class OrgData {
 	#uniqueOrgID = faker.datatype.number();
