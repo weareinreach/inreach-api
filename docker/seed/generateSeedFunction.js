@@ -64,6 +64,7 @@ export const getOrgs = async function () {
 	let final = [];
 	try {
 		let orgs = await mongoose.Organization.find();
+		console.log(orgs);
 		orgs.forEach((org) => {
 			final.push({
 				organization_id: org._id,
