@@ -65,10 +65,9 @@ export const getOrgs = async function () {
 	try {
 		let orgs = await mongoose.Organization.find();
 		orgs.forEach((org) => {
-			console.log(org);
 			final.push({
 				organization_id: org._id,
-				service_id: Math.random() < 0.5 ? org.services[0]._id : ''
+				service_id: ''
 			});
 		});
 		return final;
