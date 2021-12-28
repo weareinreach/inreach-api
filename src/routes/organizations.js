@@ -2,8 +2,8 @@ import {
 	handleBadRequest,
 	handleErr,
 	handleNotFound,
-	orderServices,
-	isBodyEmpty
+	isBodyEmpty,
+	isValidObjectId
 } from '../utils';
 import {
 	ITEM_PAGE_LIMIT,
@@ -13,6 +13,8 @@ import {
 import {sendEmail} from '../utils/mail';
 import {shareResource} from '../utils/sendMail';
 import {Organization} from '../mongoose';
+import mongoose from 'mongoose';
+const ObjectId = mongoose.Types.ObjectId;
 
 export const getOrgs = async (req, res) => {
 	const {limit, offset} = parsePageQuery(req?.query?.page);
@@ -207,15 +209,51 @@ export const deleteOrg = async (req, res) => {
 export const getOrg = async (req, res) => {
 	const {orgId} = req?.params;
 
-	await Organization.findById(orgId)
+	//Validate ObjectId for aggregate use
+	if (isValidObjectId(orgId)) {
+		console.log('Valid objectId');
+	} else {
+		return handleErr('Invalid Object ID format', res);
+	}
+
+	Organization.aggregate([
+		{
+			$match: {
+				_id: new ObjectId(orgId)
+			}
+		},
+		{
+			$project: {
+				org: '$$ROOT',
+				services: {
+					$filter: {
+						input: '$$CURRENT.services',
+						as: 'item',
+						cond: {
+							$eq: ['$$item.is_deleted', false]
+						}
+					}
+				}
+			}
+		},
+		{
+			$replaceRoot: {
+				newRoot: {
+					$mergeObjects: [
+						'$org',
+						{
+							services: '$services'
+						}
+					]
+				}
+			}
+		}
+	])
 		.then((organization) => {
-			if (!organization) {
+			if (organization.length === 0) {
 				return handleNotFound(res);
 			}
-
-			organization.services = orderServices(organization.services);
-
-			return res.json(organization);
+			return res.json(organization[0]);
 		})
 		.catch((err) => handleErr(err, res));
 };
@@ -229,6 +267,22 @@ export const updateOrg = async (req, res) => {
 		return handleBadRequest(res);
 	}
 
+	if (body.locations && body.locations.length > 0) {
+		const primaryLocation = body.locations.filter((loc) => loc.is_primary);
+		if (primaryLocation.length > 1) {
+			handleErr(
+				{message: 'Organization can only have one primary location'},
+				res
+			);
+			return;
+		} else if (primaryLocation.length === 0 && body.locations.length > 1) {
+			handleErr({message: 'Organization must have a primary location'}, res);
+			return;
+		}
+		if (primaryLocation.length === 0 && body.locations.length === 1) {
+			body.locations[0].is_primary = true;
+		}
+	}
 	await Organization.findOneAndUpdate(
 		{_id: orgId},
 		{$set: {...body, updated_at}}

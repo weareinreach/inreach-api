@@ -12,6 +12,12 @@ Object {
       "5e7e4bdfd54f1760921a4fbf",
     ],
   },
+  "is_deleted": Object {
+    "$in": Array [
+      true,
+      false,
+    ],
+  },
   "is_published": false,
   "owners.email": "test@asylumconnect.com",
   "owners.isApproved": false,
@@ -55,5 +61,6 @@ Object {
       "properties.world": "true",
     },
   },
+  "services.is_deleted": true,
 }
 `;
