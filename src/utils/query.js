@@ -48,16 +48,19 @@ export const getOrganizationQuery = (params = {}) => {
 		properties,
 		serviceArea,
 		tagLocale,
-		tags
+		tags,
+		long,
+		lat
 	} = params;
 	let query = {};
 
 	if (ids) {
 		query._id = {
-			$in: ids.split(',').map((id) => new ObjectId(id))
+			$in: ids.split(',').map((id) => new ObjectId(id.trim()))
 		};
 	}
 
+	// search by org name
 	if (name && name.trim() !== '""') {
 		query.$text = {$search: name.trim(), $caseSensitive: false};
 	}
@@ -191,6 +194,17 @@ export const getOrganizationQuery = (params = {}) => {
 		}
 
 		query.services = {$elemMatch};
+	}
+
+	if (lat?.length && long?.length) {
+		query = {
+			$geoNear: {
+				near: {type: 'Point', coordinates: [parseFloat(long), parseFloat(lat)]},
+				distanceField: 'distance',
+				query: {...query}
+			}
+		};
+		return query;
 	}
 	return query;
 };

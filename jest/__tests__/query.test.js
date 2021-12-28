@@ -41,9 +41,10 @@ describe('getOrganizationQuery', () => {
 		});
 	});
 
+	// without coordinates
 	it('should apply params and match snapshot', () => {
 		const result = getOrganizationQuery({
-			ids: '5e7e4be1d54f1760921a557e,5e7e4bdfd54f1760921a4fbf',
+			ids: '5e7e4be1d54f1760921a557e, 5e7e4bdfd54f1760921a4fbf',
 			name: 'test',
 			owner: 'test@asylumconnect.com',
 			pending: 'true',
@@ -54,6 +55,20 @@ describe('getOrganizationQuery', () => {
 			serviceArea: 'city,state,other-place',
 			tagLocale: 'en_us',
 			tags: 'Food,Medical.Check Up,Legal'
+		});
+		expect(result).toMatchSnapshot();
+	});
+
+	// with coordinates
+	it('should apply geoNear query and match snapshot', () => {
+		const result = getOrganizationQuery({
+			deleted: 'false',
+			serviceDeleted: 'false',
+			serviceArea: 'city,state',
+			tagLocale: 'en_us',
+			tags: 'Food,Legal',
+			lat: '11',
+			long: '-11'
 		});
 		expect(result).toMatchSnapshot();
 	});

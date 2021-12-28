@@ -1,5 +1,56 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`getOrganizationQuery should apply geoNear query and match snapshot 1`] = `
+Object {
+  "$geoNear": Object {
+    "distanceField": "distance",
+    "near": Object {
+      "coordinates": Array [
+        -11,
+        11,
+      ],
+      "type": "Point",
+    },
+    "query": Object {
+      "is_deleted": Object {
+        "$in": Array [
+          true,
+          false,
+        ],
+      },
+      "is_published": true,
+      "services": Object {
+        "$elemMatch": Object {
+          "$and": Array [
+            Object {
+              "$or": Array [
+                Object {
+                  "properties.city": "true",
+                },
+                Object {
+                  "properties.state": "true",
+                },
+              ],
+            },
+            Object {
+              "$or": Array [
+                Object {
+                  "tags.en_us.Food": "true",
+                },
+                Object {
+                  "tags.en_us.Legal": "true",
+                },
+              ],
+            },
+          ],
+        },
+      },
+      "services.is_deleted": true,
+    },
+  },
+}
+`;
+
 exports[`getOrganizationQuery should apply params and match snapshot 1`] = `
 Object {
   "$text": Object {
