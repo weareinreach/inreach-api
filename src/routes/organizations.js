@@ -210,9 +210,7 @@ export const getOrg = async (req, res) => {
 	const {orgId} = req?.params;
 
 	//Validate ObjectId for aggregate use
-	if (isValidObjectId(orgId)) {
-		console.log('Valid objectId');
-	} else {
+	if (!isValidObjectId(orgId)) {
 		return handleErr('Invalid Object ID format', res);
 	}
 
