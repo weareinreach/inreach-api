@@ -10,8 +10,12 @@ require('babel-register')({
 const mongoose = require('../../src/mongoose');
 const seedFunctions = require('./generateSeedFunction');
 
-//Indexes
+//Compound Indexes
 const organizationsAddedIndexes = [{name: 'text'}];
 
 //Organization Indexes
-seedFunctions.createIndex(mongoose.Organization, organizationsAddedIndexes);
+seedFunctions.createIndex(
+	'Organization',
+	mongoose.Organization,
+	organizationsAddedIndexes
+);

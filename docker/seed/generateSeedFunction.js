@@ -78,7 +78,7 @@ export const getOrgs = async function () {
 };
 
 export const getNumberBetween = function (upperLimit, lowerLimit) {
-	return Math.floor(Math.random() * (upperLimit - 1 + 1) + lowerLimit);
+	return Math.floor(Math.random() * (upperLimit - lowerLimit + 1) + lowerLimit);
 };
 
 export const getArray = function (max) {
@@ -90,12 +90,12 @@ export const getArray = function (max) {
 	).fill();
 };
 
-export const createIndex = async function (model, indexArray) {
+export const createIndex = async function (schema, model, indexArray) {
 	indexArray.forEach((index) => {
 		model.schema.index(index);
 	});
 	try {
-		console.log('Creating indexes...');
+		console.log(`Creating indexes for ${schema}...`);
 		await model.createIndexes();
 		process.exit(0);
 	} catch (err) {
