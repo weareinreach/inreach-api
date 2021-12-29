@@ -20,77 +20,7 @@ export const getOrgs = async (req, res) => {
 	const {limit, offset} = parsePageQuery(req?.query?.page);
 	const {query} = req;
 	let dbQuery = getOrganizationQuery(query);
-	var sortObjectArray = '';
 	var obj = {};
-
-	// specifies sorting order
-	if (dbQuery['services']) {
-		if (dbQuery['services']['$elemMatch']['$or']) {
-			sortObjectArray = dbQuery['services']['$elemMatch']['$or'];
-
-			var nestedNameArray = sortObjectArray.map(function (el) {
-				return Object.getOwnPropertyNames(el);
-			});
-			var nameArray = nestedNameArray.flat([1]);
-			var prioritySortArray = [];
-
-			for (var i = 0; i < nameArray.length; i++) {
-				if (nameArray[i].includes('county')) {
-					if (nameArray.length > 0) {
-						prioritySortArray[0] = nameArray[i];
-					}
-				} else if (nameArray[i].includes('state')) {
-					if (nameArray.length > 1) {
-						prioritySortArray[1] = nameArray[i];
-					}
-				} else if (nameArray[i].includes('national')) {
-					if (nameArray.length > 2) {
-						prioritySortArray[2] = nameArray[i];
-					}
-				}
-			}
-			var prioritySort = prioritySortArray.filter(function (el) {
-				return el != null;
-			});
-
-			for (const key of prioritySort) {
-				obj[key] = -1;
-			}
-		} else if (dbQuery['services']['$elemMatch']['$and']) {
-			sortObjectArray = dbQuery['services']['$elemMatch']['$and'][0]['$or'];
-			var nestedTagNameArray = sortObjectArray.map(function (el) {
-				return Object.getOwnPropertyNames(el);
-			});
-			var nameTagArray = nestedTagNameArray.flat([1]);
-			var priorityTagSortArray = [];
-
-			for (var a = 0; a < nameTagArray.length; a++) {
-				if (nameTagArray[a].includes('county')) {
-					if (nameTagArray.length > 0) {
-						priorityTagSortArray[0] = nameTagArray[a];
-					}
-				} else if (nameTagArray[a].includes('state')) {
-					if (nameTagArray.length > 1) {
-						priorityTagSortArray[1] = nameTagArray[a];
-					}
-				} else if (nameTagArray[a].includes('national')) {
-					if (nameTagArray.length > 2) {
-						priorityTagSortArray[2] = nameTagArray[a];
-					}
-				}
-			}
-			var priorityTagSort = priorityTagSortArray.filter(function (el) {
-				return el != null;
-			});
-
-			for (const key of priorityTagSort) {
-				obj[key] = -1;
-			}
-		}
-	} else if (dbQuery.$text) {
-		// sorts results based on text match score
-		obj = {score: {$meta: 'textScore'}};
-	}
 
 	if (query.lastVerified) {
 		dbQuery = Object.assign(dbQuery, {
@@ -137,16 +67,31 @@ export const getOrgs = async (req, res) => {
 		});
 	}
 
-	await Organization.find(dbQuery)
-		.sort(obj)
-		.skip(offset)
-		.limit(limit)
-		.then((organizations) => {
+	try {
+		if (dbQuery.$geoNear) {
+			const organizations = await Organization.aggregate([
+				dbQuery,
+				{$skip: offset},
+				{$limit: limit}
+			]);
 			return res.json({
 				organizations
 			});
-		})
-		.catch((err) => handleErr(err, res));
+		}
+		if (dbQuery.$text) {
+			// sorts results based on text match score
+			obj = {score: {$meta: 'textScore'}};
+		}
+		const organizations = await Organization.find(dbQuery)
+			.sort(obj)
+			.skip(offset)
+			.limit(limit);
+		return res.json({
+			organizations
+		});
+	} catch (err) {
+		handleErr(err, res);
+	}
 };
 
 // Query organizations by name
@@ -182,12 +127,15 @@ export const getOrgsCount = async (req, res) => {
 
 export const createOrg = async (req, res) => {
 	const body = req?.body;
-	const org = new Organization(body);
 
 	if (isBodyEmpty(body)) {
 		return handleBadRequest(res);
 	}
 
+	const org = new Organization(body);
+	if (org.locations?.length) {
+		locations.map((location) => updateLocationGeolocation(location));
+	}
 	await org
 		.save()
 		.then((organization) => {
@@ -282,6 +230,7 @@ export const updateOrg = async (req, res) => {
 		if (primaryLocation.length === 0 && body.locations.length === 1) {
 			body.locations[0].is_primary = true;
 		}
+		body.locations.map((location) => updateLocationGeolocation(location));
 	}
 	await Organization.findOneAndUpdate(
 		{_id: orgId},
@@ -442,4 +391,12 @@ export const shareOrganization = async (req, res) => {
 	} catch (error) {
 		handleErr(error, res);
 	}
+};
+
+const updateLocationGeolocation = (location) => {
+	location.geolocation = {
+		type: 'Point',
+		coordinates: [parseFloat(location.long), parseFloat(location.lat)]
+	};
+	return location;
 };
