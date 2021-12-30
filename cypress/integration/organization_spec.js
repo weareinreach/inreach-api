@@ -626,7 +626,8 @@ describe('Organization Routers', () => {
 								);
 								cy.request({
 									method: 'GET',
-									url: compoundURL
+									url: compoundURL,
+									failOnStatusCode: false
 								}).should((response) => {
 									expect(response.status).to.be.eq(404);
 									expect(response.body.notFound).to.be.an('boolean');
