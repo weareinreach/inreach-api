@@ -169,6 +169,30 @@ describe('Services Routers', () => {
 		});
 	});
 
+	it('POST - /v1/organizations/:orgId/services - Add Services to a Organizations - Good Org Id And No Body', () => {
+		cy.get('@organization').then((organization) => {
+			cy.addOrg(organization).then((createdOrgResponse) => {
+				cy.get('@service').then((service) => {
+					compoundURL = Cypress.env('baseUrl').concat(
+						Cypress.env('version'),
+						Cypress.env('route_organizations'),
+						`/${createdOrgResponse.body.organization._id}`,
+						Cypress.env('route_services')
+					);
+					cy.request({
+						method: 'POST',
+						url: compoundURL,
+						failOnStatusCode: false
+					}).should((response) => {
+						expect(response.status).to.be.eq(400);
+						expect(response.body.error).to.be.an('boolean');
+						expect(response.body.error).to.be.eq(true);
+					});
+				});
+			});
+		});
+	});
+
 	it('GET - /v1/organizations/:orgid/services/:serviceid - Good org id and service id', () => {
 		cy.get('@organization').then((organization) => {
 			cy.addOrg(organization).then((createdorgresponse) => {
