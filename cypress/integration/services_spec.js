@@ -36,6 +36,30 @@ describe('Services Routers', () => {
 		});
 	});
 
+	it('GET - /v1/organizations/:orgId/services - Get Organization Services - Non Existing Org Id', () => {
+		cy.get('@organization').then((org) => {
+			cy.addOrg(org).then((createdOrgResponse) => {
+				cy.generateObjectId().then((generateObjectId) => {
+					compoundURL = Cypress.env('baseUrl').concat(
+						Cypress.env('version'),
+						Cypress.env('route_organizations'),
+						`/${generateObjectId}`,
+						Cypress.env('route_services')
+					);
+					cy.request({
+						method: 'GET',
+						url: compoundURL,
+						failOnStatusCode: false
+					}).should((response) => {
+						expect(response.status).to.be.eq(404);
+						expect(response.body.notFound).to.be.an('boolean');
+						expect(response.body.notFound).to.be.eq(true);
+					});
+				});
+			});
+		});
+	});
+
 	it('GET - /v1/organizations/:orgId/services - Get Organization Services - Bad Org ID', () => {
 		compoundURL = Cypress.env('baseUrl').concat(
 			Cypress.env('version'),
@@ -68,19 +92,46 @@ describe('Services Routers', () => {
 	});
 
 	it('POST - /v1/organzizations/:orgId/services - Add Services to a Organizations - Bad Org Id', () => {
-		compoundURL = Cypress.env('baseUrl').concat(
-			Cypress.env('version'),
-			Cypress.env('route_organizations'),
-			'/BAAAAADDORGID',
-			Cypress.env('route_services')
-		);
-		cy.request({
-			method: 'POST',
-			url: compoundURL,
-			failOnStatusCode: false,
-			body: {}
-		}).should((response) => {
-			expect(response.status).to.be.eq(400);
+		cy.get('@service').then((service) => {
+			compoundURL = Cypress.env('baseUrl').concat(
+				Cypress.env('version'),
+				Cypress.env('route_organizations'),
+				'/BAAAAADDORGID',
+				Cypress.env('route_services')
+			);
+			cy.request({
+				method: 'POST',
+				url: compoundURL,
+				failOnStatusCode: false,
+				body: service
+			}).should((response) => {
+				expect(response.status).to.be.eq(500);
+				expect(response.body.error).to.be.an('boolean');
+				expect(response.body.error).to.be.eq(true);
+			});
+		});
+	});
+
+	it('POST - /v1/organizations/:orgId/services - Add Services to a Organizations - Non Existent Org', () => {
+		cy.generateObjectId().then((generateObjectId) => {
+			cy.get('@service').then((service) => {
+				compoundURL = Cypress.env('baseUrl').concat(
+					Cypress.env('version'),
+					Cypress.env('route_organizations'),
+					`/${generateObjectId}`,
+					Cypress.env('route_services')
+				);
+				cy.request({
+					method: 'POST',
+					url: compoundURL,
+					failOnStatusCode: false,
+					body: service
+				}).should((response) => {
+					expect(response.status).to.be.eq(404);
+					expect(response.body.notFound).to.be.an('boolean');
+					expect(response.body.notFound).to.be.eq(true);
+				});
+			});
 		});
 	});
 
@@ -118,7 +169,7 @@ describe('Services Routers', () => {
 		});
 	});
 
-	it('get - /v1/organizations/:orgid/services/:serviceid - good org id and service id', () => {
+	it('GET - /v1/organizations/:orgid/services/:serviceid - Good org id and service id', () => {
 		cy.get('@organization').then((organization) => {
 			cy.addOrg(organization).then((createdorgresponse) => {
 				cy.get('@service').then((service) => {
@@ -167,6 +218,7 @@ describe('Services Routers', () => {
 									Cypress.env('version'),
 									Cypress.env('route_organizations'),
 									'/BADOORGID',
+									'services',
 									`/${retrievedOrgResponse.body.services[0]._id}`
 								);
 								cy.request({
@@ -175,9 +227,45 @@ describe('Services Routers', () => {
 									failOnStatusCode: false
 								}).should((response) => {
 									expect(response.status).to.be.eq(404);
+									expect(response.body.notFound).to.be.an('boolean');
+									expect(response.body.notFound).to.be.eq(true);
 								});
 							}
 						);
+					});
+				});
+			});
+		});
+	});
+
+	it('GET - /v1/organizations/:orgId/services/:serviceId - Bad Org ID and Good Service ID', () => {
+		cy.get('@organization').then((organization) => {
+			cy.addOrg(organization).then((createdOrgResponse) => {
+				cy.get('@service').then((service) => {
+					cy.addServiceToOrg(
+						createdOrgResponse.body.organization._id,
+						service
+					).then(() => {
+						cy.generateObjectId().then((generateObjectId) => {
+							cy.getOrgById(createdOrgResponse.body.organization._id).then(
+								(retrievedOrgResponse) => {
+									compoundURL = Cypress.env('baseUrl').concat(
+										Cypress.env('version'),
+										Cypress.env('route_organizations'),
+										`/${generateObjectId}`,
+										'services',
+										`/${retrievedOrgResponse.body.services[0]._id}`
+									);
+									cy.request({
+										method: 'GET',
+										url: compoundURL,
+										failOnStatusCode: false
+									}).should((response) => {
+										expect(response.status).to.be.eq(404);
+									});
+								}
+							);
+						});
 					});
 				});
 			});
@@ -343,6 +431,42 @@ describe('Services Routers', () => {
 								});
 							}
 						);
+					});
+				});
+			});
+		});
+	});
+	it('DELETE - /v1/organization/:orgId/services/:serviceId - Delete Service from Org Non Existent Org', () => {
+		cy.get('@organization').then((organization) => {
+			cy.addOrg(organization).then((createdOrgResponse) => {
+				cy.get('@service').then((service) => {
+					cy.addServiceToOrg(
+						createdOrgResponse.body.organization._id,
+						service
+					).then(() => {
+						cy.generateObjectId().then((generatedId) => {
+							cy.getOrgById(createdOrgResponse.body.organization._id).then(
+								(retrievedOrgResponse) => {
+									compoundURL = Cypress.env('baseUrl').concat(
+										Cypress.env('version'),
+										Cypress.env('route_organizations'),
+										`/${generatedId}`,
+										Cypress.env('route_services'),
+										`/${retrievedOrgResponse.body.services[0]._id}`
+									);
+									cy.request({
+										method: 'DELETE',
+										url: compoundURL,
+										failOnStatusCode: false
+									}).should((response) => {
+										cy.log(response);
+										expect(response.status).to.be.eq(404);
+										expect(response.body.notFound).to.be.an('boolean');
+										expect(response.body.notFound).to.be.eq(true);
+									});
+								}
+							);
+						});
 					});
 				});
 			});
