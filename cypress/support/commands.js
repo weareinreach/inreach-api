@@ -26,6 +26,18 @@
 
 // Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
 let compoundURL = null;
+//Create mongoDB IDs
+Cypress.Commands.add('generateObjectId', () => {
+	var timestamp = ((new Date().getTime() / 1000) | 0).toString(16);
+	return (
+		timestamp +
+		'xxxxxxxxxxxxxxxx'
+			.replace(/[x]/g, function () {
+				return ((Math.random() * 16) | 0).toString(16);
+			})
+			.toLowerCase()
+	);
+});
 
 //Authentication Functions
 Cypress.Commands.add('login', (creds_json) => {

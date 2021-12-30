@@ -195,6 +195,25 @@ describe('Organization Routers', () => {
 		});
 	});
 
+	it('GET - /v1/organizations/:orgId - Get Org Data from Id - Non Existent ID', () => {
+		cy.generateObjectId().then((generateObjectId) => {
+			compoundURL = Cypress.env('baseUrl').concat(
+				Cypress.env('version'),
+				Cypress.env('route_organizations'),
+				`/${generateObjectId}`
+			);
+			cy.request({
+				method: 'GET',
+				url: compoundURL,
+				failOnStatusCode: false
+			}).should((response) => {
+				expect(response.status).to.be.eq(404);
+				expect(response.body.notFound).to.be.an('boolean');
+				expect(response.body.notFound).to.be.eq(true);
+			});
+		});
+	});
+
 	it('GET - /v1/organizations/name/:name - Get Org Data from name - Good name', () => {
 		cy.get('@organization').then((org) => {
 			cy.addOrg(org).then((createdOrgResponse) => {
@@ -270,6 +289,22 @@ describe('Organization Routers', () => {
 		});
 	});
 
+	it('POST - /v1/organizations - Create Organization - No Body', () => {
+		compoundURL = Cypress.env('baseUrl').concat(
+			Cypress.env('version'),
+			Cypress.env('route_organizations')
+		);
+		cy.request({
+			method: 'POST',
+			url: compoundURL,
+			failOnStatusCode: false
+		}).should((response) => {
+			expect(response.status).to.be.eq(400);
+			expect(response.body.error).to.be.an('boolean');
+			expect(response.body.error).to.be.eq(true);
+		});
+	});
+
 	it('PATCH - /v1/organizations - Update Organization - Good Data', () => {
 		cy.get('@organization').then((org) => {
 			cy.get('@organization_updated').then((org_updated) => {
@@ -313,6 +348,27 @@ describe('Organization Routers', () => {
 		});
 	});
 
+	it('PATCH - /v1/organizations - Update Organization - No Data', () => {
+		cy.get('@organization').then((org) => {
+			cy.addOrg(org).then((createdOrgResponse) => {
+				compoundURL = Cypress.env('baseUrl').concat(
+					Cypress.env('version'),
+					Cypress.env('route_organizations'),
+					`/${createdOrgResponse.body.organization._id}`
+				);
+				cy.request({
+					method: 'PATCH',
+					url: compoundURL,
+					failOnStatusCode: false
+				}).should((response) => {
+					expect(response.status).to.be.eq(400);
+					expect(response.body.error).to.be.an('boolean');
+					expect(response.body.error).to.be.eq(true);
+				});
+			});
+		});
+	});
+
 	it('PATCH - /v1/organizations - Add Location', () => {
 		cy.get('@organization').then((org) => {
 			cy.addOrg(org).then((createdOrgResponse) => {
@@ -324,7 +380,9 @@ describe('Organization Routers', () => {
 				cy.request({
 					method: 'PATCH',
 					url: compoundURL,
-					body: {locations: updateLocation}
+					body: {
+						locations: updateLocation
+					}
 				}).should((response) => {
 					expect(response.status).to.be.eq(200);
 					expect(response.body.updated).to.be.an('boolean');
@@ -342,7 +400,9 @@ describe('Organization Routers', () => {
 				cy.request({
 					method: 'PATCH',
 					url: compoundURL,
-					body: {locations: multiplePrimaryLocationUpdate},
+					body: {
+						locations: multiplePrimaryLocationUpdate
+					},
 					failOnStatusCode: false
 				}).should((response) => {
 					expect(response.status).to.be.eq(500);
@@ -355,7 +415,9 @@ describe('Organization Routers', () => {
 				cy.request({
 					method: 'PATCH',
 					url: compoundURL,
-					body: {locations: multipleLocationUpdate},
+					body: {
+						locations: multipleLocationUpdate
+					},
 					failOnStatusCode: false
 				}).should((response) => {
 					expect(response.status).to.be.eq(500);
@@ -419,6 +481,97 @@ describe('Organization Routers', () => {
 		});
 	});
 
+	it('POST - /v1/organizations/:orgId/owners - Add Organization Owners - No Data', () => {
+		cy.get('@organization').then((org) => {
+			cy.addOrg(org).then((createdOrgResponse) => {
+				compoundURL = Cypress.env('baseUrl').concat(
+					Cypress.env('version'),
+					Cypress.env('route_organizations'),
+					`/${createdOrgResponse.body.organization._id}`,
+					Cypress.env('route_organizations_owners')
+				);
+				cy.request({
+					method: 'POST',
+					url: compoundURL,
+					failOnStatusCode: false
+				}).should((response) => {
+					expect(response.status).to.be.eq(400);
+					expect(response.body.error).to.be.an('boolean');
+					expect(response.body.error).to.be.eq(true);
+				});
+			});
+		});
+	});
+
+	it('POST - /v1/organizations/:orgId/owners - Add Organization Owners - User Already Added', () => {
+		cy.get('@new_user').then((user) => {
+			cy.get('@organization').then((org) => {
+				cy.addUser(user).then((addedUserResponse) => {
+					cy.addOrg(org).then((createdOrgResponse) => {
+						compoundURL = Cypress.env('baseUrl').concat(
+							Cypress.env('version'),
+							Cypress.env('route_organizations'),
+							`/${createdOrgResponse.body.organization._id}`,
+							Cypress.env('route_organizations_owners')
+						);
+						cy.request({
+							method: 'POST',
+							url: compoundURL,
+							body: {
+								email: addedUserResponse.body.userInfo.email,
+								userId: addedUserResponse.body.userInfo._id
+							}
+						}).then(() => {
+							//Try to re-add the user
+							cy.request({
+								method: 'POST',
+								url: compoundURL,
+								body: {
+									email: addedUserResponse.body.userInfo.email,
+									userId: addedUserResponse.body.userInfo._id
+								},
+								failOnStatusCode: false
+							}).should((response) => {
+								expect(response.status).to.be.eq(409);
+								expect(response.body).to.be.eq(
+									'Affiliation request has already been received and/or approved for this user'
+								);
+							});
+						});
+					});
+				});
+			});
+		});
+	});
+
+	it('POST - /v1/organizations/:orgId/owners - Add Organization Owners - Non Existent Org', () => {
+		cy.get('@new_user').then((user) => {
+			cy.generateObjectId().then((generatedObjectId) => {
+				cy.addUser(user).then((addedUserResponse) => {
+					compoundURL = Cypress.env('baseUrl').concat(
+						Cypress.env('version'),
+						Cypress.env('route_organizations'),
+						`/${generatedObjectId}`,
+						Cypress.env('route_organizations_owners')
+					);
+					cy.request({
+						method: 'POST',
+						url: compoundURL,
+						body: {
+							email: addedUserResponse.body.userInfo.email,
+							userId: addedUserResponse.body.userInfo._id
+						},
+						failOnStatusCode: false
+					}).should((response) => {
+						expect(response.status).to.be.eq(404);
+						expect(response.body.notFound).to.be.an('boolean');
+						expect(response.body.notFound).to.be.eq(true);
+					});
+				});
+			});
+		});
+	});
+
 	it('GET - /v1/organizations/:orgId/owners/:userId/approve - Approve Organization Owner - Good Data', () => {
 		cy.get('@new_user').then((user) => {
 			cy.get('@organization').then((org) => {
@@ -444,6 +597,41 @@ describe('Organization Routers', () => {
 								expect(response.status).to.be.eq(200);
 								expect(response.body.updated).to.be.an('boolean');
 								expect(response.body.updated).to.be.eq(true);
+							});
+						});
+					});
+				});
+			});
+		});
+	});
+
+	it('GET - /v1/organizations/:orgId/owners/:userId/approve - Approve Organization Owner - Non Existent Org', () => {
+		cy.get('@new_user').then((user) => {
+			cy.get('@organization').then((org) => {
+				cy.addUser(user).then((addedUserResponse) => {
+					cy.addOrg(org).then((createdOrgResponse) => {
+						cy.addOrgOwner(
+							createdOrgResponse.body.organization._id,
+							addedUserResponse.body.userInfo._id,
+							addedUserResponse.body.userInfo.email
+						).then(() => {
+							cy.generateObjectId().then((generateObjectId) => {
+								compoundURL = Cypress.env('baseUrl').concat(
+									Cypress.env('version'),
+									Cypress.env('route_organizations'),
+									`/${generateObjectId}`,
+									Cypress.env('route_organizations_owners'),
+									`/${addedUserResponse.body.userInfo._id}`,
+									Cypress.env('route_organizations_approve')
+								);
+								cy.request({
+									method: 'GET',
+									url: compoundURL
+								}).should((response) => {
+									expect(response.status).to.be.eq(404);
+									expect(response.body.notFound).to.be.an('boolean');
+									expect(response.body.notFound).to.be.eq(true);
+								});
 							});
 						});
 					});
@@ -494,6 +682,109 @@ describe('Organization Routers', () => {
 								expect(response.status).to.be.eq(200);
 								expect(response.body.deleted).to.be.an('boolean');
 								expect(response.body.deleted).to.be.eq(true);
+							});
+						});
+					});
+				});
+			});
+		});
+	});
+
+	it('DELETE - /v1/organizations/:orgId/owners/:userId - Remove Organization Owner - Bad Data', () => {
+		cy.get('@new_user').then((user) => {
+			cy.get('@organization').then((org) => {
+				cy.addUser(user).then((addedUserResponse) => {
+					cy.addOrg(org).then((createdOrgResponse) => {
+						cy.addOrgOwner(
+							createdOrgResponse.body.organization._id,
+							addedUserResponse.body.userInfo._id,
+							addedUserResponse.body.userInfo.email
+						).then(() => {
+							compoundURL = Cypress.env('baseUrl').concat(
+								Cypress.env('version'),
+								Cypress.env('route_organizations'),
+								`/BADORGID`,
+								Cypress.env('route_organizations_owners'),
+								`/BADUSERID`
+							);
+							cy.request({
+								method: 'DELETE',
+								url: compoundURL,
+								failOnStatusCode: false
+							}).should((response) => {
+								expect(response.status).to.be.eq(500);
+								expect(response.body.error).to.be.an('boolean');
+								expect(response.body.error).to.be.eq(true);
+							});
+						});
+					});
+				});
+			});
+		});
+	});
+
+	it('DELETE - /v1/organizations/:orgId/owners/:userId - Remove Organization Owner - Non Existent Org Data', () => {
+		cy.get('@new_user').then((user) => {
+			cy.get('@organization').then((org) => {
+				cy.addUser(user).then((addedUserResponse) => {
+					cy.addOrg(org).then((createdOrgResponse) => {
+						cy.addOrgOwner(
+							createdOrgResponse.body.organization._id,
+							addedUserResponse.body.userInfo._id,
+							addedUserResponse.body.userInfo.email
+						).then(() => {
+							cy.generateObjectId().then((generatedObjectId) => {
+								compoundURL = Cypress.env('baseUrl').concat(
+									Cypress.env('version'),
+									Cypress.env('route_organizations'),
+									`/${generatedObjectId}`,
+									Cypress.env('route_organizations_owners'),
+									`/${addedUserResponse.body.userInfo._id}`
+								);
+								cy.request({
+									method: 'DELETE',
+									url: compoundURL,
+									failOnStatusCode: false
+								}).should((response) => {
+									expect(response.status).to.be.eq(404);
+									expect(response.body.notFound).to.be.an('boolean');
+									expect(response.body.notFound).to.be.eq(true);
+								});
+							});
+						});
+					});
+				});
+			});
+		});
+	});
+
+	it('DELETE - /v1/organizations/:orgId/owners/:userId - Remove Organization Owner - Non Existent User Data', () => {
+		cy.get('@new_user').then((user) => {
+			cy.get('@organization').then((org) => {
+				cy.addUser(user).then((addedUserResponse) => {
+					cy.addOrg(org).then((createdOrgResponse) => {
+						cy.addOrgOwner(
+							createdOrgResponse.body.organization._id,
+							addedUserResponse.body.userInfo._id,
+							addedUserResponse.body.userInfo.email
+						).then(() => {
+							cy.generateObjectId().then((generatedObjectId) => {
+								compoundURL = Cypress.env('baseUrl').concat(
+									Cypress.env('version'),
+									Cypress.env('route_organizations'),
+									`/${createdOrgResponse.body.organization._id}`,
+									Cypress.env('route_organizations_owners'),
+									`/${generatedObjectId}`
+								);
+								cy.request({
+									method: 'DELETE',
+									url: compoundURL,
+									failOnStatusCode: false
+								}).should((response) => {
+									expect(response.status).to.be.eq(404);
+									expect(response.body.notFound).to.be.an('boolean');
+									expect(response.body.notFound).to.be.eq(true);
+								});
 							});
 						});
 					});
@@ -565,6 +856,23 @@ describe('Organization Routers', () => {
 		});
 	});
 
+	it('DELETE - /v1/organizations - Delete Organization - Bad Org ID', () => {
+		compoundURL = Cypress.env('baseUrl').concat(
+			Cypress.env('version'),
+			Cypress.env('route_organizations'),
+			`/werwefwefwe`
+		);
+		cy.request({
+			method: 'DELETE',
+			url: compoundURL,
+			failOnStatusCode: false
+		}).should((response) => {
+			expect(response.status).to.be.eq(500);
+			expect(response.body.error).to.be.an('boolean');
+			expect(response.body.error).to.be.eq(true);
+		});
+	});
+
 	it('POST - /v1/organizations/:orgId/share - Share Organization - Good Data', () => {
 		cy.fixture('user_share_resource.json').then((share_user) => {
 			cy.get('@organization').then((org) => {
@@ -620,6 +928,37 @@ describe('Organization Routers', () => {
 						expect(response.status).to.be.eq(400);
 						expect(response.body.error).to.be.an('boolean');
 						expect(response.body.error).to.be.eq(true);
+					});
+				});
+			});
+		});
+	});
+
+	it('POST - /v1/organizations/:orgId/share - Share Organization - Non Existent Org', () => {
+		cy.fixture('user_share_resource.json').then((share_user) => {
+			cy.get('@organization').then((org) => {
+				cy.addOrg(org).then((createdOrgResponse) => {
+					cy.generateObjectId().then((generateObjectId) => {
+						compoundURL = Cypress.env('baseUrl').concat(
+							Cypress.env('version'),
+							Cypress.env('route_organizations'),
+							`/${generateObjectId}`,
+							Cypress.env('route_share')
+						);
+						cy.request({
+							method: 'POST',
+							url: compoundURL,
+							body: {
+								email: `${share_user.email}`,
+								shareType: 'resource',
+								shareUrl: `cool-org`
+							},
+							failOnStatusCode: false
+						}).should((response) => {
+							expect(response.status).to.be.eq(404);
+							expect(response.body.notFound).to.be.an('boolean');
+							expect(response.body.notFound).to.be.eq(true);
+						});
 					});
 				});
 			});
