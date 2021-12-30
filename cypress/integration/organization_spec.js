@@ -50,7 +50,7 @@ describe('Organization Routers', () => {
 				compoundURL = Cypress.env('baseUrl').concat(
 					Cypress.env('version'),
 					Cypress.env('route_organizations'),
-					`?ids=${createdOrgResponse.body.organization._id}`
+					`?ids=${createdOrgResponse.body.organization._id}&createdAt=${createdOrgResponse.body.organization.created_at}&createdStart=${createdOrgResponse.body.organization.created_at}`
 				);
 				cy.request({
 					method: 'GET',

@@ -105,6 +105,12 @@ jobs:
         environment:
           ## this enables colors in the output
           TERM: xterm
+      ## MongoDB 
+      - image: mongo:4.4.10
+        environment:
+          MONGO_INITDB_ROOT_USERNAME: user
+          MONGO_INITDB_ROOT_PASSWORD: password
+          MONGO_INITDB_DATABASE: asylum-connect
     working_directory: ~/catalog-api
     steps:
       - checkout
@@ -144,8 +150,14 @@ jobs:
            MAILGUN_API_KEY=$MAILGUN_API_KEY
            MAILGUN_DOMAIN=$MAILGUN_DOMAIN
            DB_URI=$DB_URI
+           ENV=TEST
            SHEETS_API_KEY=$SHEETS_API_KEY
+           TEST_DB_URI=$TEST_DB_URI
            EOF
+      #Seeed Docker DB
+      - run:
+          name: "Seed Docker DB"
+          command: yarn seed-docker-db
       #Testing
       - run: 
           name: "E2E Automation"
