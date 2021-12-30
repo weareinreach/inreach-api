@@ -227,8 +227,6 @@ describe('Services Routers', () => {
 									failOnStatusCode: false
 								}).should((response) => {
 									expect(response.status).to.be.eq(404);
-									expect(response.body.notFound).to.be.an('boolean');
-									expect(response.body.notFound).to.be.eq(true);
 								});
 							}
 						);
@@ -238,7 +236,7 @@ describe('Services Routers', () => {
 		});
 	});
 
-	it('GET - /v1/organizations/:orgId/services/:serviceId - Bad Org ID and Good Service ID', () => {
+	it('GET - /v1/organizations/:orgId/services/:serviceId - Non Existent Org and Good Service ID', () => {
 		cy.get('@organization').then((organization) => {
 			cy.addOrg(organization).then((createdOrgResponse) => {
 				cy.get('@service').then((service) => {
