@@ -1,0 +1,17 @@
+[{
+   "address": "11 Asylum connect road",
+   "city": "Safe place",
+    "city_ES": "",
+   "country": "USA",
+    "country_ES": "",
+    "is_primary": false,
+    "lat": "-80",
+    "long": "100",
+    "name": "Safe harbour",
+    "name_ES":"",
+    "show_on_organization":true,
+    "state": "CA",
+    "state_ES": "",
+    "unit": "",
+   "zip_code": "11111"
+}]

@@ -1,6 +1,8 @@
 import jwt from 'jsonwebtoken';
 import _omit from 'lodash/omit';
 import _orderBy from 'lodash/orderBy';
+import mongoose from 'mongoose';
+const ObjectId = mongoose.Types.ObjectId;
 
 import config from './config';
 
@@ -58,8 +60,8 @@ export const handleNotFound = (res) => {
 export const handleErr = (err, res) => {
 	// eslint-disable-next-line
 	console.error(err);
-
-	return res.status(500).json({error: true});
+	const message = err.message ? err.message : 'Unspecified server error';
+	return res.status(500).json({error: true, message: message});
 };
 
 /**
@@ -106,4 +108,12 @@ export const verifyJWT = (token) => {
  */
 export const isBodyEmpty = (body) => {
 	return Object.keys(body).length === 0;
+};
+
+/**
+ * Verify that ID passed by is a valid ObjectID
+ *  to be used in aggregate functions
+ */
+export const isValidObjectId = (id) => {
+	return ObjectId.isValid(id);
 };

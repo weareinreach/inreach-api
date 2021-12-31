@@ -27,16 +27,6 @@ describe('Suggestion Routes', () => {
 		}).should((response) => {
 			expect(response.status).to.be.eq(200);
 			expect(response.body).to.be.an('array');
-			expect(response.body[0]).has.all.keys(
-				'_id',
-				'organizationId',
-				'userEmail',
-				'field',
-				'value',
-				'created_at',
-				'updated_at',
-				'__v'
-			);
 		});
 	});
 

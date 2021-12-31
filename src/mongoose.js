@@ -1,3 +1,4 @@
+import {Decimal128} from 'mongoose';
 import crypto from 'crypto';
 
 import {model, Schema} from 'mongoose';
@@ -25,6 +26,7 @@ const ServiceSchema = new Schema({
 	description_ES: String,
 	email_id: String,
 	is_published,
+	is_deleted: {type: Boolean, required: true, default: false},
 	location_id: String,
 	name: {type: String, required: true},
 	name_ES: {type: String},
@@ -66,6 +68,7 @@ const OrganizationSchema = new Schema(
 		name: {type: String, required: true},
 		name_ES: {type: String},
 		is_published,
+		is_deleted: {type: Boolean, required: true, default: false},
 		locations: [
 			{
 				address: String,
@@ -82,7 +85,8 @@ const OrganizationSchema = new Schema(
 				state: String,
 				state_ES: String,
 				unit: String,
-				zip_code: String
+				zip_code: String,
+				geolocation: {type: {type: String}, coordinates: [Decimal128]}
 			}
 		],
 		notes_log: [
@@ -149,6 +153,7 @@ const CommentSchema = new Schema(
 	{
 		organizationId: String,
 		serviceId: String,
+		is_deleted: {type: Boolean, required: true, default: false},
 		comments: [
 			{
 				created_at,
@@ -221,9 +226,9 @@ const UserSchema = new Schema(
 		},
 		ethnicityRace: [String],
 		hash: {type: String, required: true},
-		homeLocation: String,
-		identityPrimary: String,
-		identitySupplimental: [String],
+		countryOfOrigin: String,
+		sogIdentity: [String],
+		immigrationStatus: String,
 		isAdminDataManager: {type: Boolean, default: false},
 		isDataManager: {type: Boolean, default: false},
 		isProfessional: {type: Boolean, default: false},
@@ -240,9 +245,10 @@ const UserSchema = new Schema(
 			}
 		],
 		name: {type: String, required: true},
-		orgAreaOfWork: String,
 		orgId: String,
+		orgName: String,
 		orgPositionTitle: String,
+		orgType: String,
 		reasonForJoining: String,
 		salt: {type: String, required: true}
 	},

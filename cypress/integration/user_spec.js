@@ -96,8 +96,7 @@ describe('Users Routers', () => {
 				expect(response.body.userInfo.age).to.be.an('string');
 				expect(response.body.userInfo.ethnicityRace).to.be.an('array');
 				expect(response.body.userInfo.ethnicityRace).to.be.lengthOf(0);
-				expect(response.body.userInfo.identitySupplimental).to.be.an('array');
-				expect(response.body.userInfo.identitySupplimental).to.be.lengthOf(0);
+				expect(response.body.userInfo.immigrationStatus).to.be.an('string');
 				expect(response.body.userInfo.lists).to.be.an('array');
 				expect(response.body.userInfo.lists).to.be.lengthOf(0);
 			});
@@ -144,8 +143,7 @@ describe('Users Routers', () => {
 					expect(response.body.age).to.be.an('string');
 					expect(response.body.ethnicityRace).to.be.an('array');
 					expect(response.body.ethnicityRace).to.be.lengthOf(0);
-					expect(response.body.identitySupplimental).to.be.an('array');
-					expect(response.body.identitySupplimental).to.be.lengthOf(0);
+					expect(response.body.immigrationStatus).to.be.an('string');
 					expect(response.body.lists).to.be.an('array');
 					expect(response.body.lists).to.be.lengthOf(0);
 				});

@@ -461,7 +461,8 @@ Cypress.Commands.add('deleteUsersIfExist', () => {
 	);
 	cy.request({
 		method: 'GET',
-		url: compoundURL
+		url: compoundURL,
+		failOnStatusCode: false
 	}).then((response) => {
 		let usersArray = response.body.users;
 		usersArray.forEach((user) => {

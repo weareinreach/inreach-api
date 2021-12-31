@@ -40,7 +40,7 @@ describe('Services Routers', () => {
 		compoundURL = Cypress.env('baseUrl').concat(
 			Cypress.env('version'),
 			Cypress.env('route_organizations'),
-			'/BadOrgID'
+			'/BadOrgID/services'
 		);
 		cy.request({
 			method: 'GET',

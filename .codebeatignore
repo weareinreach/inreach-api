@@ -4,3 +4,5 @@
 /jest/**
 /mochawesome-report/**
 /reports/**
+/docker/**
+/build/**

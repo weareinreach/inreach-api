@@ -1,5 +1,4 @@
 import mongoose from 'mongoose';
-
 const ObjectId = mongoose.Types.ObjectId;
 
 /**
@@ -43,20 +42,25 @@ export const getOrganizationQuery = (params = {}) => {
 		name,
 		owner,
 		pending,
+		deleted,
+		serviceDeleted,
 		pendingOwnership,
 		properties,
 		serviceArea,
 		tagLocale,
-		tags
+		tags,
+		long,
+		lat
 	} = params;
 	let query = {};
 
 	if (ids) {
 		query._id = {
-			$in: ids.split(',').map((id) => new ObjectId(id))
+			$in: ids.split(',').map((id) => new ObjectId(id.trim()))
 		};
 	}
 
+	// search by org name
 	if (name && name.trim() !== '""') {
 		query.$text = {$search: name.trim(), $caseSensitive: false};
 	}
@@ -67,6 +71,18 @@ export const getOrganizationQuery = (params = {}) => {
 
 	if (pendingOwnership) {
 		query['owners.isApproved'] = false;
+	}
+
+	if (deleted) {
+		query.is_deleted = true;
+	} else {
+		query.is_deleted = false;
+	}
+
+	if (serviceDeleted) {
+		query['services.is_deleted'] = true;
+		//Overide deleted to get both deleted and non deleted orgs.
+		query.is_deleted = {$in: [true, false]};
 	}
 
 	if (pending) {
@@ -178,6 +194,17 @@ export const getOrganizationQuery = (params = {}) => {
 		}
 
 		query.services = {$elemMatch};
+	}
+
+	if (lat?.length && long?.length) {
+		query = {
+			$geoNear: {
+				near: {type: 'Point', coordinates: [parseFloat(long), parseFloat(lat)]},
+				distanceField: 'distance',
+				query: {...query}
+			}
+		};
+		return query;
 	}
 	return query;
 };
