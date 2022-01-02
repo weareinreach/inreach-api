@@ -36,7 +36,7 @@ if (process.env.ROLLBACK) {
 
 //Scripts
 function runMigrationScript() {
-	mongoose.Users.updateMany(
+	mongoose.User.updateMany(
 		{},
 		{
 			$rename: {
@@ -45,7 +45,8 @@ function runMigrationScript() {
 				identitySupplimental: 'immigrationStatus',
 				orgAreaOfWork: 'orgType'
 			}
-		}
+		},
+		{strict: false, multi: true}
 	)
 		.then((result) => {
 			console.log('Number of modified rows ' + result.nModified);
@@ -60,7 +61,7 @@ function runMigrationScript() {
 
 function runRollbackScript() {
 	//Rollback Script
-	mongoose.Users.updateMany(
+	mongoose.User.updateMany(
 		{},
 		{
 			$rename: {
@@ -69,7 +70,8 @@ function runRollbackScript() {
 				immigrationStatus: 'identitySupplimental',
 				orgType: 'orgAreaOfWork'
 			}
-		}
+		},
+		{strict: false, multi: true}
 	)
 		.then((result) => {
 			console.log('Number of modified rows ' + result.nModified);

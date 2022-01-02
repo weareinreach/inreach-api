@@ -119,7 +119,6 @@ const runMigrationScript = async () => {
 		]);
 		let bulkOperations = [];
 		result.forEach((org) => {
-			console.log(`${JSON.stringify(org.locations)}`);
 			bulkOperations.push({
 				updateOne: {filter: {_id: org._id}, update: {locations: org.locations}}
 			});
