@@ -24,7 +24,7 @@ require('dotenv').config({path: '.env'});
 // Import DB Connection
 require('../src/db');
 
-var mongoose = require('../../src/mongoose');
+var mongoose = require('../src/mongoose');
 
 if (process.env.MIGRATION) {
 	runMigrationScript();
