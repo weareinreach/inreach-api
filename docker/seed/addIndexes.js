@@ -11,7 +11,10 @@ const mongoose = require('../../src/mongoose');
 const seedFunctions = require('./generateSeedFunction');
 
 //Compound Indexes
-const organizationsAddedIndexes = [{name: 'text'}];
+const organizationsAddedIndexes = [
+	{index: {name: 'text'}},
+	{index: {'locations.geolocation': '2dsphere'}, sparse: true}
+];
 
 //Organization Indexes
 seedFunctions.createIndex(

@@ -53,11 +53,11 @@ export const generateSeedData = async (
 					process.exit(1);
 				}
 				console.log(`${collection} seeding completed. Exiting...`);
+				//Exit Process
+				process.exit(0);
 			}
 		);
 	}
-	//Exit Process
-	process.exit(0);
 };
 
 export const getOrgs = async function () {
@@ -91,8 +91,12 @@ export const getArray = function (max) {
 };
 
 export const createIndex = async function (schema, model, indexArray) {
-	indexArray.forEach((index) => {
-		model.schema.index(index);
+	indexArray.forEach((indexObject) => {
+		if (indexObject.sparse) {
+			model.schema.index(indexObject.index, {sparse: true});
+		} else {
+			model.schema.index(indexObject.index);
+		}
 	});
 	try {
 		console.log(`Creating indexes for ${schema}...`);
