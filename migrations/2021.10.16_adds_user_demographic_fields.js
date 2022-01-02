@@ -22,7 +22,7 @@ require('babel-register')({
 //Replace .env with a {.env-prod} file with DB_URI env var pointing to Prod
 require('dotenv').config({path: '.env'});
 // Import DB Connection
-require('../../src/db');
+require('../src/db');
 
 var mongoose = require('../../src/mongoose');
 
