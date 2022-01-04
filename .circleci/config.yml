@@ -221,6 +221,9 @@ jobs:
            cat \<< EOF > ./.env
            DB_URI=$DB_URI_PROD
            EOF
+      - run:
+          name: Install Packages
+          command: yarn install
       - run: 
           name: Run migration
           command: |
@@ -244,6 +247,9 @@ jobs:
            cat \<< EOF > ./.env
            DB_URI=$DB_URI_PROD
            EOF
+      - run:
+          name: Install Packages
+          command: yarn install
       - run: 
           name: Run rollback
           command: |

@@ -22,9 +22,9 @@ require('babel-register')({
 //Replace .env with a {.env-prod} file with DB_URI env var pointing to Prod
 require('dotenv').config({path: '.env'});
 // Import DB Connection
-require('../../src/db');
+require('../src/db');
 
-var mongoose = require('../../src/mongoose');
+var mongoose = require('../src/mongoose');
 
 if (process.env.MIGRATION) {
 	runMigrationScript();
@@ -36,7 +36,7 @@ if (process.env.ROLLBACK) {
 
 //Scripts
 function runMigrationScript() {
-	mongoose.Users.updateMany(
+	mongoose.User.updateMany(
 		{},
 		{
 			$rename: {
@@ -45,7 +45,8 @@ function runMigrationScript() {
 				identitySupplimental: 'immigrationStatus',
 				orgAreaOfWork: 'orgType'
 			}
-		}
+		},
+		{strict: false, multi: true}
 	)
 		.then((result) => {
 			console.log('Number of modified rows ' + result.nModified);
@@ -60,7 +61,7 @@ function runMigrationScript() {
 
 function runRollbackScript() {
 	//Rollback Script
-	mongoose.Users.updateMany(
+	mongoose.User.updateMany(
 		{},
 		{
 			$rename: {
@@ -69,7 +70,8 @@ function runRollbackScript() {
 				immigrationStatus: 'identitySupplimental',
 				orgType: 'orgAreaOfWork'
 			}
-		}
+		},
+		{strict: false, multi: true}
 	)
 		.then((result) => {
 			console.log('Number of modified rows ' + result.nModified);
