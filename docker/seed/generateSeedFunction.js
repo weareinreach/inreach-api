@@ -58,6 +58,7 @@ export const generateSeedData = async (
 			}
 		);
 	}
+	process.exit(0);
 };
 
 export const getOrgs = async function () {
