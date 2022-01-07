@@ -253,6 +253,7 @@ jobs:
           command: |
            cat \<< EOF > ./.env
            DB_URI=$DB_URI_PROD
+           PROFILE=CI
            EOF
       - run:
           name: Install Packages
@@ -282,6 +283,7 @@ jobs:
           command: |
            cat \<< EOF > ./.env
            DB_URI=$DB_URI_STAGING
+           PROFILE=CI
            EOF
       - run:
           name: Install Packages
@@ -312,6 +314,7 @@ jobs:
           command: |
            cat \<< EOF > ./.env
            DB_URI=$DB_URI_PROD
+           PROFILE=CI
            EOF
       - run:
           name: Install Packages
@@ -341,6 +344,7 @@ jobs:
           command: |
            cat \<< EOF > ./.env
            DB_URI=$DB_URI_STAGING
+           PROFILE=CI
            EOF
       - run:
           name: Install Packages
