@@ -3,13 +3,22 @@
 #This file is to be used to run Github Status Checks
 version: 2.1
 parameters:
-  run_migration:
+  run_migration_prod:
     default: false
     type: boolean
-  run_rollback:
+  run_migration_stage:
+    default: false
+    type: boolean
+  run_rollback_prod:
+    default: false
+    type: boolean
+  run_rollback_stage:
     default: false
     type: boolean
   files:
+    default: ""
+    type: string
+  date_pattern:
     default: ""
     type: string
 orbs:
@@ -394,8 +403,6 @@ workflows:
   migration_stage:
     when: << pipeline.parameters.run_migration_stage >>
     jobs:
-      - hold:
-          type: approval
       - migration_stage:
           filters:
             branches:
@@ -416,8 +423,6 @@ workflows:
   rollback_stage:
     when: << pipeline.parameters.run_rollback_stage >>
     jobs:
-      - hold:
-          type: approval
       - rollback_stage:
           filters:
             branches:
