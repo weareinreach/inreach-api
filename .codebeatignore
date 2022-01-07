@@ -6,3 +6,4 @@
 /reports/**
 /docker/**
 /build/**
+/migrations/**
