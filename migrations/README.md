@@ -63,6 +63,8 @@ Ex:
 
 In circle CI there are workflows to run migration_stage/rollback_stage. They are triggered by a Postman or CURL Request to CircleCI API when migration is merged into dev branch. Add the files necessary separated by a comma for the migration to run under the key files.
 
+[Creating your CircleCI Token](https://circleci.com/docs/2.0/managing-api-tokens/)
+
 CURL example:
 
 ```
@@ -90,8 +92,6 @@ curl --request POST \
     "parameters":{"run_migration_prod": true,
     "date_pattern": "2022.02.01"}}'
 ```
-
-[Creating your CircleCI Token](https://circleci.com/docs/2.0/managing-api-tokens/)
 
 ## Migration files
 

@@ -8,7 +8,7 @@
 
 #Use the correct date pattern all the files with a release
 #The pattern should follow yyyy.mm.dd{.|_}
-export DATE_PATTERN=2022.02.01_
+export DATE_PATTERN=2021.02.01_
 
 #Check if which directory script was run from
 if [[ $PWD == *catalog-api ]]; then
