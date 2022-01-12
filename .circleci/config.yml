@@ -123,12 +123,6 @@ jobs:
     working_directory: ~/catalog-api
     steps:
       - checkout
-      # Download and cache dependencies
-    #   - restore_cache:
-    #       keys:
-    #       - v1-dependencies-{{ checksum "package.json" }}
-    #       # fallback to using the latest cache if no exact match is found
-    #       - v1-dependencies-
       - run: 
           name: Check Node Version
           command: node --version
@@ -186,49 +180,12 @@ jobs:
       - store_artifacts:
           path: ./cypressCoverage
           destination: E2E Coverage Reports
-  test_pr_migration:
-   docker:
-      - image: cypress/base:16.5.0
-        environment:
-          ## this enables colors in the output
-          TERM: xterm
-      ## MongoDB 
-      - image: mongo:4.4.10
-        environment:
-          MONGO_INITDB_ROOT_USERNAME: user
-          MONGO_INITDB_ROOT_PASSWORD: password
-          MONGO_INITDB_DATABASE: asylum-connect
-   working_directory: ~/catalog-api
-   steps:
-      - checkout
-      - run:
-          name: Install Packages
-          command: yarn install
-      #Recreate .env file from CircleCI Project Env Vars
-      - run:
-          name: Create .env file
-          command: |
-           cat \<< EOF > ./.env
-           ENV=TEST
-           TEST_DB_URI=$TEST_DB_URI
-           EOF
-      #Seeed Docker DB
-      - run:
-          name: "Seed Docker DB"
-          command: yarn seed-docker-db
-   
   lint:
     docker:
       - image: cimg/node:16.12.0
     working_directory: ~/catalog-api
     steps:
       - checkout
-      # Download and cache dependencies
-    #   - restore_cache:
-    #       keys:
-    #       - v1-dependencies-{{ checksum "package.json" }}
-    #       # fallback to using the latest cache if no exact match is found
-    #       - v1-dependencies-
       - run: 
           name: Check Node Version
           command: node --version
