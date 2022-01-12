@@ -213,6 +213,7 @@ export const updateOrg = async (req, res) => {
 		return handleBadRequest(res);
 	}
 
+	//Validate locations
 	if (body.locations && body.locations.length > 0) {
 		const primaryLocation = body.locations.filter((loc) => loc.is_primary);
 		if (primaryLocation.length > 1) {
@@ -230,6 +231,7 @@ export const updateOrg = async (req, res) => {
 		}
 		body.locations.map((location) => updateLocationGeolocation(location));
 	}
+
 	await Organization.findOneAndUpdate(
 		{_id: orgId},
 		{$set: {...body, updated_at}}
@@ -392,6 +394,9 @@ export const shareOrganization = async (req, res) => {
 };
 
 const updateLocationGeolocation = (location) => {
+	//if no lat and long provided defaults to 0
+	location.long = location.long ? location.long : 0;
+	location.lat = location.lat ? location.lat : 0;
 	location.geolocation = {
 		type: 'Point',
 		coordinates: [parseFloat(location.long), parseFloat(location.lat)]
