@@ -135,12 +135,13 @@ export const createOrg = async (req, res) => {
 	const org = new Organization(body);
 	if (org.locations?.length) {
 		locations.map((location) => updateLocationGeolocation(location, res));
+		//Validate Geolocation
+		if (!validateLocationGeolocation(body.locations)) {
+			handleErr({message: 'Longitude and Latitude are required fields'}, res);
+			return;
+		}
 	}
-	//Validate Geolocation
-	if (!validateLocationGeolocation(body.locations)) {
-		handleErr({message: 'Longitude and Latitude are required fields'}, res);
-		return;
-	}
+
 	await org
 		.save()
 		.then((organization) => {
@@ -235,11 +236,11 @@ export const updateOrg = async (req, res) => {
 			body.locations[0].is_primary = true;
 		}
 		body.locations.map((location) => updateLocationGeolocation(location, res));
-	}
-	//Validate Geolocation
-	if (!validateLocationGeolocation(body.locations)) {
-		handleErr({message: 'Longitude and Latitude are required fields'}, res);
-		return;
+		//Validate Geolocation
+		if (!validateLocationGeolocation(body.locations)) {
+			handleErr({message: 'Longitude and Latitude are required fields'}, res);
+			return;
+		}
 	}
 
 	await Organization.findOneAndUpdate(
