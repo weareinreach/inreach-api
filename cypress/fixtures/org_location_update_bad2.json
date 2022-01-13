@@ -1,0 +1,36 @@
+[
+    {
+       "address": "11 Asylum connect road",
+       "city": "Safe place",
+       "city_ES": "",
+       "country": "USA",
+       "country_ES": "",
+       "is_primary": true,
+       "lat": "-100",
+       "long": "100",
+       "name": "Safe harbour",
+       "name_ES": "",
+       "show_on_organization": true,
+       "state": "CA",
+       "state_ES": "",
+       "unit": "",
+       "zip_code": "11111"
+    },
+    {
+       "address": "11 Haven road",
+       "city": "Safe place",
+       "city_ES": "",
+       "country": "USA",
+       "country_ES": "",
+       "is_primary": false,
+       "lat": "",
+       "long": "",
+       "name": "Safe harbour",
+       "name_ES": "",
+       "show_on_organization": true,
+       "state": "CA",
+       "state_ES": "",
+       "unit": "",
+       "zip_code": "11111"
+    }
+ ]

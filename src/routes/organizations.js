@@ -134,8 +134,14 @@ export const createOrg = async (req, res) => {
 
 	const org = new Organization(body);
 	if (org.locations?.length) {
-		locations.map((location) => updateLocationGeolocation(location));
+		org.locations.map((location) => updateLocationGeolocation(location, res));
+		//Validate Geolocation
+		if (!validateLocationGeolocation(body.locations)) {
+			handleErr({message: 'Longitude and Latitude are required fields'}, res);
+			return;
+		}
 	}
+
 	await org
 		.save()
 		.then((organization) => {
@@ -213,6 +219,7 @@ export const updateOrg = async (req, res) => {
 		return handleBadRequest(res);
 	}
 
+	//Validate locations
 	if (body.locations && body.locations.length > 0) {
 		const primaryLocation = body.locations.filter((loc) => loc.is_primary);
 		if (primaryLocation.length > 1) {
@@ -228,8 +235,14 @@ export const updateOrg = async (req, res) => {
 		if (primaryLocation.length === 0 && body.locations.length === 1) {
 			body.locations[0].is_primary = true;
 		}
-		body.locations.map((location) => updateLocationGeolocation(location));
+		body.locations.map((location) => updateLocationGeolocation(location, res));
+		//Validate Geolocation
+		if (!validateLocationGeolocation(body.locations)) {
+			handleErr({message: 'Longitude and Latitude are required fields'}, res);
+			return;
+		}
 	}
+
 	await Organization.findOneAndUpdate(
 		{_id: orgId},
 		{$set: {...body, updated_at}}
@@ -397,4 +410,14 @@ const updateLocationGeolocation = (location) => {
 		coordinates: [parseFloat(location.long), parseFloat(location.lat)]
 	};
 	return location;
+};
+
+const validateLocationGeolocation = (locations) => {
+	let valid = true;
+	locations.forEach((location) => {
+		if (!location.long || !location.lat) {
+			valid = false;
+		}
+	});
+	return valid;
 };
