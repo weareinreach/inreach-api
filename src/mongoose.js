@@ -39,8 +39,8 @@ const ServiceSchema = new Schema({
 	phone_id: String,
 	properties: {},
 	schedule_id: String,
-	slug: {type: String, unique: true},
-	slug_ES: {type: String, unique: true},
+	slug: String,
+	slug_ES: String,
 	tags: {
 		canada: {},
 		mexico: {},
@@ -135,8 +135,8 @@ const OrganizationSchema = new Schema(
 			}
 		],
 		services: [ServiceSchema],
-		slug: {type: String, unique: true},
-		slug_ES: {type: String, unique: true},
+		slug: String,
+		slug_ES: String,
 		social_media: [{name: String, url: String}],
 		source: String,
 		verified_at: Date,

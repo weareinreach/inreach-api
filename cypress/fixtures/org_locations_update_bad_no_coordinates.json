@@ -1,0 +1,26 @@
+{
+	"name": "Surprisingly Unique Org Name",
+	"description": "Test organizations Description",
+	"slug": "surprisingly-unique-organizations-slug",
+	"website": "https://google.com",
+	"is_deleted":false,
+    "locations":[
+		{
+			"address": "11 Haven road",
+			"city": "Safe place",
+			"city_ES": "",
+			"country": "USA",
+			"country_ES": "",
+			"is_primary": false,
+			"lat": "",
+			"long": "",
+			"name": "Safe harbour",
+			"name_ES": "",
+			"show_on_organization": true,
+			"state": "CA",
+			"state_ES": "",
+			"unit": "",
+			"zip_code": "11111"
+		 }
+	]
+}

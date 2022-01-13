@@ -3,7 +3,7 @@
 import updateLocation from '../fixtures/org_location_update.json';
 import multiplePrimaryLocationUpdate from '../fixtures/org_location_update_bad.json';
 import multipleLocationUpdate from '../fixtures/org_multiple_location_update_bad.json';
-
+import locationWithNoCoordinates from '../fixtures/org_location_update_bad2.json';
 //compound url
 let compoundURL = null;
 
@@ -15,6 +15,9 @@ describe('Organization Routers', () => {
 		cy.fixture('org_good_format.json').as('organization');
 		cy.fixture('org_good_format_update.json').as('organization_updated');
 		cy.fixture('note.json').as('note');
+		cy.fixture('org_locations_update_bad_no_coordinates.json').as(
+			'organization_bad_location'
+		);
 	});
 	afterEach(() => {
 		//Do the clean up
@@ -289,6 +292,30 @@ describe('Organization Routers', () => {
 		});
 	});
 
+	it('POST - /v1/organizations - Create Organization - Bad Location Data', () => {
+		cy.get('@organization_bad_location').then((org) => {
+			compoundURL = Cypress.env('baseUrl').concat(
+				Cypress.env('version'),
+				Cypress.env('route_organizations')
+			);
+			//Get Org Data
+			cy.request({
+				method: 'POST',
+				url: compoundURL,
+				body: org,
+				failOnStatusCode: false
+			}).should((response) => {
+				expect(response.status).to.be.eq(500);
+				expect(response.body.error).to.be.an('boolean');
+				expect(response.body.error).to.be.eq(true);
+				expect(response.body.message).to.be.an('string');
+				expect(response.body.message).to.be.eq(
+					'Longitude and Latitude are required fields'
+				);
+			});
+		});
+	});
+
 	it('POST - /v1/organizations - Create Organization - No Body', () => {
 		compoundURL = Cypress.env('baseUrl').concat(
 			Cypress.env('version'),
@@ -334,7 +361,8 @@ describe('Organization Routers', () => {
 							expect(retrieved_org.body.website).to.be.eq(org_updated.website);
 							expect(retrieved_org.body.slug).to.be.eq(org_updated.slug);
 
-							//Check that it is not equal to inital object								expect(retrieved_org.body._id).to.be.an('string');
+							//Check that it is not equal to inital object
+							expect(retrieved_org.body._id).to.be.an('string');
 							expect(retrieved_org.body.is_published).to.be.an('boolean');
 							expect(retrieved_org.body.name).to.be.an('string');
 							expect(retrieved_org.body.website).to.be.an('string');
@@ -425,6 +453,19 @@ describe('Organization Routers', () => {
 					expect(response.body.error).to.be.eq(true);
 					expect(response.body.message).to.be.eq(
 						'Organization must have a primary location'
+					);
+				});
+				cy.request({
+					method: 'PATCH',
+					url: compoundURL,
+					body: {locations: locationWithNoCoordinates},
+					failOnStatusCode: false
+				}).should((response) => {
+					expect(response.status).to.be.eq(500);
+					expect(response.body.error).to.be.an('boolean');
+					expect(response.body.error).to.be.eq(true);
+					expect(response.body.message).to.be.eq(
+						'Longitude and Latitude are required fields'
 					);
 				});
 			});
