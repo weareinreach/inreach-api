@@ -292,7 +292,7 @@ describe('Organization Routers', () => {
 		});
 	});
 
-  it('POST - /v1/organizations - Create Organization - Bad Location Data', () => {
+	it('POST - /v1/organizations - Create Organization - Bad Location Data', () => {
 		cy.get('@organization_bad_location').then((org) => {
 			compoundURL = Cypress.env('baseUrl').concat(
 				Cypress.env('version'),
@@ -313,6 +313,8 @@ describe('Organization Routers', () => {
 					'Longitude and Latitude are required fields'
 				);
 			});
+		});
+	});
 
 	it('POST - /v1/organizations - Create Organization - No Body', () => {
 		compoundURL = Cypress.env('baseUrl').concat(
@@ -359,8 +361,8 @@ describe('Organization Routers', () => {
 							expect(retrieved_org.body.website).to.be.eq(org_updated.website);
 							expect(retrieved_org.body.slug).to.be.eq(org_updated.slug);
 
-							//Check that it is not equal to inital object								
-              expect(retrieved_org.body._id).to.be.an('string');
+							//Check that it is not equal to inital object
+							expect(retrieved_org.body._id).to.be.an('string');
 							expect(retrieved_org.body.is_published).to.be.an('boolean');
 							expect(retrieved_org.body.name).to.be.an('string');
 							expect(retrieved_org.body.website).to.be.an('string');
