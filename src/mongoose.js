@@ -10,6 +10,17 @@ const schemaOptions = {
 };
 const ObjectId = Schema.Types.ObjectId;
 
+const MigrationSchema = new Schema({
+	created_at,
+	updated_at: Date,
+	migration_file: {type: String, unique: true, required: true},
+	pipeline_reference: String,
+	approver: String,
+	migration_type: {type: String, required: true}
+});
+
+export const Migration = model('Migration', MigrationSchema);
+
 const ServiceSchema = new Schema({
 	created_at,
 	updated_at: Date,

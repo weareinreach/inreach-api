@@ -19,6 +19,7 @@ class OrgData {
 	};
 	#serviceTagsMexico = {Medical: {'HIV and sexual health': 'true'}};
 	#serviceTagsCanada = {'Mental Health': {'Support groups': 'true'}};
+
 	constructor(param) {
 		this.is_published = Math.random() < 0.9;
 		this.description = `Organization ${this.#uniqueOrgID} description`;
