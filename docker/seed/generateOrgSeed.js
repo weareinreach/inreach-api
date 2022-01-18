@@ -28,6 +28,7 @@ class OrgData {
 		this.slug_ES = `organization-seeded-number-${this.#uniqueOrgID}`;
 		this.verified_at = faker.date.past();
 		this.website = faker.internet.url();
+		this.photos = [];
 		(this.website_ES = Math.random() < 0.5 ? faker.internet.url() : ''),
 			(this.services = seedFunctions.getArray(randNumber).map(() => {
 				return {
