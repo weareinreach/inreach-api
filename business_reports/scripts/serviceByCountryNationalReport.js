@@ -17,37 +17,37 @@ const csvHeaders = [
 ];
 
 async function generateReportNational() {
-	let usa_data_orgs = await reportFuntions.getServiceNational(
+	let usa_data_orgs = await reportFuntions.getServiceNationalOrgs(
 		usa_states,
 		mongoose.Organization,
 		'united_states',
 		[]
 	);
-	let usa_data_services = await reportFuntions.getServiceNational(
+	let usa_data_services = await reportFuntions.getServiceNationalServices(
 		usa_states,
 		mongoose.Organization,
 		'united_states',
 		[]
 	);
-	let mexico_data_orgs = await reportFuntions.getServiceNational(
+	let mexico_data_orgs = await reportFuntions.getServiceNationalOrgs(
 		mexico_states,
 		mongoose.Organization,
 		'mexico',
 		[]
 	);
-	let mexico_data_services = await reportFuntions.getServiceNational(
+	let mexico_data_services = await reportFuntions.getServiceNationalServices(
 		mexico_states,
 		mongoose.Organization,
 		'mexico',
 		[]
 	);
-	let canada_data_orgs = await reportFuntions.getServiceNational(
+	let canada_data_orgs = await reportFuntions.getServiceNationalOrgs(
 		canada_states,
 		mongoose.Organization,
 		'canada',
 		[]
 	);
-	let canada_data_services = await reportFuntions.getServiceNational(
+	let canada_data_services = await reportFuntions.getServiceNationalServices(
 		canada_states,
 		mongoose.Organization,
 		'canada',
@@ -82,7 +82,7 @@ async function generateReportNational() {
 	);
 	await reportFuntions.writeFilesCsv(
 		csvHeaders,
-		'canada_services.csv',
+		'canada_services_national.csv',
 		canada_data_services
 	);
 	console.log('Finished generating report...');

@@ -17,37 +17,37 @@ const csvHeaders = [
 ];
 
 async function generateReportSate() {
-	let usa_data_orgs = await reportFuntions.getServiceState(
+	let usa_data_orgs = await reportFuntions.getServiceStateOrgs(
 		usa_states,
 		mongoose.Organization,
 		'united_states',
 		[]
 	);
-	let usa_data_services = await reportFuntions.getServiceState(
+	let usa_data_services = await reportFuntions.getServiceStateServices(
 		usa_states,
 		mongoose.Organization,
 		'united_states',
 		[]
 	);
-	let mexico_data_orgs = await reportFuntions.getServiceState(
+	let mexico_data_orgs = await reportFuntions.getServiceStateOrgs(
 		mexico_states,
 		mongoose.Organization,
 		'mexico',
 		[]
 	);
-	let mexico_data_services = await reportFuntions.getServiceState(
+	let mexico_data_services = await reportFuntions.getServiceStateServices(
 		mexico_states,
 		mongoose.Organization,
 		'mexico',
 		[]
 	);
-	let canada_data_orgs = await reportFuntions.getServiceState(
+	let canada_data_orgs = await reportFuntions.getServiceStateOrgs(
 		canada_states,
 		mongoose.Organization,
 		'canada',
 		[]
 	);
-	let canada_data_services = await reportFuntions.getServiceState(
+	let canada_data_services = await reportFuntions.getServiceStateServices(
 		canada_states,
 		mongoose.Organization,
 		'canada',
