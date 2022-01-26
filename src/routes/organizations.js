@@ -237,10 +237,11 @@ export const updateOrg = async (req, res) => {
 		}
 		body.locations.map((location) => updateLocationGeolocation(location, res));
 		//Validate Geolocation
-		if (!validateLocationGeolocation(body.locations)) {
-			handleErr({message: 'Longitude and Latitude are required fields'}, res);
-			return;
-		}
+		//commenting out - hot fix - https://app.asana.com/0/1132189118126148/1201710885977986
+		// if (!validateLocationGeolocation(body.locations)) {
+		// 	handleErr({message: 'Longitude and Latitude are required fields'}, res);
+		// 	return;
+		// }
 	}
 
 	await Organization.findOneAndUpdate(
@@ -407,7 +408,12 @@ export const shareOrganization = async (req, res) => {
 const updateLocationGeolocation = (location) => {
 	location.geolocation = {
 		type: 'Point',
-		coordinates: [parseFloat(location.long), parseFloat(location.lat)]
+		//hot fix https://app.asana.com/0/1132189118126148/1201710885977986
+		// coordinates: [parseFloat(location.long), parseFloat(location.lat)]
+		coordinates: [
+			parseFloat(location.long ? location.long : 0),
+			parseFloat(location.lat ? location.lat : 0)
+		]
 	};
 	return location;
 };

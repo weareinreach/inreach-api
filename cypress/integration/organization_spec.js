@@ -392,19 +392,21 @@ describe('Organization Routers', () => {
 						'Organization must have a primary location'
 					);
 				});
-				cy.request({
-					method: 'PATCH',
-					url: compoundURL,
-					body: {locations: locationWithNoCoordinates},
-					failOnStatusCode: false
-				}).should((response) => {
-					expect(response.status).to.be.eq(500);
-					expect(response.body.error).to.be.an('boolean');
-					expect(response.body.error).to.be.eq(true);
-					expect(response.body.message).to.be.eq(
-						'Longitude and Latitude are required fields'
-					);
-				});
+				//hotfix - https://app.asana.com/0/1132189118126148/1201710885977989
+				//defaulting goecode so don't need this test at the moment
+				// cy.request({
+				// 	method: 'PATCH',
+				// 	url: compoundURL,
+				// 	body: {locations: locationWithNoCoordinates},
+				// 	failOnStatusCode: false
+				// }).should((response) => {
+				// 	expect(response.status).to.be.eq(500);
+				// 	expect(response.body.error).to.be.an('boolean');
+				// 	expect(response.body.error).to.be.eq(true);
+				// 	expect(response.body.message).to.be.eq(
+				// 		'Longitude and Latitude are required fields'
+				// 	);
+				// });
 			});
 		});
 	});
