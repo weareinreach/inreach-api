@@ -69,12 +69,12 @@ async function runMigrationScript() {
 			bulkOperations.push({
 				updateOne: {
 					filter: {
-						_id: org._id,
-						'services._id': org.service_id
+						_id: org._id
 					},
 					update: {
-						'services.$[].tags.mexico.Medical': updatedTags
-					}
+						'services.$[elem].tags.mexico.Medical': updatedTags
+					},
+					arrayFilters: [{'elem._id': {$eq: org.service_id}}]
 				}
 			});
 		});
@@ -127,12 +127,12 @@ async function runRollbackScript() {
 			bulkOperations.push({
 				updateOne: {
 					filter: {
-						_id: org._id,
-						'services._id': org.service_id
+						_id: org._id
 					},
 					update: {
-						'services.$[].tags.mexico.Medical': updatedTags
-					}
+						'services.$[elem].tags.mexico.Medical': updatedTags
+					},
+					arrayFilters: [{'elem._id': {$eq: org.service_id}}]
 				}
 			});
 		});

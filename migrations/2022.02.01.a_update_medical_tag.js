@@ -21,6 +21,7 @@ require('dotenv').config({
 require('../src/db');
 
 var mongoose = require('../src/mongoose');
+
 //Helper Function
 let renameKeys = (keysMap, object) =>
 	Object.keys(object).reduce(
@@ -69,12 +70,12 @@ async function runMigrationScript() {
 			bulkOperations.push({
 				updateOne: {
 					filter: {
-						_id: org._id,
-						'services._id': org.service_id
+						_id: org._id
 					},
 					update: {
-						'services.$[].tags.united_states.Medical': updatedTags
-					}
+						'services.$[elem].tags.united_states.Medical': updatedTags
+					},
+					arrayFilters: [{'elem._id': {$eq: org.service_id}}]
 				}
 			});
 		});
@@ -127,12 +128,12 @@ async function runRollbackScript() {
 			bulkOperations.push({
 				updateOne: {
 					filter: {
-						_id: org._id,
-						'services._id': org.service_id
+						_id: org._id
 					},
 					update: {
-						'services.$[].tags.united_states.Medical': updatedTags
-					}
+						'services.$[elem].tags.united_states.Medical': updatedTags
+					},
+					arrayFilters: [{'elem._id': {$eq: org.service_id}}]
 				}
 			});
 		});
