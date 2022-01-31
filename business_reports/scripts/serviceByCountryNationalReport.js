@@ -6,81 +6,66 @@ require('dotenv').config({
 	path: '.env'
 });
 
-const reportFuntions = require('./reportFunctions');
+const reportFunctions = require('./reportFunctions');
 const mongoose = require('../../src/mongoose');
-const usa_states = require('../resources/usa_states.json');
-const mexico_states = require('../resources/mexico_states.json');
-const canada_states = require('../resources/canada_states.json');
 const csvHeaders = [
-	{id: 'state', title: 'State'},
+	{id: 'country', title: 'Country'},
 	{id: 'count', title: 'Count'}
 ];
 
 async function generateReportNational() {
-	let usa_data_orgs = await reportFuntions.getServiceNationalOrgs(
-		usa_states,
+	let usa_data_orgs = await reportFunctions.getServiceNationalOrgs(
 		mongoose.Organization,
-		'united_states',
-		[]
+		'united-states'
 	);
-	let usa_data_services = await reportFuntions.getServiceNationalServices(
-		usa_states,
+	let usa_data_services = await reportFunctions.getServiceNationalServices(
 		mongoose.Organization,
-		'united_states',
-		[]
+		'united-states'
 	);
-	let mexico_data_orgs = await reportFuntions.getServiceNationalOrgs(
-		mexico_states,
+	let mexico_data_orgs = await reportFunctions.getServiceNationalOrgs(
 		mongoose.Organization,
-		'mexico',
-		[]
+		'mexico'
 	);
-	let mexico_data_services = await reportFuntions.getServiceNationalServices(
-		mexico_states,
+	let mexico_data_services = await reportFunctions.getServiceNationalServices(
 		mongoose.Organization,
-		'mexico',
-		[]
+		'mexico'
 	);
-	let canada_data_orgs = await reportFuntions.getServiceNationalOrgs(
-		canada_states,
+	let canada_data_orgs = await reportFunctions.getServiceNationalOrgs(
 		mongoose.Organization,
-		'canada',
-		[]
+		'canada'
 	);
-	let canada_data_services = await reportFuntions.getServiceNationalServices(
-		canada_states,
+	let canada_data_services = await reportFunctions.getServiceNationalServices(
 		mongoose.Organization,
-		'canada',
-		[]
+		'canada'
 	);
 
 	//Write Reports
-	await reportFuntions.writeFilesCsv(
+	await reportFunctions.writeFilesCsv(
 		csvHeaders,
 		'usa_orgs_national.csv',
 		usa_data_orgs
 	);
-	await reportFuntions.writeFilesCsv(
+	await reportFunctions.writeFilesCsv(
 		csvHeaders,
 		'usa_services_national.csv',
 		usa_data_services
 	);
-	await reportFuntions.writeFilesCsv(
+	await reportFunctions.writeFilesCsv(
 		csvHeaders,
 		'mexico_orgs_national.csv',
 		mexico_data_orgs
 	);
-	await reportFuntions.writeFilesCsv(
+	await reportFunctions.writeFilesCsv(
 		csvHeaders,
 		'mexico_services_national.csv',
 		mexico_data_services
 	);
-	await reportFuntions.writeFilesCsv(
+	await reportFunctions.writeFilesCsv(
 		csvHeaders,
 		'canada_orgs_national.csv',
 		canada_data_orgs
 	);
-	await reportFuntions.writeFilesCsv(
+	await reportFunctions.writeFilesCsv(
 		csvHeaders,
 		'canada_services_national.csv',
 		canada_data_services

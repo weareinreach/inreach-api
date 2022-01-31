@@ -14,11 +14,16 @@ class OrgData {
 	#uniqueOrgID = faker.datatype.number();
 	#uniqueServiceId = faker.datatype.number();
 	#serviceTagsUnitedStates = {
-		Medical: {'HIV and sexual health': 'true'},
+		Medical: {'HIV and sexual health': 'true', "Women's Health": 'true'},
 		'Mental Health': {'Support groups': 'true'}
 	};
-	#serviceTagsMexico = {Medical: {'HIV and sexual health': 'true'}};
-	#serviceTagsCanada = {'Mental Health': {'Support groups': 'true'}};
+	#serviceTagsMexico = {
+		Medical: {'HIV and sexual health': 'true', "Women's Health": 'true'}
+	};
+	#serviceTagsCanada = {
+		Medical: {'HIV and sexual health': 'true', "Women's Health": 'true'},
+		'Mental Health': {'Support groups': 'true'}
+	};
 
 	constructor(param) {
 		this.is_published = Math.random() < 0.9;
