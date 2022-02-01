@@ -258,7 +258,6 @@ jobs:
           name: Run migration
           #Find all files matching regex
           command: |
-            export  FILES=$(find . -type f -iname "*$DATE_PATTERN*" | cut -c 13-)
             for i in ${FILES//,/ }; do
               export MIGRATION_FILE=$i
               yarn run-migration
@@ -318,7 +317,6 @@ jobs:
       - run: 
           name: Run rollback
           command: |
-            export  FILES=$(find . -type f -iname "*$DATE_PATTERN*" | cut -c 13-)
             for i in ${FILES//,/ }; do
               export MIGRATION_FILE=$i
               yarn run-rollback
