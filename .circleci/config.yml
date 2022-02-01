@@ -3,13 +3,22 @@
 #This file is to be used to run Github Status Checks
 version: 2.1
 parameters:
-  run_migration:
+  run_migration_prod:
     default: false
     type: boolean
-  run_rollback:
+  run_migration_stage:
+    default: false
+    type: boolean
+  run_rollback_prod:
+    default: false
+    type: boolean
+  run_rollback_stage:
     default: false
     type: boolean
   files:
+    default: ""
+    type: string
+  date_pattern:
     default: ""
     type: string
 orbs:
@@ -114,12 +123,6 @@ jobs:
     working_directory: ~/catalog-api
     steps:
       - checkout
-      # Download and cache dependencies
-    #   - restore_cache:
-    #       keys:
-    #       - v1-dependencies-{{ checksum "package.json" }}
-    #       # fallback to using the latest cache if no exact match is found
-    #       - v1-dependencies-
       - run: 
           name: Check Node Version
           command: node --version
@@ -149,7 +152,7 @@ jobs:
            cat \<< EOF > ./.env
            MAILGUN_API_KEY=$MAILGUN_API_KEY
            MAILGUN_DOMAIN=$MAILGUN_DOMAIN
-           DB_URI=$DB_URI
+           DB_URI=$DB_URI_STAGING
            ENV=TEST
            SHEETS_API_KEY=$SHEETS_API_KEY
            TEST_DB_URI=$TEST_DB_URI
@@ -183,12 +186,6 @@ jobs:
     working_directory: ~/catalog-api
     steps:
       - checkout
-      # Download and cache dependencies
-    #   - restore_cache:
-    #       keys:
-    #       - v1-dependencies-{{ checksum "package.json" }}
-    #       # fallback to using the latest cache if no exact match is found
-    #       - v1-dependencies-
       - run: 
           name: Check Node Version
           command: node --version
@@ -206,12 +203,14 @@ jobs:
           name: Run linting
           command: "yarn lint"
   
-  migration:
+  migration_prod:
     docker:
       - image: cimg/node:16.12.0
     working_directory: ~/catalog-api
     environment:
-      FILES: << pipeline.parameters.files>>
+      DATE_PATTERN: << pipeline.parameters.date_pattern>>
+      PIPELINE_ID: << pipeline.id >>
+      TYPE: migration_prod
     steps:
       - checkout
       #Recreate .env file from CircleCI Project Env Vars
@@ -220,6 +219,7 @@ jobs:
           command: |
            cat \<< EOF > ./.env
            DB_URI=$DB_URI_PROD
+           PROFILE=CI
            EOF
       - run:
           name: Install Packages
@@ -227,17 +227,50 @@ jobs:
       - run: 
           name: Run migration
           command: |
+            export  FILES=$(find . -type f -iname "*$DATE_PATTERN*" | cut -c 13-)
             for i in ${FILES//,/ }; do
               export MIGRATION_FILE=$i
               yarn run-migration
             done
   
-  rollback:
+  migration_stage:
     docker:
       - image: cimg/node:16.12.0
     working_directory: ~/catalog-api
     environment:
-      FILES: << pipeline.parameters.files>>
+      FILES: << pipeline.parameters.files >>
+      PIPELINE_ID: << pipeline.id >>
+      TYPE: migration_stage
+    steps:
+      - checkout
+      #Recreate .env file from CircleCI Project Env Vars
+      - run:
+          name: Create .env file
+          command: |
+           cat \<< EOF > ./.env
+           DB_URI=$DB_URI_STAGING
+           PROFILE=CI
+           EOF
+      - run:
+          name: Install Packages
+          command: yarn install
+      - run: 
+          name: Run migration
+          #Find all files matching regex
+          command: |
+            for i in ${FILES//,/ }; do
+              export MIGRATION_FILE=$i
+              yarn run-migration
+            done
+  
+  rollback_prod:
+    docker:
+      - image: cimg/node:16.12.0
+    working_directory: ~/catalog-api
+    environment:
+      DATE_PATTERN: << pipeline.parameters.date_pattern >>
+      PIPELINE_ID: << pipeline.id >>
+      TYPE: rollback_prod
     steps:
       - checkout
       #Recreate .env file from CircleCI Project Env Vars
@@ -246,6 +279,37 @@ jobs:
           command: |
            cat \<< EOF > ./.env
            DB_URI=$DB_URI_PROD
+           PROFILE=CI
+           EOF
+      - run:
+          name: Install Packages
+          command: yarn install
+      - run: 
+          name: Run rollback
+          command: |
+            export  FILES=$(find . -type f -iname "*$DATE_PATTERN*" | cut -c 13-)
+            for i in ${FILES//,/ }; do
+              export MIGRATION_FILE=$i
+              yarn run-rollback
+            done
+
+  rollback_stage:
+    docker:
+      - image: cimg/node:16.12.0
+    working_directory: ~/catalog-api
+    environment:
+      FILES: << pipeline.parameters.date_pattern >>
+      PIPELINE_ID: << pipeline.id >>
+      TYPE: rollback_stage
+    steps:
+      - checkout
+      #Recreate .env file from CircleCI Project Env Vars
+      - run:
+          name: Create .env file
+          command: |
+           cat \<< EOF > ./.env
+           DB_URI=$DB_URI_STAGING
+           PROFILE=CI
            EOF
       - run:
           name: Install Packages
@@ -279,26 +343,42 @@ workflows:
             branches:
               ignore: main
               
-  migration:
-    when: << pipeline.parameters.run_migration >>
+  migration_prod:
+    when: << pipeline.parameters.run_migration_prod >>
     jobs:
       - hold:
           type: approval
-      - migration:
+      - migration_prod:
           filters:
             branches:
               only: main
           requires:
             - hold
   
-  rollback:
-    when: << pipeline.parameters.run_rollback >>
+  migration_stage:
+    when: << pipeline.parameters.run_migration_stage >>
+    jobs:
+      - migration_stage:
+          filters:
+            branches:
+             only: dev 
+  
+  rollback_prod:
+    when: << pipeline.parameters.run_rollback_prod >>
     jobs:
       - hold:
           type: approval
-      - rollback:
+      - rollback_prod:
           filters:
             branches:
               only: main
           requires:
             - hold
+  
+  rollback_stage:
+    when: << pipeline.parameters.run_rollback_stage >>
+    jobs:
+      - rollback_stage:
+          filters:
+            branches:
+              only: dev
