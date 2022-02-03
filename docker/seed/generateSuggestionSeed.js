@@ -7,7 +7,7 @@ const faker = require('faker');
 const mongoose = require('../../src/mongoose');
 
 //Functions
-const numberOfSuggestions = seedFunctions.getNumberBetween(8, 1);
+const numberOfSuggestions = 1; //seedFunctions.getNumberBetween(8, 1);
 const randNumber = seedFunctions.getNumberBetween(4, 1);
 
 class SuggestionData {
