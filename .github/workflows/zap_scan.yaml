@@ -1,0 +1,16 @@
+jobs:
+  zap_scan:
+    runs-on: ubuntu-latest
+    name: Scan ZAP website
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          ref: dev
+      - name: ZAP Scan
+        uses: zaproxy/action-baseline@v0.3.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          target: 'https://asylum-connect-api-staging.herokuapp.com'
+          rules_file_name: '.zap/rules.tsv'
+          cmd_options: '-a'
