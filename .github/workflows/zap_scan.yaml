@@ -19,7 +19,7 @@ jobs:
         uses: zaproxy/action-baseline@v0.3.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          target: https://reviews-api-pr-${PR_NUMBER}.herokuapp.com
+          target: https://reviews-api-pr-111.herokuapp.com
           cmd_options: '-a'
 
   zap_scan_production:
