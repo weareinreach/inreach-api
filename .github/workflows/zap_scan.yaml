@@ -4,16 +4,17 @@ on:
 
 env:
   PR_NUMBER: ${{ github.event.number }}
+  BASE_BRANCH: ${{ github.base_ref }}
     
 jobs:
   zap_scan_pr:
     runs-on: ubuntu-latest
-    name: Scan ZAP website
+    name: Scan ZAP website PR
     steps:
       - name: Checkout
         uses: actions/checkout@v2
         with:
-          ref: ${GITHUB_REF##*/}
+          ref: ${BASE_BRANCH}
       - name: ZAP Scan
         uses: zaproxy/action-baseline@v0.3.0
         with:
@@ -23,7 +24,7 @@ jobs:
 
   zap_scan_production:
     runs-on: ubuntu-latest
-    name: Scan ZAP website
+    name: Scan ZAP website Production
     steps:
       - name: Checkout
         uses: actions/checkout@v2
