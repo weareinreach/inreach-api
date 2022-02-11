@@ -8,7 +8,7 @@
 
 <!-- Please validate your changes with the checklist below before marking for code review. -->
 
-- [ ] Assign @FJKhan **and** @Alfredo-Moreira as reviewers.
+- [ ] Assign @trigal2012 **and** @Alfredo-Moreira as reviewers.
 - [ ] If your PR is not a hotfix, is it targeted for `dev`?
 - [ ] Unit and functional test coverage was added where applicable.
 - [ ] CI/CD passes for your PR.
