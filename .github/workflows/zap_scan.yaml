@@ -1,20 +1,37 @@
 on:
   pull_request:
     types: [opened,reopened]
+
+env:
+  PR_NUMBER: ${{ github.event.number }}
     
 jobs:
-  zap_scan:
+  zap_scan_pr:
     runs-on: ubuntu-latest
     name: Scan ZAP website
     steps:
       - name: Checkout
         uses: actions/checkout@v2
         with:
-          ref: dev
+          ref: ${GITHUB_REF##*/}
       - name: ZAP Scan
         uses: zaproxy/action-baseline@v0.3.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          target: 'https://asylum-connect-api-staging.herokuapp.com'
-          rules_file_name: '.zap/rules.tsv'
+          target: 'https://reviews-api-pr-${PR_NUMBER}.herokuapp.com'
+          cmd_options: '-a'
+
+  zap_scan_production:
+    runs-on: ubuntu-latest
+    name: Scan ZAP website
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          ref: main
+      - name: ZAP Scan
+        uses: zaproxy/action-baseline@v0.3.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          target: 'https://asylum-connect-api.herokuapp.com'
           cmd_options: '-a'
