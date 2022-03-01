@@ -56,23 +56,26 @@ class OrgData {
 				title: ''
 			};
 		});
-		this.locations = seedFunctions.getArray(randNumber).map(() => {
-			return {
-				geolocation: {
-					coordinates: [faker.address.longitude(), faker.address.latitude()],
-					type: 'Point'
-				},
-				address: faker.address.streetAddress(),
-				city: faker.address.city(),
-				is_primary: false,
-				lat: faker.address.latitude(),
-				long: faker.address.longitude(),
-				name: faker.company.companyName(),
-				show_on_organization: true,
-				state: faker.address.stateAbbr(),
-				zip_code: faker.address.zipCode()
-			};
-		});
+		this.locations = seedFunctions
+			.getArray(randNumber)
+			.map((element, index) => {
+				return {
+					geolocation: {
+						coordinates: [faker.address.longitude(), faker.address.latitude()],
+						type: 'Point'
+					},
+					address: faker.address.streetAddress(),
+					city: faker.address.city(),
+					//First entry is always the primary
+					is_primary: index == 0 ? true : false,
+					lat: faker.address.latitude(),
+					long: faker.address.longitude(),
+					name: faker.company.companyName(),
+					show_on_organization: true,
+					state: faker.address.stateAbbr(),
+					zip_code: faker.address.zipCode()
+				};
+			});
 		(this.phones = seedFunctions.getArray(randNumber).map(() => {
 			return {
 				digits: faker.phone.phoneNumber(),
