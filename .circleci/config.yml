@@ -174,12 +174,6 @@ jobs:
       - run:
           name: "Post E2E tasks"
           command: "yarn post-e2e-test"
-      - store_artifacts:
-          path: "reports/"
-          destination: E2E Test Reports
-      - store_artifacts:
-          path: ./cypressCoverage
-          destination: E2E Coverage Reports
   lint:
     docker:
       - image: cimg/node:16.12.0

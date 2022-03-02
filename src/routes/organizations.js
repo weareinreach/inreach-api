@@ -339,20 +339,15 @@ export const deleteOrgOwner = async (req, res) => {
 			if (!organization) {
 				return handleNotFound(res);
 			}
-
-			const ownerIndex = organization.owners.findIndex(
-				(owner) => owner.userId === userId
-			);
-
-			if (ownerIndex === -1) {
-				return handleNotFound(res);
-			}
-
-			organization.owners[ownerIndex].remove();
-
-			await organization
-				.save()
-				.then(() => res.json({deleted: true}))
+			Organization.update(
+				{_id: orgId},
+				{
+					$pull: {
+						owners: {userId: userId}
+					}
+				}
+			)
+				.then((org) => res.json({deleted: true}))
 				.catch((err) => handleErr(err, res));
 		})
 		.catch((err) => handleErr(err, res));
