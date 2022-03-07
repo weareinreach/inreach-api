@@ -1,28 +1,3 @@
-require('babel-register')({
-	presets: ['env']
-});
-require('regenerator-runtime/runtime');
-require('dotenv').config({
-	path: '.env'
-});
-
-require('../../src/db');
-const fs = require('fs');
-const report_path = './business_reports/output/';
-const createCsvWritter = require('csv-writer').createObjectCsvWriter;
-
-export async function writeFilesCsv(headers, path, data) {
-	!fs.existsSync(report_path) ? fs.mkdirSync(report_path) : null;
-	await createCsvWritter({
-		path: report_path + path,
-		header: headers
-	})
-		.writeRecords(data)
-		.then(() => {
-			console.log(`${path} file was written successfuly`);
-		});
-}
-
 export async function getServiceNationalOrgs(model, country) {
 	let national_property = `properties.service-national-${country}`;
 	let result = await model.aggregate([
@@ -37,12 +12,15 @@ export async function getServiceNationalOrgs(model, country) {
 			$count: 'count'
 		}
 	]);
-	return [
-		{
-			country: country,
-			count: result[0].count
-		}
-	];
+	return result.length > 0
+		? {
+				country: country,
+				count: result[0].count
+		  }
+		: {
+				country: country,
+				count: 0
+		  };
 }
 
 export async function getServiceNationalServices(model, country) {
@@ -73,14 +51,17 @@ export async function getServiceNationalServices(model, country) {
 			$count: 'count'
 		}
 	]);
-	console.log(result);
-	return [
-		{
-			country: country,
-			count: result[0].count
-		}
-	];
+	return result.length > 0
+		? {
+				country: country,
+				count: result[0].count
+		  }
+		: {
+				country: country,
+				count: 0
+		  };
 }
+
 export async function getServiceStateOrgs(states, model, country, resultArray) {
 	let service_tags = `services.tags.${country}`;
 	for (const state of states) {
@@ -132,7 +113,6 @@ export async function getServiceStateOrgs(states, model, country, resultArray) {
 				$count: 'count'
 			}
 		]);
-		console.log(`${state} processed...`);
 		var value = result.length > 0 ? result[0].count : 0;
 		resultArray.push({
 			state: state,
@@ -204,7 +184,6 @@ export async function getServiceStateServices(
 				$count: 'count'
 			}
 		]);
-		console.log(`${state} processed...`);
 		var value = result.length > 0 ? result[0].count : 0;
 		resultArray.push({
 			state: state,
@@ -271,7 +250,6 @@ export async function getServiceBySupportCategory(
 				$count: 'count'
 			}
 		]);
-		console.log(`${category} for ${country} processed...`);
 		var value = result.length > 0 ? result[0].count : 0;
 		resultArray.push({
 			category: category,
