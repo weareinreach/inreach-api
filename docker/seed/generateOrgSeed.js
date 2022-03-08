@@ -14,11 +14,16 @@ class OrgData {
 	#uniqueOrgID = faker.datatype.number();
 	#uniqueServiceId = faker.datatype.number();
 	#serviceTagsUnitedStates = {
-		Medical: {'HIV and sexual health': 'true'},
+		Medical: {'HIV and sexual health': 'true', "Women's Health": 'true'},
 		'Mental Health': {'Support groups': 'true'}
 	};
-	#serviceTagsMexico = {Medical: {'HIV and sexual health': 'true'}};
-	#serviceTagsCanada = {'Mental Health': {'Support groups': 'true'}};
+	#serviceTagsMexico = {
+		Medical: {'HIV and sexual health': 'true', "Women's Health": 'true'}
+	};
+	#serviceTagsCanada = {
+		Medical: {'HIV and sexual health': 'true', "Women's Health": 'true'},
+		'Mental Health': {'Support groups': 'true'}
+	};
 
 	constructor(param) {
 		this.is_published = Math.random() < 0.9;
@@ -29,23 +34,78 @@ class OrgData {
 		this.slug_ES = `organization-seeded-number-${this.#uniqueOrgID}`;
 		this.verified_at = faker.date.past();
 		this.website = faker.internet.url();
-		(this.website_ES = Math.random() < 0.5 ? faker.internet.url() : ''),
-			(this.services = seedFunctions.getArray(randNumber).map(() => {
-				return {
-					description: faker.lorem.sentence(),
-					is_published: true,
-					is_deleted: Math.random() < 0.5,
-					name: faker.company.companyName(),
-					slug: `service-slug-${this.#uniqueServiceId}`,
-					slug_ES: `service-slug-${this.#uniqueServiceId}`,
-					tags: {
-						united_states:
-							Math.random() < 0.5 ? this.#serviceTagsUnitedStates : {},
-						mexico: Math.random() < 0.5 ? this.#serviceTagsMexico : {},
-						canada: Math.random() < 0.5 ? this.#serviceTagsCanada : {}
-					}
-				};
-			}));
+		this.website_ES = Math.random() < 0.5 ? faker.internet.url() : '';
+		let national_us =
+			Math.random() < 0.5 ? {'service-national-united-states': 'true'} : {};
+		let state_1 =
+			Math.random() < 0.8
+				? {
+						[`service-${faker.address
+							.state()
+							.toLowerCase()
+							.replace(/\s+/g, '-')}`]: 'true'
+				  }
+				: {};
+		let state_2 =
+			Math.random() < 0.8
+				? {
+						[`service-${faker.address
+							.state()
+							.toLowerCase()
+							.replace(/\s+/g, '-')}`]: 'true'
+				  }
+				: {};
+		let city_1 =
+			Math.random() < 0.8
+				? {
+						[`service-${faker.address
+							.city()
+							.toLowerCase()
+							.replace(/\s+/g, '-')}`]: 'true'
+				  }
+				: {};
+		let city_2 =
+			Math.random() < 0.8
+				? {
+						[`service-${faker.address
+							.city()
+							.toLowerCase()
+							.replace(/\s+/g, '-')}`]: 'true'
+				  }
+				: {};
+		this.services = seedFunctions.getArray(randNumber).map(() => {
+			return {
+				description: faker.lorem.sentence(),
+				is_published: true,
+				is_deleted: Math.random() < 0.5,
+				name: faker.company.companyName(),
+				slug: `service-slug-${this.#uniqueServiceId}`,
+				slug_ES: `service-slug-${this.#uniqueServiceId}`,
+
+				properties: Object.assign(
+					{},
+					national_us,
+					state_1,
+					state_2,
+					city_1,
+					city_2
+				),
+				tags: {
+					united_states:
+						Math.random() < 0.5 ? this.#serviceTagsUnitedStates : {},
+					mexico: Math.random() < 0.5 ? this.#serviceTagsMexico : {},
+					canada: Math.random() < 0.5 ? this.#serviceTagsCanada : {}
+				}
+			};
+		});
+		this.properties = Object.assign(
+			{},
+			national_us,
+			state_1,
+			state_2,
+			city_1,
+			city_2
+		);
 		this.emails = seedFunctions.getArray(randNumber).map(() => {
 			return {
 				email: faker.internet.email(),
