@@ -698,7 +698,7 @@ describe('Organization Routers', () => {
 			url: compoundURL,
 			failOnStatusCode: false
 		}).should((response) => {
-			expect(response.status).to.be.eq(500);
+			expect(response.status).to.be.eq(400);
 		});
 	});
 
@@ -769,7 +769,7 @@ describe('Organization Routers', () => {
 								url: compoundURL,
 								failOnStatusCode: false
 							}).should((response) => {
-								expect(response.status).to.be.eq(500);
+								expect(response.status).to.be.eq(400);
 								expect(response.body.error).to.be.an('boolean');
 								expect(response.body.error).to.be.eq(true);
 							});
