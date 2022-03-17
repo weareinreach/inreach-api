@@ -12,7 +12,7 @@ import {
 } from '../utils/query';
 import {sendEmail} from '../utils/mail';
 import {shareResource} from '../utils/sendMail';
-import {Organization} from '../mongoose';
+import {Organization, User} from '../mongoose';
 import mongoose from 'mongoose';
 const ObjectId = mongoose.Types.ObjectId;
 
@@ -277,7 +277,7 @@ export const createOrgOwner = async (req, res) => {
 		const {orgId} = req?.params;
 		const {email, userId} = req?.body;
 
-		if (!email || !userId) {
+		if (!email || !userId || !isValidObjectId(userId)) {
 			return handleBadRequest(res);
 		}
 		const organization = await Organization.findById(orgId);
@@ -307,6 +307,15 @@ export const createOrgOwner = async (req, res) => {
 export const approveOrgOwner = async (req, res) => {
 	const {orgId, userId} = req?.params;
 
+	if (
+		!orgId ||
+		!userId ||
+		!isValidObjectId(orgId) ||
+		!isValidObjectId(userId)
+	) {
+		return handleBadRequest(res);
+	}
+
 	await Organization.findById(orgId)
 		.then(async (organization) => {
 			if (!organization) {
@@ -334,25 +343,38 @@ export const approveOrgOwner = async (req, res) => {
 export const deleteOrgOwner = async (req, res) => {
 	const {orgId, userId} = req?.params;
 
-	await Organization.findById(orgId)
-		.then(async (organization) => {
-			if (!organization) {
+	if (
+		!orgId ||
+		!userId ||
+		!isValidObjectId(orgId) ||
+		!isValidObjectId(userId)
+	) {
+		return handleBadRequest(res);
+	}
+	//Check if user exists
+	await User.findById(userId)
+		.then(async (user) => {
+			//Exit if user does not exist
+			if (user === null) {
 				return handleNotFound(res);
 			}
-
-			const ownerIndex = organization.owners.findIndex(
-				(owner) => owner.userId === userId
-			);
-
-			if (ownerIndex === -1) {
-				return handleNotFound(res);
-			}
-
-			organization.owners[ownerIndex].remove();
-
-			await organization
-				.save()
-				.then(() => res.json({deleted: true}))
+			//Remove User
+			await Organization.findById(orgId)
+				.then(async (organization) => {
+					if (!organization) {
+						return handleNotFound(res);
+					}
+					Organization.updateOne(
+						{_id: orgId},
+						{
+							$pull: {
+								owners: {userId: userId}
+							}
+						}
+					)
+						.then((org) => res.json({deleted: true}))
+						.catch((err) => handleErr(err, res));
+				})
 				.catch((err) => handleErr(err, res));
 		})
 		.catch((err) => handleErr(err, res));
