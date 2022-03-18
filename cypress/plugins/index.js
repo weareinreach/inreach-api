@@ -21,6 +21,10 @@ module.exports = (on, config) => {
 	// `on` is used to hook into various events Cypress emits
 	// `config` is the resolved Cypress config
 	require('@cypress/code-coverage/task')(on, config);
+	on('after:run', (results) => {
+		// /!\ don't forget to return the Promise /!\
+		return require('cypress-sonarqube-reporter/mergeReports')(results);
+	});
 	on(
 		'file:preprocessor',
 		require('@cypress/code-coverage/use-browserify-istanbul')

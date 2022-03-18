@@ -3,8 +3,9 @@
 
 //compound url
 let compoundURL = null;
+const specTitle = require('cypress-sonarqube-reporter/specTitle');
 
-describe('Suggestion Routes', () => {
+describe(specTitle('Suggestion Routes'), () => {
 	beforeEach(() => {
 		//Add Org
 		cy.fixture('org_good_format.json').as('organization');

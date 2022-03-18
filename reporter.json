@@ -1,0 +1,13 @@
+{
+    "reporterEnabled": "cypress-sonarqube-reporter, mochawesome, mocha-junit-reporter",
+	"mochawesomeReporterOptions":{
+		"reportDir":"./reports/mochawesome",
+		"quiet":true,
+		"overwrite": false,
+		"html": true,
+		"json": true
+	},
+	"mochaJunitReporterReporterOptions": {
+		"mochaFile": "./reports/mocha/results-[hash].xml"
+	}
+}

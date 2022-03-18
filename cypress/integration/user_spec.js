@@ -3,10 +3,11 @@
 
 //compound url
 let compoundURL = null;
+const specTitle = require('cypress-sonarqube-reporter/specTitle');
 
 //Routes Constants
 
-describe('Users Routers', () => {
+describe(specTitle('Users Routers'), () => {
 	beforeEach(() => {
 		cy.fixture('org_good_format.json').as('organization');
 		cy.fixture('user_new_bad.json').as('bad_user');

@@ -3,9 +3,10 @@
 
 //compound url
 let compoundURL = null;
+const specTitle = require('cypress-sonarqube-reporter/specTitle');
 
 //Test Suite
-describe('Authentication Routers', () => {
+describe(specTitle('Authentication Routers'), () => {
 	beforeEach(() => {
 		//Load the necessary fixtures
 		cy.fixture('user_new.json').as('new_user');

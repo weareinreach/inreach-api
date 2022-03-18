@@ -2,16 +2,16 @@
 	"name": "asylum-connect-catalog-api",
 	"private": true,
 	"scripts": {
-		"cypress:open": "cypress open --config-file ./cypress.json",
-		"cypress:run": "nyc cypress run --config-file ./cypress.json",
-		"clean:reports": "rm -R -f ./mochawesome-report && rm -R -f ./.nyc_output && rm -R -f ./jestCoverage && rm -R -f ./coverageReports && rm -R -f ./cypressCoverage && rm -R -f ./reports",
-		"combine-reports": "mkdir ./reports && mochawesome-merge mochawesome-report/*.json > ./reports/reporte2e.json",
+		"cypress:open": "cypress open --config-file cypress.json",
+		"cypress:run": "cypress run --config-file cypress.json",
+		"clean:reports": "rm -R -f ./mochawesome-report && rm -R -f ./.nyc_output && rm -R -f ./jestCoverage && rm -R -f ./coverageReports && rm -R -f ./coverage && rm -R -f ./reports",
+		"combine-reports": "mochawesome-merge reports/mochawesome/*.json > ./reports/reporte2e.json",
 		"generate-report": "marge ./reports/reporte2e.json -f e2e-report -o ./reports",
 		"post-e2e-test": "yarn combine-reports && yarn generate-report",
 		"show-coverage": "npx nyc report --reporter json --reporter=text",
 		"pre-e2e-test": "yarn clean:reports && yarn dev-background && (wait-on http://localhost:8080 -l -v -t 30000 && exit 0)",
 		"pre-unit-test": "yarn clean:reports",
-		"copy:reports": "mkdir coverageReports && cp cypressCoverage/coverage-final.json coverageReports/from-cypress.json && cp jestCoverage/coverage-final.json coverageReports/from-jest.json",
+		"copy:reports": "mkdir coverageReports && cp coverage/coverage-final.json coverageReports/from-cypress.json && cp jestCoverage/coverage-final.json coverageReports/from-jest.json",
 		"combine:reports": "npx nyc merge coverageReports",
 		"report:combined": "npx nyc report --reporter lcov --reporter html --reporter text --report-dir coverageReports",
 		"combine:unit-e2e": "yarn copy:reports && yarn report:combined && yarn report:combined",
@@ -45,6 +45,7 @@
 		"body-parser": "^1.19.0",
 		"cors": "^2.8.5",
 		"crypto": "^1.0.1",
+		"cypress-multi-reporters": "^1.5.0",
 		"dotenv": "^8.2.0",
 		"express": "^4.17.1",
 		"faker": "^5.5.3",
@@ -71,32 +72,19 @@
 		"babel-register": "^6.26.0",
 		"csv-writer": "^1.6.0",
 		"cypress": "^6.4.0",
+		"cypress-sonarqube-reporter": "^1.10.0",
 		"dotenv-webpack": "^1.7.0",
 		"eslint": "^6.8.0",
 		"husky": "^4.2.5",
 		"jest": "^25.5.4",
 		"lint-staged": "^10.1.7",
+		"mocha-junit-reporter": "^2.0.2",
 		"mochawesome": "^6.2.2",
 		"mochawesome-merge": "^4.2.0",
 		"nyc": "^15.1.0",
 		"prettier": "^2.0.5",
 		"start-server-and-test": "^1.12.1",
 		"wait-on": "^5.2.1"
-	},
-	"nyc": {
-		"sourceMap": false,
-		"instrument": false,
-		"excludeAfterRemap": false,
-		"all": true,
-		"include": [
-			"**/src/*"
-		],
-		"report-dir": "cypressCoverage",
-		"reporter": [
-			"html",
-			"json",
-			"lcov"
-		]
 	},
 	"engines": {
 		"node": "16.x"

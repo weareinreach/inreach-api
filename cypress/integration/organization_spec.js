@@ -6,9 +6,10 @@ import multipleLocationUpdate from '../fixtures/org_multiple_location_update_bad
 import locationWithNoCoordinates from '../fixtures/org_location_update_bad2.json';
 //compound url
 let compoundURL = null;
+const specTitle = require('cypress-sonarqube-reporter/specTitle');
 
 //Test Suite
-describe('Organization Routers', () => {
+describe(specTitle('Organization Routers'), () => {
 	beforeEach(() => {
 		//Loading Necessary Fixtures
 		cy.fixture('user_new.json').as('new_user');

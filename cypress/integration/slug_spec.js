@@ -3,9 +3,10 @@
 
 //compound url
 let compoundURL = null;
+const specTitle = require('cypress-sonarqube-reporter/specTitle');
 
 //Test suite
-describe('Slug Routers', () => {
+describe(specTitle('Slug Routers'), () => {
 	beforeEach(() => {
 		cy.fixture('org_good_format.json').as('organization');
 		cy.fixture('org_services.json').as('services');

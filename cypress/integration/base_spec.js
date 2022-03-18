@@ -3,11 +3,10 @@
 
 //compound url
 let compoundURL = null;
-
-//Routes constants
+const specTitle = require('cypress-sonarqube-reporter/specTitle');
 
 //Test Suite
-describe('Base Routers', () => {
+describe(specTitle('Base Routers'), () => {
 	it('GET - / - Base URL', () => {
 		cy.request(Cypress.env('baseUrl')).should((response) => {
 			expect(response.status).to.eq(200);

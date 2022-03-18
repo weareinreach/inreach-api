@@ -3,8 +3,9 @@
 
 //compound url
 let compoundURL = null;
+const specTitle = require('cypress-sonarqube-reporter/specTitle');
 
-describe('Reviews Routes', () => {
+describe(specTitle('Reviews Routes'), () => {
 	beforeEach(() => {
 		//Loading Necessary Fixtures
 		cy.fixture('review.json').as('review');

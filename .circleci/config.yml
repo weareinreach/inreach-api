@@ -170,7 +170,7 @@ jobs:
           name: "Show Coverage"
           command: "yarn show-coverage"
       - codecov/upload:
-          file: 'cypressCoverage/coverage-final.json'
+          file: 'coverage/coverage-final.json'
           flags: 'Integration'
       - run:
           name: "Post E2E tasks"

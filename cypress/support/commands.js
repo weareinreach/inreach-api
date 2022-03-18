@@ -26,6 +26,7 @@
 
 // Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
 let compoundURL = null;
+
 //Create mongoDB IDs
 Cypress.Commands.add('generateObjectId', () => {
 	var timestamp = ((new Date().getTime() / 1000) | 0).toString(16);

@@ -1,14 +1,11 @@
 /* eslint-disable no-undef */
 /// <reference types="cypress" />
 
-//TODO CHECK FOR KEYS IN REPONSE
-
-//Instantiate up Server variable
-
 //compound url
 let compoundURL = null;
+const specTitle = require('cypress-sonarqube-reporter/specTitle');
 
-describe('Comments Routers', () => {
+describe(specTitle('Comments Routers'), () => {
 	beforeEach(() => {
 		//Loading Necessary Fixtures
 		cy.fixture('org_good_format.json').as('organization');

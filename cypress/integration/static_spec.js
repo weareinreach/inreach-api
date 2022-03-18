@@ -3,8 +3,9 @@
 
 //compound url
 let compoundURL = null;
+const specTitle = require('cypress-sonarqube-reporter/specTitle');
 
-describe('Reviews Routes', () => {
+describe(specTitle('Reviews Routes'), () => {
 	//Need to get a good Page ID
 	it('GET - /v1/static/:pageId - Get Static page by ID - Bad ID', () => {
 		compoundURL = Cypress.env('baseUrl').concat(

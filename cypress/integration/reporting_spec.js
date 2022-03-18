@@ -3,8 +3,9 @@
 
 //compound url
 let compoundURL = null;
+const specTitle = require('cypress-sonarqube-reporter/specTitle');
 
-describe('Reporting Routers', () => {
+describe(specTitle('Reporting Routers'), () => {
 	it('GET - /v1/reporting/:country/organizations/count - Get Count of Organizations in a country', () => {
 		compoundURL = Cypress.env('baseUrl').concat(
 			Cypress.env('version'),
