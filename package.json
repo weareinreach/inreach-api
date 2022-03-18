@@ -86,6 +86,15 @@
 		"start-server-and-test": "^1.12.1",
 		"wait-on": "^5.2.1"
 	},
+	"nyc": {
+		"sourceMap": false,
+		"instrument": false,
+		"excludeAfterRemap": false,
+		"all": true,
+		"include": [
+			"**/src/*"
+		]
+	},
 	"engines": {
 		"node": "16.x"
 	},
