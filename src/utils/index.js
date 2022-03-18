@@ -59,7 +59,6 @@ export const handleNotFound = (res) => {
  */
 export const handleErr = (err, res) => {
 	// eslint-disable-next-line
-	console.error(err);
 	const message = err.message ? err.message : 'Unspecified server error';
 	return res.status(500).json({error: true, message: message});
 };
