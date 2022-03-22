@@ -24,6 +24,7 @@ parameters:
 orbs:
   node: circleci/node@3.0.0
   codecov: codecov/codecov@1.1.3
+  sonarcloud: sonarsource/sonarcloud@1.0.3
 jobs: 
   build:
     docker:
@@ -74,12 +75,6 @@ jobs:
     working_directory: ~/catalog-api
     steps:
       - checkout
-      # Download and cache dependencies
-    #   - restore_cache:
-    #       keys:
-    #       - v1-dependencies-{{ checksum "package.json" }}
-    #       # fallback to using the latest cache if no exact match is found
-    #       - v1-dependencies-
       - run: 
           name: Check Node Version
           command: node --version
@@ -157,7 +152,7 @@ jobs:
            SHEETS_API_KEY=$SHEETS_API_KEY
            TEST_DB_URI=$TEST_DB_URI
            EOF
-      #Seeed Docker DB
+      #Seed Docker DB
       - run:
           name: "Seed Docker DB"
           command: yarn seed-docker-db
@@ -174,6 +169,13 @@ jobs:
       - run:
           name: "Post E2E tasks"
           command: "yarn post-e2e-test"
+      - run:
+          name: "Dev long live branch"
+          command: |
+              if test "$CIRCLE_BRANCH" == "dev"; then
+                sed -ir "s/^[#]*\s*sonar.branch.name=.*/sonar.branch.name=dev/" sonar-project.properties
+              fi
+      - sonarcloud/scan
   lint:
     docker:
       - image: cimg/node:16.12.0
@@ -318,6 +320,16 @@ jobs:
 
 workflows:
   version: 2
+  development:
+    jobs:
+      - build:
+          filters:
+            branches:
+              only: dev
+      - e2e:
+          filters:
+            branches:
+              only: dev
   pull_request:
     jobs:
       - build:
@@ -325,6 +337,7 @@ workflows:
             branches:
               ignore: main
       - e2e:
+          context: SonarCloud
           filters:
             branches:
               ignore: main
