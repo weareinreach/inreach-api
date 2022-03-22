@@ -75,12 +75,6 @@ jobs:
     working_directory: ~/catalog-api
     steps:
       - checkout
-      # Download and cache dependencies
-    #   - restore_cache:
-    #       keys:
-    #       - v1-dependencies-{{ checksum "package.json" }}
-    #       # fallback to using the latest cache if no exact match is found
-    #       - v1-dependencies-
       - run: 
           name: Check Node Version
           command: node --version
@@ -175,6 +169,12 @@ jobs:
       - run:
           name: "Post E2E tasks"
           command: "yarn post-e2e-test"
+      - run:
+          name: "Dev long live branch"
+          command: |
+              if test "$CIRCLE_BRANCH" == "dev"; then
+                sed -ir "s/^[#]*\s*sonar.branch.name=.*/sonar.branch.name=dev/" sonar-project.properties
+              fi
       - sonarcloud/scan
   lint:
     docker:
@@ -320,6 +320,16 @@ jobs:
 
 workflows:
   version: 2
+  development:
+    jobs:
+      - build:
+          filters:
+            branches:
+              only: dev
+      - e2e:
+          filters:
+            branches:
+              only: dev
   pull_request:
     jobs:
       - build:
