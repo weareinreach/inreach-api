@@ -62,7 +62,12 @@ import verifyToken from '../middleware/verifyToken';
 import {generatePasswordResetMail} from '../utils/sendMail';
 import {
 	getVerifiedOrgsCountryCount,
-	getServicesCountryCount
+	getServicesCountryCount,
+	getOrgsWithNationalServices,
+	getServicesWithNationalServices,
+	getOrgsByStateInCountry,
+	getServicesByStateInCountry,
+	getServicesByCategories
 } from './reporting';
 export const baseRouter = Router();
 export const versionOneRouter = Router();
@@ -231,6 +236,23 @@ versionOneRouter.get(
 	'/reporting/:country/services/count',
 	getServicesCountryCount
 );
+versionOneRouter.get(
+	'/reporting/:country/nationalOrgs',
+	getOrgsWithNationalServices
+);
+versionOneRouter.get(
+	'/reporting/:country/nationalServices',
+	getServicesWithNationalServices
+);
+versionOneRouter.get(
+	'/reporting/:country/orgsByState',
+	getOrgsByStateInCountry
+);
+versionOneRouter.get(
+	'/reporting/:country/servicesByState',
+	getServicesByStateInCountry
+);
+versionOneRouter.get('/reporting/:country/categories', getServicesByCategories);
 
 // Reviews - Partially Automation Tested
 versionOneRouter.get('/reviews', getReviews);
