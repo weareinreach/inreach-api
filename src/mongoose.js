@@ -76,7 +76,7 @@ const OrganizationSchema = new Schema(
 				title_ES: String
 			}
 		],
-		name: {type: String, required: true},
+		name: {type: String},
 		name_ES: {type: String},
 		is_published,
 		is_deleted: {type: Boolean, required: true, default: false},

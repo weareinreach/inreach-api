@@ -136,10 +136,10 @@ export const createOrg = async (req, res) => {
 	if (org.locations?.length) {
 		org.locations.map((location) => updateLocationGeolocation(location, res));
 		//Validate Geolocation
-		if (!validateLocationGeolocation(body.locations)) {
-			handleErr({message: 'Longitude and Latitude are required fields'}, res);
-			return;
-		}
+		// if (!validateLocationGeolocation(body.locations)) {
+		// 	handleErr({message: 'Longitude and Latitude are required fields'}, res);
+		// 	return;
+		// }
 	}
 
 	await org
