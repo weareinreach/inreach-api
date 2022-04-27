@@ -44,10 +44,6 @@ jobs:
       - run:
           name: Install Packages
           command: yarn install
-      - run:
-          name: Install Cypress
-          command: yarn add cypress
-      #save cache for use next tests
       - save_cache:
          paths:
           - node_modules
@@ -176,6 +172,24 @@ jobs:
     steps:
       - checkout
       #Download dependencies
+      - run:
+          name: Install Packages
+          command: yarn install
+      #Recreate .env file from CircleCI Project Env Vars
+      - run:
+          name: Create .env file
+          command: |
+           cat \<< EOF > ./.env
+           MAILGUN_API_KEY=$MAILGUN_API_KEY
+           MAILGUN_DOMAIN=$MAILGUN_DOMAIN
+           DB_URI=$DB_URI
+           SHEETS_API_KEY=$SHEETS_API_KEY
+           EOF
+
+      #Building and Compiling Binary
+      - run: 
+          name: Compile Binary
+          command: yarn build
       - sonarcloud/scan
   lint:
     docker:
