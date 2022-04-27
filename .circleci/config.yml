@@ -169,12 +169,13 @@ jobs:
       - run:
           name: "Post E2E tasks"
           command: "yarn post-e2e-test"
-      - run:
-          name: "Dev long live branch"
-          command: |
-              if test "$CIRCLE_BRANCH" == "dev"; then
-                sed -ir "s/^[#]*\s*sonar.branch.name=.*/sonar.branch.name=dev/" sonar-project.properties
-              fi
+
+  sonar-scan:
+    docker:
+      - image:
+    steps:
+      - checkout
+      #Download dependencies
       - sonarcloud/scan
   lint:
     docker:
@@ -330,6 +331,11 @@ workflows:
           filters:
             branches:
               only: dev
+      - sonar-scan:
+          context: SonarCloud
+          filters:
+            branches:
+              only: dev
   pull_request:
     jobs:
       - build:
@@ -337,6 +343,11 @@ workflows:
             branches:
               ignore: main
       - e2e:
+          context: SonarCloud
+          filters:
+            branches:
+              ignore: main
+      - sonar-scan:
           context: SonarCloud
           filters:
             branches:
