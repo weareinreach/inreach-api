@@ -172,7 +172,7 @@ jobs:
 
   sonar-scan:
     docker:
-      - image:
+      - image: cimg/node:16.12.0
     steps:
       - checkout
       #Download dependencies
