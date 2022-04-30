@@ -159,38 +159,19 @@ jobs:
       - run:
           name: "Show Coverage"
           command: "yarn show-coverage"
+      - run:
+          name: "Generate Report"
+          command: "yarn report:combined"
       - codecov/upload:
-          file: 'cypressCoverage/coverage-final.json'
+          file: 'coverageReports/coverage-final.json'
           flags: 'Integration'
+      - sonarcloud/scan
+      - store_artifacts:
+          path: 'coverageReports/lcov.info'
       - run:
           name: "Post E2E tasks"
           command: "yarn post-e2e-test"
 
-  sonar-scan:
-    docker:
-      - image: cimg/node:16.12.0
-    steps:
-      - checkout
-      #Download dependencies
-      - run:
-          name: Install Packages
-          command: yarn install
-      #Recreate .env file from CircleCI Project Env Vars
-      - run:
-          name: Create .env file
-          command: |
-           cat \<< EOF > ./.env
-           MAILGUN_API_KEY=$MAILGUN_API_KEY
-           MAILGUN_DOMAIN=$MAILGUN_DOMAIN
-           DB_URI=$DB_URI
-           SHEETS_API_KEY=$SHEETS_API_KEY
-           EOF
-
-      #Building and Compiling Binary
-      - run: 
-          name: Compile Binary
-          command: yarn build
-      - sonarcloud/scan
   lint:
     docker:
       - image: cimg/node:16.12.0
@@ -342,12 +323,8 @@ workflows:
             branches:
               only: dev
       - e2e:
-          filters:
-            branches:
-              only: dev
-      - sonar-scan:
-          context: SonarCloud
-          filters:
+         context: SonarCloud
+         filters:
             branches:
               only: dev
   pull_request:
@@ -357,13 +334,8 @@ workflows:
             branches:
               ignore: main
       - e2e:
-          context: SonarCloud
-          filters:
-            branches:
-              ignore: main
-      - sonar-scan:
-          context: SonarCloud
-          filters:
+         context: SonarCloud
+         filters:
             branches:
               ignore: main
       - unit:
