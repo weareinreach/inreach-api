@@ -335,7 +335,7 @@ workflows:
               ignore: main
       - e2e:
          context: SonarCloud
-        filters:
+         filters:
             branches:
               ignore: main
       - unit:
