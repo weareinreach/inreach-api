@@ -159,15 +159,18 @@ jobs:
       - run:
           name: "Show Coverage"
           command: "yarn show-coverage"
+      - run:
+          name: "Generate Report"
+          command: "yarn report:combined"
       - codecov/upload:
-          file: 'cypressCoverage/coverage-final.json'
+          file: 'coverageReports/coverage-final.json'
           flags: 'Integration'
+      - store_artifacts:
+          path: 'coverageReports/lcov.info'
       - run:
           name: "Post E2E tasks"
           command: "yarn post-e2e-test"
-      - store_artifacts:
-          path: 'cypressCoverage/lcov.info'
-
+      
   sonar-scan:
     docker:
       - image: cimg/node:16.12.0
