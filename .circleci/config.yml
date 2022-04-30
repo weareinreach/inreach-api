@@ -165,6 +165,8 @@ jobs:
       - run:
           name: "Post E2E tasks"
           command: "yarn post-e2e-test"
+      - store_artifacts:
+          path: 'cypressCoverage/lcov.info'
 
   sonar-scan:
     docker:
@@ -346,6 +348,8 @@ workflows:
             branches:
               only: dev
       - sonar-scan:
+          requires:
+            - e2e
           context: SonarCloud
           filters:
             branches:
@@ -357,11 +361,12 @@ workflows:
             branches:
               ignore: main
       - e2e:
-          context: SonarCloud
           filters:
             branches:
               ignore: main
       - sonar-scan:
+          requires:
+            - e2e
           context: SonarCloud
           filters:
             branches:
