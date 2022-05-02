@@ -386,9 +386,6 @@ export let sendOrgOwnerStatus = async (req, res, next) => {
 	let message;
 	let html;
 
-	console.log(recipient);
-	console.log(ownerStatus);
-
 	switch (ownerStatus) {
 		case 'approve':
 			subject = `You are now affiliated with ${org} on AsylumConnect`;

@@ -32,12 +32,6 @@ jobs:
     working_directory: ~/catalog-api
     steps:
       - checkout
-      # Download and cache dependencies
-    #   - restore_cache:
-    #       keys:
-    #       - v1-dependencies-{{ checksum "package.json" }}
-    #       # fallback to using the latest cache if no exact match is found
-    #       - v1-dependencies-
       - run: 
           name: Check Node Version
           command: node --version
@@ -166,8 +160,6 @@ jobs:
           file: 'coverageReports/coverage-final.json'
           flags: 'Integration'
       - sonarcloud/scan
-      - store_artifacts:
-          path: 'coverageReports/lcov.info'
       - run:
           name: "Post E2E tasks"
           command: "yarn post-e2e-test"
@@ -332,20 +324,20 @@ workflows:
       - build:
           filters:
             branches:
-              ignore: main
+              ignore: [main, dev]
       - e2e:
          context: SonarCloud
          filters:
             branches:
-              ignore: main
+              ignore: [main, dev]
       - unit:
           filters:
             branches:
-              ignore: main
+              ignore: [main, dev]
       - lint:
           filters:
             branches:
-              ignore: main
+              ignore: [main, dev]
               
   migration_prod:
     when: << pipeline.parameters.run_migration_prod >>
