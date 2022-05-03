@@ -30,7 +30,7 @@ export const deleteCommentById = async (req, res) => {
 				.catch((err) => handleErr(err, res));
 		})
 		.catch((err) => {
-			console.log(err);
+			//console.log(err);
 			return handleNotFound(res);
 		});
 };
@@ -94,7 +94,7 @@ export const deleteRatingById = async (req, res) => {
 				.catch((err) => handleErr(err, res));
 		})
 		.catch((err) => {
-			console.log(err);
+			//console.log(err);
 			return handleNotFound(res);
 		});
 };
