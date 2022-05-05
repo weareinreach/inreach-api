@@ -7,8 +7,9 @@ import {
 	getServiceBySupportCategory,
 	getServiceStateServices
 } from '../utils/report';
-const path = '../../resources/';
-
+const path = 'resources/';
+import * as fs from 'fs';
+import * as pathModule from 'path';
 const supportedCountries = ['united-states', 'mexico', 'canada'];
 
 const createCountryQuery = (country) => {
@@ -92,7 +93,11 @@ export const getOrgsByStateInCountry = async (req, res) => {
 	//handle non supported/malformed country
 	if (!supportedCountries.includes(req?.params?.country))
 		return handleBadRequest(res);
-	const states = require(`../../resources/${req?.params?.country}-states.json`);
+
+	const reqPath = __dirname + path + `${req?.params?.country}-states.json`;
+	const resolvePath = pathModule.resolve(reqPath);
+	if (!resolvePath.startsWith(__dirname + path)) return handleBadRequest(res);
+	const states = fs.readFileSync(resolvePath, {encoding: 'utf8', flag: 'r'});
 	try {
 		let result = await getServiceStateOrgs(
 			states,
@@ -112,7 +117,12 @@ export const getServicesByStateInCountry = async (req, res) => {
 	//handle non supported/malformed country
 	if (!supportedCountries.includes(req?.params?.country))
 		return handleBadRequest(res);
-	const states = require(`../../resources/${req?.params?.country}-states.json`);
+
+	const reqPath = __dirname + path + `${req?.params?.country}-states.json`;
+	const resolvePath = pathModule.resolve(reqPath);
+	if (!resolvePath.startsWith(__dirname + path)) return handleBadRequest(res);
+	const states = fs.readFileSync(resolvePath, {encoding: 'utf8', flag: 'r'});
+
 	try {
 		let result = await getServiceStateServices(
 			states,
@@ -132,7 +142,14 @@ export const getServicesByCategories = async (req, res) => {
 	//handle non supported/malformed country
 	if (!supportedCountries.includes(req?.params?.country))
 		return handleBadRequest(res);
-	const categories = require(`../../resources/categories.json`);
+	const reqPath = __dirname + path + 'categories.json';
+	const resolvePath = pathModule.resolve(reqPath);
+	if (!resolvePath.startsWith(__dirname + path)) return handleBadRequest(res);
+	const categories = fs.readFileSync(resolvePath, {
+		encoding: 'utf8',
+		flag: 'r'
+	});
+
 	try {
 		let result = await getServiceBySupportCategory(
 			categories,
