@@ -15,7 +15,7 @@ export const generatePasswordResetMail = async (req, res) => {
 
 		const sendPasswordReset = () => {
 			const data = {
-				from: 'InReach Support <hello@inreach.org>',
+				from: 'InReach Support <app@inreach.org>',
 				to: req.body.email,
 				subject: `Password reset for ${req.body.email}`,
 				html: `
@@ -23,7 +23,7 @@ export const generatePasswordResetMail = async (req, res) => {
       <p>This notification is on behalf of InReach to let you know that your account password has been
       successfully reset to <strong>${newPassword}</strong>. Please use this password to log back into the
       <a href="https://catalog.inreach.org/" target="_blank">InReach App</a> where you can create a new password for your account.
-      <p>If you did not reset your account password, please contact InReach immediately at <a href="mailto:hello@inreach.org?subject=Problem%20with%20password%20reset">hello@inreach.org</a>.</p>
+      <p>If you did not reset your account password, please contact InReach immediately at <a href="mailto:app@inreach.org?subject=Problem%20with%20password%20reset">app@inreach.org</a>.</p>
       <p>Thank you, Merci, Gracias!</p>
       <p>The InReach Team</p>
       `
@@ -68,7 +68,7 @@ export const shareResource = (
 			shareType === 'collection' ? 'a list of resources' : 'an organization';
 		const html = genereateEmailContent(shareUrl, resourceType);
 		const data = {
-			from: 'InReach Support <hello@inreach.org>',
+			from: 'InReach Support <app@inreach.org>',
 			to: email,
 			subject: `Someone just shared ${resourceType} with you!`,
 			html: html

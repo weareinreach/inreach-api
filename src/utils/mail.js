@@ -5,7 +5,7 @@ const mailgun = require('mailgun-js')({apiKey: API_KEY, domain: DOMAIN});
 exports.sendEmail = (recipient, subject, message, html) =>
 	new Promise((res, rej) => {
 		const data = {
-			from: 'InReach <hello@inreach.org>',
+			from: 'InReach <app@inreach.org>',
 			to: recipient,
 			subject: subject,
 			text: message,
