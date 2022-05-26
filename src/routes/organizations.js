@@ -388,14 +388,14 @@ export let sendOrgOwnerStatus = async (req, res, next) => {
 
 	switch (ownerStatus) {
 		case 'approve':
-			subject = `You are now affiliated with ${org} on AsylumConnect`;
-			message = `Thank you for requesting to join ${org} on the AsylumConnect Catalog (https://asylumconnect.org). Our team has approved your request and your AsylumConnect user account is now connected to ${org}'s profile page on AsylumConnect.\n\nBest,\nThe AsylumConnect Team`;
-			html = `<html>Thank you for requesting to join ${org} on the <a href='https://asylumconnect.org'>AsylumConnect Catalog</a>. Our team has approved your request and your AsylumConnect user account is now connected to ${org}'s profile page on AsylumConnect.<br/><br/>Best,<br/>The AsylumConnect Team</html>`;
+			subject = `You are now affiliated with ${org} on InReach`;
+			message = `Thank you for requesting to join ${org} on the InReach App (https://InReach.org). Our team has approved your request and your InReach user account is now connected to ${org}'s profile page on InReach.\n\nBest,\nThe InReach Team`;
+			html = `<html>Thank you for requesting to join ${org} on the <a href='https://InReach.org'>InReach App</a>. Our team has approved your request and your InReach user account is now connected to ${org}'s profile page on InReach.<br/><br/>Best,<br/>The InReach Team</html>`;
 			break;
 		case 'deny':
-			subject = `Follow Up Re: Request to Join ${org} on AsylumConnect`;
-			message = `Thank you for requesting to join ${org} on the AsylumConnect Catalog <https://asylumconnect.org>. Our team was not able to verify your connection to ${org} based on your initial registration information. Please reply to this email with more details on how exactly you are affiliated with ${org}.\n\nBest,\nThe AsylumConnect Team`;
-			html = `<html>Thank you for requesting to join ${org} on the <a href='https://asylumconnect.org'>AsylumConnect Catalog</a>. Our team was not able to verify your connection to ${org} based on your initial registration information. Please reply to this email with more details on how exactly you are affiliated with ${org}.<br/><br/>Best,<br/>The AsylumConnect Team</html>`;
+			subject = `Follow Up Re: Request to Join ${org} on InReach`;
+			message = `Thank you for requesting to join ${org} on the InReach App <https://InReach.org>. Our team was not able to verify your connection to ${org} based on your initial registration information. Please reply to this email with more details on how exactly you are affiliated with ${org}.\n\nBest,\nThe InReach Team`;
+			html = `<html>Thank you for requesting to join ${org} on the <a href='https://InReach.org'>InReach App</a>. Our team was not able to verify your connection to ${org} based on your initial registration information. Please reply to this email with more details on how exactly you are affiliated with ${org}.<br/><br/>Best,<br/>The InReach Team</html>`;
 			break;
 	}
 	try {
