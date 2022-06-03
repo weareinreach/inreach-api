@@ -24,6 +24,8 @@ ex: Developing in January 2022, migration file should be: 2022.02.01.
 
 In order to run a single migration file locally against the Docker database in package.json there are 2 scripts you can use:
 
+Please ensure that you export the $MIGRATION_FILE.
+
 ```
 "run-migration": "MIGRATION=true node $MIGRATION_FILE",
 "rollback-migration":"ROLLBACK=true node $MIGRATION_FILE",
@@ -165,3 +167,7 @@ function runRollbackScript() {
 ```
 
 Inside the runMigrationScript/runRollbackScript functions add the actual migration to the schema.
+
+## Released folder
+
+All released migrations are put in the released folder. Look in there for examples of other migration scripts.
