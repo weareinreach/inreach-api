@@ -147,7 +147,7 @@ jobs:
           name: "Seed Docker DB"
           command: yarn seed-docker-db
       #Testing
-      - run: ls
+      - run: cd .. && ls
       - run: 
           name: "E2E Automation"
           command: "yarn pre-e2e-test && yarn e2e"
