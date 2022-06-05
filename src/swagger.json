@@ -9,7 +9,7 @@
   },
   "servers": [
     {
-      "url": "https://asylum-connect-api-staging.herokuapp.com/v1",
+      "url": "https://inreach-api-staging.herokuapp.com/v1",
       "description": "Powering the Catalog and Control Panel"
     }
   ],

@@ -71,7 +71,7 @@ CURL example:
 
 ```
 curl --request POST \
-  --url https://circleci.com/api/v2/project/gh/asylum-connect/catalog-api/pipeline \
+  --url https://circleci.com/api/v2/project/gh/asylum-connect/inreach-api/pipeline \
   --header 'Circle-Token: ***********************************' \
   --header 'content-type: application/json' \
   --data '{"branch":"dev",
@@ -87,7 +87,7 @@ CURL example:
 
 ```
 curl --request POST \
-  --url https://circleci.com/api/v2/project/gh/asylum-connect/catalog-api/pipeline \
+  --url https://circleci.com/api/v2/project/gh/asylum-connect/inreach-api/pipeline \
   --header 'Circle-Token: ***********************************' \
   --header 'content-type: application/json' \
   --data '{"branch":"main",

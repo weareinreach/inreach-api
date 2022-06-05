@@ -1,5 +1,9 @@
 # InReach catalog-api
 
+**NOTE:**
+
+In some locations you will encounter asylum-connect references vs inreach references. The application/organization used to be called asylum-connect, and during a rebrand in May 2022, it is now inReach/inreach,
+
 ## CI/CD
 
 The development lifecycle is controlled by these tools:
