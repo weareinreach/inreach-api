@@ -1,5 +1,5 @@
 {
-	"name": "asylum-connect-catalog-api",
+	"name": "inreach-catalog-api",
 	"private": true,
 	"scripts": {
 		"cypress:open": "cypress open --config-file ./cypress.json",
