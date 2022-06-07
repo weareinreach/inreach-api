@@ -4,12 +4,12 @@
     "title": "Catalog API",
     "version": "1",
     "contact": {
-      "email": "romello@asylumconnect.org"
+      "email": "jamie@inreach.org"
     }
   },
   "servers": [
     {
-      "url": "https://asylum-connect-api-staging.herokuapp.com/v1",
+      "url": "https://inreach-api-staging.herokuapp.com/v1",
       "description": "Powering the Catalog and Control Panel"
     }
   ],

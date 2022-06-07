@@ -87,5 +87,6 @@ This will run all the seed prefix, sequentially.
 To alter the data being seeded in the DB change the files in the path:
 
 ```
-docker/seed/generate*
+docker/seed/generate*.js
+docker/seed/addIndexes.js
 ```

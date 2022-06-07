@@ -11,12 +11,12 @@
 export DATE_PATTERN=2022.02.01.
 
 #Check if which directory script was run from
-if [[ $PWD == *catalog-api ]]; then
+if [[ $PWD == *inrech-api ]]; then
     export CUT=14
 elif [[ $PWD == *migrations ]]; then
     export CUT=3
 else
-    echo "Please run the script from the root of the project catalog-api, or migrations folder. It was run from folder $PWD"
+    echo "Please run the script from the root of the project inreqch-api, or migrations folder. It was run from folder $PWD"
     exit 1
 fi
 
