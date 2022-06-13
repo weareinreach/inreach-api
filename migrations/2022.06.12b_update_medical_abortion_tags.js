@@ -19,7 +19,7 @@ require('dotenv').config({
 });
 // Import DB Connection
 require('../src/db');
-
+var migrationFunctions = require('./migrationsFunctions');
 var mongoose = require('../src/mongoose');
 //Helper Function
 let renameKeys = (keysMap, object) =>
@@ -85,7 +85,6 @@ async function runMigrationScript() {
 			`Number of modified rows: ${JSON.stringify(updateResponse.nModified)}`
 		);
 		console.log('Migration Mexico executed');
-		process.exit(0);
 	} catch (err) {
 		console.log(err);
 		process.exit(1);
@@ -143,7 +142,6 @@ async function runRollbackScript() {
 			`Number of modified rows: ${JSON.stringify(updateResponse.nModified)}`
 		);
 		console.log('Rollback Mexico executed');
-		process.exit(0);
 	} catch (err) {
 		console.log(err);
 		process.exit(1);
@@ -151,9 +149,33 @@ async function runRollbackScript() {
 }
 
 if (process.env.MIGRATION) {
-	runMigrationScript();
+	switch (process.env.PROFILE) {
+		case 'CI':
+			migrationFunctions.checkIfMigrationHasRun().then((hasRun) => {
+				if (!hasRun) {
+					runMigrationScript();
+					migrationFunctions.registerMigration();
+				}
+			});
+			break;
+		default:
+			runMigrationScript();
+			break;
+	}
 }
 
 if (process.env.ROLLBACK) {
-	runRollbackScript();
+	switch (process.env.PROFILE) {
+		case 'CI':
+			migrationFunctions.checkIfMigrationHasRun().then((hasRun) => {
+				if (!hasRun) {
+					runRollbackScript();
+					migrationFunctions.registerMigration();
+				}
+			});
+			break;
+		default:
+			runRollbackScript();
+			break;
+	}
 }
