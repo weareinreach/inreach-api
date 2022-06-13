@@ -76,6 +76,7 @@ curl --request POST \
   --header 'content-type: application/json' \
   --data '{"branch":"dev",
       "parameters":{"run_rollback_staging": true,
+	  "run_branch_pipeline":false,
     "files": "migration_file_1.js,migration_file_2.js,migration_file_3.js"}}'
 ```
 
