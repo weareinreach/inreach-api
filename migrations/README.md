@@ -131,6 +131,7 @@ if (process.env.MIGRATION) {
 			migrationFunctions.checkIfMigrationHasRun().then(hasRun => {
 				if (!hasRun) {
 					runMigrationScript();
+					migrationFunctions.registerMigration();
 				}
 			});
 			break;
@@ -146,6 +147,7 @@ if (process.env.ROLLBACK) {
 			migrationFunctions.checkIfMigrationHasRun().then(hasRun => {
 				if (!hasRun) {
 					runRollbackScript();
+					migrationFunctions.registerMigration();
 				}
 			});
 			break;
