@@ -3,6 +3,9 @@
 #This file is to be used to run Github Status Checks
 version: 2.1
 parameters:
+  run_branch_pipeline:
+    default: true
+    type: boolean
   run_migration_prod:
     default: false
     type: boolean
@@ -309,6 +312,7 @@ jobs:
 workflows:
   version: 2
   development:
+    when: << pipeline.parameters.run_branch_pipeline >>
     jobs:
       - build:
           filters:
