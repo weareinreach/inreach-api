@@ -203,6 +203,7 @@ jobs:
     environment:
       PIPELINE_ID: << pipeline.parameters.pipeline_id >>
       TYPE: migration_stage
+      FILES: << pipeline.parameters.files >>
     steps:
       - checkout
       #Recreate .env file from CircleCI Project Env Vars
@@ -331,7 +332,7 @@ jobs:
               --url https://circleci.com/api/v2/project/gh/asylum-connect/inreach-api/pipeline \
               --header "Circle-Token: $PERSONAL_TOKEN" \
               --header 'content-type: application/json' \
-              --data '{"branch":"dev","parameters":{"register_migration": true,"pipeline_id":"$PIPELINE_ID","run_branch_pipeline":false}}'
+              --data '{"branch":"dev","parameters":{"register_migration": true,"pipeline_id":"$PIPELINE_ID","run_branch_pipeline":false,files:$FILES}}'
   
   rollback_prod:
     docker:
@@ -410,7 +411,7 @@ jobs:
               --url https://circleci.com/api/v2/project/gh/asylum-connect/inreach-api/pipeline \
               --header "Circle-Token: $PERSONAL_TOKEN" \
               --header 'content-type: application/json' \
-              --data '{"branch":"dev","parameters":{"register_migration": true,"pipeline_id":"$PIPELINE_ID","run_branch_pipeline":false}}'
+              --data '{"branch":"dev","parameters":{"register_migration": true,"pipeline_id":"$PIPELINE_ID","run_branch_pipeline":false,"files":$FILES}}'
 
 workflows:
   version: 2
