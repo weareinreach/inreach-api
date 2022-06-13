@@ -85,6 +85,7 @@ async function runMigrationScript() {
 			`Number of modified rows: ${JSON.stringify(updateResponse.nModified)}`
 		);
 		console.log('Migration Mexico executed');
+		process.exit(0);
 	} catch (err) {
 		console.log(err);
 		process.exit(1);
@@ -142,6 +143,7 @@ async function runRollbackScript() {
 			`Number of modified rows: ${JSON.stringify(updateResponse.nModified)}`
 		);
 		console.log('Rollback Mexico executed');
+		process.exit(0);
 	} catch (err) {
 		console.log(err);
 		process.exit(1);
@@ -154,7 +156,6 @@ if (process.env.MIGRATION) {
 			migrationFunctions.checkIfMigrationHasRun().then((hasRun) => {
 				if (!hasRun) {
 					runMigrationScript();
-					migrationFunctions.registerMigration();
 				}
 			});
 			break;
@@ -170,7 +171,6 @@ if (process.env.ROLLBACK) {
 			migrationFunctions.checkIfMigrationHasRun().then((hasRun) => {
 				if (!hasRun) {
 					runRollbackScript();
-					migrationFunctions.registerMigration();
 				}
 			});
 			break;
