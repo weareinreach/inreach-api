@@ -289,7 +289,7 @@ jobs:
               --url https://circleci.com/api/v2/project/gh/asylum-connect/inreach-api/pipeline \
               --header "Circle-Token: $TOKEN" \
               --header 'content-type: application/json' \
-              --data '{"branch":"main","parameters":{"register_migration": true,"pipeline_id":"$PIPELINE_ID","run_branch_pipeline":false}'
+              --data '{"branch":"main","parameters":{"register_migration": true,"pipeline_id":"$PIPELINE_ID","run_branch_pipeline":false}}'
   
   migration_stage:
     docker:
@@ -327,7 +327,7 @@ jobs:
               --url https://circleci.com/api/v2/project/gh/asylum-connect/inreach-api/pipeline \
               --header "Circle-Token: $TOKEN" \
               --header 'content-type: application/json' \
-              --data '{"branch":"dev","parameters":{"register_migration": true,"pipeline_id":"$PIPELINE_ID","run_branch_pipeline":false}'
+              --data '{"branch":"dev","parameters":{"register_migration": true,"pipeline_id":"$PIPELINE_ID","run_branch_pipeline":false}}'
   
   rollback_prod:
     docker:
@@ -365,7 +365,7 @@ jobs:
               --url https://circleci.com/api/v2/project/gh/asylum-connect/inreach-api/pipeline \
               --header "Circle-Token: $TOKEN" \
               --header 'content-type: application/json' \
-              --data '{"branch":"main","parameters":{"register_migration": true,"pipeline_id":"$PIPELINE_ID","run_branch_pipeline":false}'
+              --data '{"branch":"main","parameters":{"register_migration": true,"pipeline_id":"$PIPELINE_ID","run_branch_pipeline":false}}'
 
   rollback_stage:
     docker:
@@ -402,7 +402,7 @@ jobs:
               --url https://circleci.com/api/v2/project/gh/asylum-connect/inreach-api/pipeline \
               --header "Circle-Token: $TOKEN" \
               --header 'content-type: application/json' \
-              --data '{"branch":"dev","parameters":{"register_migration": true,"pipeline_id":"$PIPELINE_ID","run_branch_pipeline":false}'
+              --data '{"branch":"dev","parameters":{"register_migration": true,"pipeline_id":"$PIPELINE_ID","run_branch_pipeline":false}}'
 
 workflows:
   version: 2
