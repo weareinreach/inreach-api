@@ -292,8 +292,9 @@ jobs:
               --url https://circleci.com/api/v2/project/gh/asylum-connect/inreach-api/pipeline \
               --header "Circle-Token: $PERSONAL_TOKEN" \
               --header 'content-type: application/json' \
-              --data "{"branch":"main","parameters":{"register_migration": true,"pipeline_id":"$PIPELINE_ID","run_branch_pipeline":false}}"
-  
+              --data "$(cat <<EOF
+                {"branch":"main","parameters":{"register_migration": true,"pipeline_id":"$PIPELINE_ID","run_branch_pipeline":false}}
+                EOF)"  
   migration_stage:
     docker:
       - image: cimg/node:16.12.0
@@ -332,8 +333,9 @@ jobs:
               --url https://circleci.com/api/v2/project/gh/asylum-connect/inreach-api/pipeline \
               --header "Circle-Token: $PERSONAL_TOKEN" \
               --header 'content-type: application/json' \
-              --data "{"branch":"dev","parameters":{"register_migration": true,"pipeline_id":"$PIPELINE_ID","run_branch_pipeline":false,"files":"$FILES"}}"
-  
+              --data "$(cat <<EOF
+                {"branch":"dev","parameters":{"register_migration": true,"pipeline_id":"$PIPELINE_ID","run_branch_pipeline":false,"files":"$FILES"}}
+                EOF)"  
   rollback_prod:
     docker:
       - image: cimg/node:16.12.0
@@ -372,7 +374,9 @@ jobs:
               --url https://circleci.com/api/v2/project/gh/asylum-connect/inreach-api/pipeline \
               --header "Circle-Token: $PERSONAL_TOKEN" \
               --header 'content-type: application/json' \
-              --data "{"branch":"main","parameters":{"register_migration": true,"pipeline_id":"$PIPELINE_ID","run_branch_pipeline":false}}"
+              --data "$(cat <<EOF
+                {"branch":"main","parameters":{"register_migration": true,"pipeline_id":"$PIPELINE_ID","run_branch_pipeline":false}}
+                EOF)"
 
   rollback_stage:
     docker:
@@ -411,7 +415,9 @@ jobs:
               --url https://circleci.com/api/v2/project/gh/asylum-connect/inreach-api/pipeline \
               --header "Circle-Token: $PERSONAL_TOKEN" \
               --header 'content-type: application/json' \
-              --data "{"branch":"dev","parameters":{"register_migration": true,"pipeline_id":"$PIPELINE_ID","run_branch_pipeline":false,"files":"$FILES"}}"
+              --data "$(cat <<EOF
+                {"branch":"dev","parameters":{"register_migration": true,"pipeline_id":"$PIPELINE_ID","run_branch_pipeline":false,"files":"$FILES"}}
+                EOF)"
 
 workflows:
   version: 2
