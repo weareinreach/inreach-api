@@ -282,6 +282,8 @@ jobs:
               export MIGRATION_FILE=$i
               yarn run-migration
             done
+      # Unfortunately CircleCI does not allow user or Project Token, Personal Token was used. 
+      # Update it if @Alfred-Moreira is no longer with the organization
       - run:  
           name: Register migration
           command: |
@@ -320,6 +322,8 @@ jobs:
               export MIGRATION_FILE=$i
               yarn run-migration
             done
+      # Unfortunately CircleCI does not allow user or Project Token, Personal Token was used. 
+      # Update it if @Alfred-Moreira is no longer with the organization
       - run:  
           name: Register migration
           command: |
@@ -358,6 +362,8 @@ jobs:
               export MIGRATION_FILE=$i
               yarn run-rollback
             done
+      # Unfortunately CircleCI does not allow user or Project Token, Personal Token was used. 
+      # Update it if @Alfred-Moreira is no longer with the organization
       - run:  
           name: Register migration
           command: |
@@ -395,6 +401,8 @@ jobs:
               export MIGRATION_FILE=$i
               yarn run-rollback
             done
+      # Unfortunately CircleCI does not allow user or Project Token, Personal Token was used. 
+      # Update it if @Alfred-Moreira is no longer with the organization
       - run:  
           name: Register migration
           command: |
