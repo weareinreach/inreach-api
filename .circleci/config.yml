@@ -231,6 +231,7 @@ jobs:
     working_directory: ~/inreach-api
     environment:
       PIPELINE_ID: << pipeline.parameters.pipeline_id >>
+      DATE_PATTERN: << pipeline.parameters.date_pattern >>
       TYPE: migration_prod
     steps:
       - checkout
