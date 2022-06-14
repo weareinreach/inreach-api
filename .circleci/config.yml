@@ -3,6 +3,12 @@
 #This file is to be used to run Github Status Checks
 version: 2.1
 parameters:
+  register_migration:
+    default: false
+    type: boolean
+  run_branch_pipeline:
+    default: true
+    type: boolean
   run_migration_prod:
     default: false
     type: boolean
@@ -19,6 +25,9 @@ parameters:
     default: ""
     type: string
   date_pattern:
+    default: ""
+    type: string
+  pipeline_id:
     default: ""
     type: string
 orbs:
@@ -187,6 +196,64 @@ jobs:
           name: Run linting
           command: "yarn lint"
   
+  register_migration_stage:
+    docker:
+      - image: cimg/node:16.12.0
+    working_directory: ~/inreach-api
+    environment:
+      PIPELINE_ID: << pipeline.parameters.pipeline_id >>
+      TYPE: migration_stage
+      FILES: << pipeline.parameters.files >>
+    steps:
+      - checkout
+      #Recreate .env file from CircleCI Project Env Vars
+      - run:
+          name: Create .env file
+          command: |
+           cat \<< EOF > ./.env
+           DB_URI=$DB_URI_STAGING
+           PROFILE=CI
+           EOF
+      - run:
+          name: Install Packages
+          command: yarn install
+      - run: 
+          name: Register Migration Stage
+          command: |
+            for i in ${FILES//,/ }; do
+              export MIGRATION_FILE=$i
+              yarn register-migration
+            done
+
+  register_migration_prod:
+    docker:
+      - image: cimg/node:16.12.0
+    working_directory: ~/inreach-api
+    environment:
+      PIPELINE_ID: << pipeline.parameters.pipeline_id >>
+      TYPE: migration_prod
+    steps:
+      - checkout
+      #Recreate .env file from CircleCI Project Env Vars
+      - run:
+          name: Create .env file
+          command: |
+           cat \<< EOF > ./.env
+           DB_URI=$DB_URI_PROD
+           PROFILE=CI
+           EOF
+      - run:
+          name: Install Packages
+          command: yarn install
+      - run: 
+          name: Register Migration Prof
+          command: |
+            export  FILES=$(find . -type f -iname "*$DATE_PATTERN*" | cut -c 13-)
+              export MIGRATION_FILE=$i
+              yarn register-migration
+            done
+
+
   migration_prod:
     docker:
       - image: cimg/node:16.12.0
@@ -216,7 +283,12 @@ jobs:
               export MIGRATION_FILE=$i
               yarn run-migration
             done
-  
+      # Unfortunately CircleCI does not allow user or Project Token, Personal Token was used. 
+      # Update it if @Alfred-Moreira is no longer with the organization
+      - run:  
+          name: Register migration
+          command: BRANCH=main node ./migrations/triggerRegistration.js
+ 
   migration_stage:
     docker:
       - image: cimg/node:16.12.0
@@ -246,7 +318,12 @@ jobs:
               export MIGRATION_FILE=$i
               yarn run-migration
             done
-  
+      # Unfortunately CircleCI does not allow user or Project Token, Personal Token was used. 
+      # Update it if @Alfred-Moreira is no longer with the organization
+      - run:  
+          name: Register migration
+          command: BRANCH=dev node ./migrations/triggerRegistration.js
+
   rollback_prod:
     docker:
       - image: cimg/node:16.12.0
@@ -276,6 +353,11 @@ jobs:
               export MIGRATION_FILE=$i
               yarn run-rollback
             done
+      # Unfortunately CircleCI does not allow user or Project Token, Personal Token was used. 
+      # Update it if @Alfred-Moreira is no longer with the organization
+      - run:  
+          name: Register migration
+          command: BRANCH=main node ./migrations/triggerRegistration.js
 
   rollback_stage:
     docker:
@@ -305,10 +387,16 @@ jobs:
               export MIGRATION_FILE=$i
               yarn run-rollback
             done
+      # Unfortunately CircleCI does not allow user or Project Token, Personal Token was used. 
+      # Update it if @Alfred-Moreira is no longer with the organization
+      - run:  
+          name: Register migration
+          command: BRANCH=dev node ./migrations/triggerRegistration.js
 
 workflows:
   version: 2
   development:
+    when: << pipeline.parameters.run_branch_pipeline >>
     jobs:
       - build:
           filters:
@@ -338,6 +426,22 @@ workflows:
           filters:
             branches:
               ignore: [main, dev]
+  
+  register_migration_stage:
+    when: << pipeline.parameters.register_migration >>
+    jobs:
+      - register_migration_stage:
+          filters:
+            branches:
+              only: dev
+  
+  register_migration_prod:
+    when: << pipeline.parameters.register_migration >>
+    jobs:
+      - register_migration_prod:
+          filters:
+            branches:
+              only: main
               
   migration_prod:
     when: << pipeline.parameters.run_migration_prod >>
