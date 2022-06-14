@@ -8,7 +8,7 @@ require('dotenv').config({
 require('../src/db');
 const axios = require('axios');
 const mongoose = require('../src/mongoose');
-const options = {headers: {'Circle-Token': process.env.TOKEN}};
+const options = {headers: {'Circle-Token': process.env.PERSONAL_TOKEN}};
 
 const makeGetRequest = async (url, options) => {
 	try {
