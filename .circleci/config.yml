@@ -3,12 +3,6 @@
 #This file is to be used to run Github Status Checks
 version: 2.1
 parameters:
-  register_migration:
-    default: false
-    type: boolean
-  run_branch_pipeline:
-    default: true
-    type: boolean
   run_migration_prod:
     default: false
     type: boolean
@@ -25,9 +19,6 @@ parameters:
     default: ""
     type: string
   date_pattern:
-    default: ""
-    type: string
-  pipeline_id:
     default: ""
     type: string
 orbs:
@@ -195,8 +186,8 @@ jobs:
       - run:
           name: Run linting
           command: "yarn lint"
-  
-  register_migration_stage:
+
+register_migration_stage:
     docker:
       - image: cimg/node:16.12.0
     working_directory: ~/inreach-api
@@ -289,6 +280,7 @@ jobs:
           name: Register migration
           command: BRANCH=main node ./migrations/triggerRegistration.js
  
+
   migration_stage:
     docker:
       - image: cimg/node:16.12.0
@@ -359,6 +351,7 @@ jobs:
           name: Register migration
           command: BRANCH=main node ./migrations/triggerRegistration.js
 
+
   rollback_stage:
     docker:
       - image: cimg/node:16.12.0
@@ -396,7 +389,6 @@ jobs:
 workflows:
   version: 2
   development:
-    when: << pipeline.parameters.run_branch_pipeline >>
     jobs:
       - build:
           filters:
@@ -426,22 +418,6 @@ workflows:
           filters:
             branches:
               ignore: [main, dev]
-  
-  register_migration_stage:
-    when: << pipeline.parameters.register_migration >>
-    jobs:
-      - register_migration_stage:
-          filters:
-            branches:
-              only: dev
-  
-  register_migration_prod:
-    when: << pipeline.parameters.register_migration >>
-    jobs:
-      - register_migration_prod:
-          filters:
-            branches:
-              only: main
               
   migration_prod:
     when: << pipeline.parameters.run_migration_prod >>
