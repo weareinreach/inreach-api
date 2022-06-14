@@ -250,6 +250,7 @@ jobs:
           name: Register Migration Prof
           command: |
             export  FILES=$(find . -type f -iname "*$DATE_PATTERN*" | cut -c 13-)
+            for i in ${FILES//,/ }; do
               export MIGRATION_FILE=$i
               yarn register-migration
             done
