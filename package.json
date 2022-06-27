@@ -40,6 +40,8 @@
 		"seed-docker-db": "yarn run-s seed:*"
 	},
 	"dependencies": {
+		"@octokit/auth-token": "^2.5.0",
+		"@octokit/rest": "^18.12.0",
 		"backpack-core": "^0.8.4",
 		"body-parser": "^1.19.0",
 		"cors": "^2.8.5",
