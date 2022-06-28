@@ -1,10 +1,19 @@
 import {Octokit} from '@octokit/rest';
-import {normalizeUnits} from 'moment';
+const OWNER = 'asylum-connect';
 
 export const githubClient = async () => {
 	return new Octokit({
 		auth: process.env.TOKEN,
 		log: console
+	});
+};
+
+export const deleteBranchInRepo = async (branch, repo) => {
+	const client = await githubClient();
+	const ref = await client.rest.git.deleteRef({
+		owner: OWNER,
+		repo: repo,
+		ref: `heads/${branch}`
 	});
 };
 
@@ -18,24 +27,21 @@ export const createReleaseInRepo = async (
 	const client = await githubClient();
 	//Get Ref sha from source
 	const ref = await client.rest.git.getRef({
-		owner: 'asylum-connect',
+		owner: OWNER,
 		repo: repo,
 		ref: `heads/${sourceBranch}`
 	});
 
 	//create release branch
-	const createdReleaseBranch = await client.request(
-		'POST /repos/{owner}/{repo}/git/refs',
-		{
-			owner: 'asylum-connect',
-			repo: repo,
-			ref: `refs/heads/${releaseBranch}`,
-			sha: ref.data.object.sha
-		}
-	);
+	const createdReleaseBranch = await client.rest.git.createRef({
+		owner: OWNER,
+		repo: repo,
+		ref: `refs/heads/${releaseBranch}`,
+		sha: ref.data.object.sha
+	});
 	//PR into target branch
 	const createdPR = await client.rest.pulls.create({
-		owner: 'asylum-connect',
+		owner: OWNER,
 		repo: repo,
 		title: title,
 		head: releaseBranch,

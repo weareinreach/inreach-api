@@ -1,6 +1,6 @@
 import {User} from '../mongoose';
 import {handleBadRequest, handleErr, handleNotFound} from '../utils';
-import {createReleaseInRepo} from '../utils/github';
+import {createReleaseInRepo, deleteBranchInRepo} from '../utils/github';
 //OAuth Callback
 export const oauthCallback = async (req, res) => {};
 
@@ -27,6 +27,20 @@ export const createRelease = async (req, res) => {
 			);
 		}
 		return res.json({created: true, result: result});
+	} catch (err) {
+		handleErr(err, res);
+	}
+};
+
+//Delete Branch
+export const deleteBranch = async (req, res) => {
+	const {branch, repo} = req?.body;
+
+	if (!branch || !repo) return handleBadRequest(res);
+
+	try {
+		await deleteBranchInRepo(branch, repo);
+		return res.json({deleted: true});
 	} catch (err) {
 		handleErr(err, res);
 	}

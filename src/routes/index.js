@@ -69,7 +69,7 @@ import {
 	getServicesByStateInCountry,
 	getServicesByCategories
 } from './reporting';
-import {createRelease} from './dashboard';
+import {createRelease, deleteBranch} from './dashboard';
 export const baseRouter = Router();
 export const versionOneRouter = Router();
 
@@ -265,3 +265,4 @@ versionOneRouter.get('/static/:pageId', getStaticPage);
 
 //Dashboard - Not tested
 versionOneRouter.post('/dashboard/createRelease', createRelease);
+versionOneRouter.delete('/dashboard/deleteBranch', deleteBranch);
