@@ -46,7 +46,7 @@ async function runMigrationScript() {
 			},
 			{
 				$match: {
-					'services.tags.canda.Medical.Abortion services': {
+					'services.tags.canada.Abortion Care.Abortion Providers': {
 						$exists: true
 					}
 				}
@@ -54,7 +54,7 @@ async function runMigrationScript() {
 			{
 				$project: {
 					service_id: '$services._id',
-					tags: '$services.tags.canda.Medical'
+					tags: '$services.tags.canada.Abortion Care'
 				}
 			}
 		]);
@@ -63,7 +63,7 @@ async function runMigrationScript() {
 			//Account for both possibilities
 			let updatedTags = renameKeys(
 				{
-					'Abortion services': 'Abortion Providers'
+					'Abortion Providers': 'Abortion services'
 				},
 				org.tags
 			);
@@ -73,7 +73,7 @@ async function runMigrationScript() {
 						_id: org._id
 					},
 					update: {
-						'services.$[elem].tags.canda.Abortion Care': updatedTags
+						'services.$[elem].tags.canada.Abortion Care': updatedTags
 					},
 					arrayFilters: [{'elem._id': {$eq: org.service_id}}]
 				}
@@ -105,7 +105,7 @@ async function runRollbackScript() {
 			},
 			{
 				$match: {
-					'services.tags.canda.Abortion Care.Abortion Providers': {
+					'services.tags.canada.Abortion Care.Abortion services': {
 						$exists: true
 					}
 				}
@@ -113,7 +113,7 @@ async function runRollbackScript() {
 			{
 				$project: {
 					service_id: '$services._id',
-					tags: '$services.tags.canda.Abortion Care'
+					tags: '$services.tags.canada.Abortion Care'
 				}
 			}
 		]);
@@ -121,7 +121,7 @@ async function runRollbackScript() {
 		result.forEach((org) => {
 			let updatedTags = renameKeys(
 				{
-					'Abortion Providers': 'Abortion services'
+					'Abortion services': 'Abortion Providers'
 				},
 				org.tags
 			);
@@ -131,7 +131,7 @@ async function runRollbackScript() {
 						_id: org._id
 					},
 					update: {
-						'services.$[elem].tags.canda.Medical': updatedTags
+						'services.$[elem].tags.canada.Abortion Care': updatedTags
 					},
 					arrayFilters: [{'elem._id': {$eq: org.service_id}}]
 				}

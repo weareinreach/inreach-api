@@ -46,7 +46,7 @@ async function runMigrationScript() {
 			},
 			{
 				$match: {
-					'services.tags.united_states.Medical.Abortion services': {
+					'services.tags.united_states.Abortion Care.Abortion Providers': {
 						$exists: true
 					}
 				}
@@ -54,7 +54,7 @@ async function runMigrationScript() {
 			{
 				$project: {
 					service_id: '$services._id',
-					tags: '$services.tags.united_states.Medical'
+					tags: '$services.tags.united_states.Abortion Care'
 				}
 			}
 		]);
@@ -63,7 +63,7 @@ async function runMigrationScript() {
 			//Account for both possibilities
 			let updatedTags = renameKeys(
 				{
-					'Abortion services': 'Abortion Providers'
+					'Abortion Providers': 'Abortion services'
 				},
 				org.tags
 			);
@@ -105,7 +105,7 @@ async function runRollbackScript() {
 			},
 			{
 				$match: {
-					'services.tags.united_states.Abortion Care.Abortion Providers': {
+					'services.tags.united_states.Abortion Care.Abortion services': {
 						$exists: true
 					}
 				}
@@ -121,7 +121,7 @@ async function runRollbackScript() {
 		result.forEach((org) => {
 			let updatedTags = renameKeys(
 				{
-					'Abortion Providers': 'Abortion services'
+					'Abortion services': 'Abortion Providers'
 				},
 				org.tags
 			);
@@ -131,7 +131,7 @@ async function runRollbackScript() {
 						_id: org._id
 					},
 					update: {
-						'services.$[elem].tags.united_states.Medical': updatedTags
+						'services.$[elem].tags.united_states.Abortion Care': updatedTags
 					},
 					arrayFilters: [{'elem._id': {$eq: org.service_id}}]
 				}
