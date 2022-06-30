@@ -1,10 +1,19 @@
 import {Octokit} from '@octokit/rest';
 const OWNER = 'asylum-connect';
+import moment from 'moment';
 
 export const githubClient = async () => {
 	return new Octokit({
 		auth: process.env.TOKEN,
 		log: console
+	});
+};
+
+export const getAllReleases = async (repo) => {
+	const client = await githubClient();
+	return await client.rest.repos.listReleases({
+		owner: OWNER,
+		repo: repo
 	});
 };
 
@@ -55,5 +64,32 @@ export const createReleaseInRepo = async (
 		pr_title: createdPR.data.title,
 		pr_url: createdPR.data.url,
 		pr_state: createdPR.data.state
+	};
+};
+
+export const getReposContributors = async (repo) => {
+	const client = await githubClient();
+	return await client.rest.repos.listContributors({
+		owner: OWNER,
+		repo: repo
+	});
+};
+
+export const createHallFameObject = (data) => {
+	return {
+		username: data.login,
+		avatar_url: data.avatar_url,
+		total_contributions: data.contributions,
+		profile_username_url: data.html_url
+	};
+};
+
+export const createReleaseObject = (data) => {
+	return {
+		release_name: data.name,
+		release_tag: data.tag_name,
+		release_description: data.body,
+		release_date: moment(data.created_at).format('MM/DD/YYYY, hh:mm A'),
+		release_url: data.html_url
 	};
 };

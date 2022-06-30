@@ -32,8 +32,8 @@ describe('Dashboard Routers', () => {
 				expect(response.status).to.eq(200);
 				expect(response.body.created).to.be.an('boolean');
 				expect(response.body.created).to.be.eq(true);
-				expect(response.body.result).to.be.an('array');
-				expect(response.body.result).to.have.lengthOf(1);
+				expect(response.body.data).to.be.an('array');
+				expect(response.body.data).to.have.lengthOf(1);
 			});
 		});
 	});
