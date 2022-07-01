@@ -1,6 +1,6 @@
 import {Comment, Rating, Suggestion} from '../mongoose';
 import {handleBadRequest, handleErr, handleNotFound} from '../utils';
-import {getEntityQuery} from '../utils/query';
+import {getEntityQuery, ITEM_PAGE_LIMIT} from '../utils/query';
 
 export const getComments = async (req, res) => {
 	const {orgId, serviceId} = req?.params;
@@ -155,6 +155,16 @@ export const getSuggestions = async (req, res) => {
 	await Suggestion.find({})
 		.then((suggestions) => {
 			return res.json(suggestions);
+		})
+		.catch((err) => handleErr(err, res));
+};
+
+export const getSuggestionsCount = async (req, res) => {
+	await Suggestion.find({})
+		.then((suggestions) => {
+			const pages = Math.ceil(suggestions.length / ITEM_PAGE_LIMIT);
+
+			return res.json({count: suggestions.length, pages});
 		})
 		.catch((err) => handleErr(err, res));
 };
