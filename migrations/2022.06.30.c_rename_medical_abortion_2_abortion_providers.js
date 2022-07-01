@@ -22,18 +22,6 @@ require('../src/db');
 var migrationFunctions = require('./migrationsFunctions');
 var mongoose = require('../src/mongoose');
 
-//Helper Function
-let renameKeys = (keysMap, object) =>
-	Object.keys(object).reduce(
-		(acc, key) => ({
-			...acc,
-			...{
-				[keysMap[key] || key]: object[key]
-			}
-		}),
-		{}
-	);
-
 //Scripts
 async function runMigrationScript() {
 	try {
@@ -46,7 +34,7 @@ async function runMigrationScript() {
 			},
 			{
 				$match: {
-					'services.tags.canada.Abortion Care.Abortion Providers': {
+					'services.tags.canada.Medical.Abortion services': {
 						$exists: true
 					}
 				}
@@ -54,25 +42,22 @@ async function runMigrationScript() {
 			{
 				$project: {
 					service_id: '$services._id',
-					tags: '$services.tags.canada.Abortion Care'
+					tags: '$services.tags.canada.Medical'
 				}
 			}
 		]);
 		let bulkOperations = [];
 		result.forEach((org) => {
 			//Account for both possibilities
-			let updatedTags = renameKeys(
-				{
-					'Abortion Providers': 'Abortion services'
-				},
-				org.tags
-			);
+			let updatedTags = {'Abortion Providers': 'true'};
+			delete org.tags['Abortion services'];
 			bulkOperations.push({
 				updateOne: {
 					filter: {
 						_id: org._id
 					},
 					update: {
+						'services.$[elem].tags.canada.Medical': org.tags,
 						'services.$[elem].tags.canada.Abortion Care': updatedTags
 					},
 					arrayFilters: [{'elem._id': {$eq: org.service_id}}]
