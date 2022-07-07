@@ -19,6 +19,7 @@ const ObjectId = mongoose.Types.ObjectId;
 export const getOrgs = async (req, res) => {
 	const {limit, offset} = parsePageQuery(req?.query?.page);
 	const {query} = req;
+
 	let dbQuery = getOrganizationQuery(query);
 	var obj = {};
 
@@ -69,11 +70,29 @@ export const getOrgs = async (req, res) => {
 
 	try {
 		if (dbQuery.$geoNear) {
-			const organizations = await Organization.aggregate([
+			let organizations = await Organization.aggregate([
 				dbQuery,
 				{$skip: offset},
 				{$limit: limit}
 			]);
+			console.log(organizations);
+			// //function to remove distance (organizations)
+			// let updatedOrg1 = organizations1.map(({distance, ...organizations1}) => {
+			// 	return organizations1;
+			//   });
+			// console.log(updatedOrg1);
+			// //get the other one
+			// let organizations2 = await Organization.find(dbQuery['$geoNear'].query)
+			// .skip(offset)
+			// .limit(limit);
+			// //reduce and remove common ones
+			// const organizations = [...updatedOrg1,...organizations2].filter(
+			// 	(s => o =>
+			// 		(k => !s.has(k) && s.add(k))
+			// 		(['_id'].map(k => o[k]).join('|'))
+			// 	)
+			// 	(new Set)
+			// );
 			return res.json({
 				organizations
 			});

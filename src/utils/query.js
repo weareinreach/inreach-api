@@ -94,6 +94,7 @@ export const getOrganizationQuery = (params = {}) => {
 	const queryOnProperties = properties;
 	const queryOnTags = tagLocale && tags;
 	const queryOnServiceAreaCoverage = serviceArea;
+	let defaultDistance = 321869;
 
 	/**
 	 * For querying on an organizations services. Here is a plain english explanaiton of the logic:
@@ -183,10 +184,25 @@ export const getOrganizationQuery = (params = {}) => {
 		if (propertyQuery) {
 			$elemMatch = {...propertyQuery};
 		}
-
+		const national_service_usa = /service-national-united-states/;
+		const national_service_mexico = /service-national-mexico/;
+		const national_service_canada = /service-national-canada/;
 		// Either apply both queries or a single
 		if (serviceAreaQuery && tagQuery) {
-			$elemMatch.$and = [{$or: serviceAreaQuery}, {$or: tagQuery}];
+			if (lat?.length && long?.length) {
+				defaultDistance =
+					national_service_usa.test(serviceArea) ||
+					national_service_mexico.test(serviceArea) ||
+					national_service_canada.test(serviceArea)
+						? null
+						: defaultDistance;
+				$elemMatch.$and = [
+					{$or: serviceAreaQuery.concat(tagQuery)},
+					{$or: tagQuery}
+				];
+			} else {
+				$elemMatch.$and = [{$or: serviceAreaQuery}, {$or: tagQuery}];
+			}
 		} else if (serviceAreaQuery) {
 			$elemMatch.$or = serviceAreaQuery;
 		} else if (tagQuery) {
@@ -201,10 +217,10 @@ export const getOrganizationQuery = (params = {}) => {
 			$geoNear: {
 				near: {type: 'Point', coordinates: [parseFloat(long), parseFloat(lat)]},
 				distanceField: 'distance',
+				...(defaultDistance !== null && {maxDistance: defaultDistance}),
 				query: {...query}
 			}
 		};
-		return query;
 	}
 	return query;
 };
