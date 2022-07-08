@@ -285,8 +285,7 @@ jobs:
               export MIGRATION_FILE=$i
               yarn run-migration
             done
-      # Unfortunately CircleCI does not allow user or Project Token, Personal Token was used. 
-      # Update it if @Alfred-Moreira is no longer with the organization
+      # Unfortunately CircleCI does not allow user or Project Token, Personal Token was used of InReach Service Account. 
       - run:  
           name: Register migration
           command: BRANCH=main node ./migrations/triggerRegistration.js
@@ -320,8 +319,7 @@ jobs:
               export MIGRATION_FILE=$i
               yarn run-migration
             done
-      # Unfortunately CircleCI does not allow user or Project Token, Personal Token was used. 
-      # Update it if @Alfred-Moreira is no longer with the organization
+      # Unfortunately CircleCI does not allow user or Project Token, Personal Token was used of InReach Service Account.
       - run:  
           name: Register migration
           command: BRANCH=dev node ./migrations/triggerRegistration.js
@@ -355,8 +353,7 @@ jobs:
               export MIGRATION_FILE=$i
               yarn run-rollback
             done
-      # Unfortunately CircleCI does not allow user or Project Token, Personal Token was used. 
-      # Update it if @Alfred-Moreira is no longer with the organization
+      # Unfortunately CircleCI does not allow user or Project Token, Personal Token was used of InReach Service Account.
       - run:  
           name: Register migration
           command: BRANCH=main node ./migrations/triggerRegistration.js
@@ -366,7 +363,7 @@ jobs:
       - image: cimg/node:16.12.0
     working_directory: ~/inreach-api
     environment:
-      FILES: << pipeline.parameters.date_pattern >>
+      FILES: << pipeline.parameters.files >>
       PIPELINE_ID: << pipeline.id >>
       TYPE: rollback_stage
     steps:
@@ -389,8 +386,7 @@ jobs:
               export MIGRATION_FILE=$i
               yarn run-rollback
             done
-      # Unfortunately CircleCI does not allow user or Project Token, Personal Token was used. 
-      # Update it if @Alfred-Moreira is no longer with the organization
+     # Unfortunately CircleCI does not allow user or Project Token, Personal Token was used of InReach Service Account.
       - run:  
           name: Register migration
           command: BRANCH=dev node ./migrations/triggerRegistration.js

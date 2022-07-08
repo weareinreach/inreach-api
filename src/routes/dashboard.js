@@ -6,9 +6,12 @@ import {
 	getAllReleases,
 	createReleaseObject,
 	getReposContributors,
-	createHallFameObject,
-	getReposLatestsContributors
+	createHallFameObject
 } from '../utils/github';
+import {
+	triggerStagingMigration,
+	triggerProductionMigration
+} from '../utils/circleci';
 
 //Add dev Access
 
@@ -80,7 +83,7 @@ export const getRepoContributors = async (req, res) => {
 		let data = [];
 		const result = await getReposContributors(repo);
 		for (const contributor in result.data) {
-			if (counter == 3) break;
+			if (counter == 5) break;
 			data.push(createHallFameObject(result.data[contributor]));
 			counter++;
 		}
@@ -90,4 +93,24 @@ export const getRepoContributors = async (req, res) => {
 	}
 };
 
-//clean merged branches
+export const triggerStagMigration = async (req, res) => {
+	const {branch, parameters} = req?.body;
+	if (!branch || !parameters || branch !== 'dev') return handleBadRequest(res);
+	try {
+		const result = await triggerStagingMigration(req?.body);
+		return res.json({message: 'Staging Migration Triggered'});
+	} catch (err) {
+		handleErr(err, res);
+	}
+};
+
+export const triggerProdMigration = async (req, res) => {
+	const {branch, parameters} = req?.body;
+	if (!branch || !parameters || branch !== 'main') return handleBadRequest(res);
+	try {
+		const result = await triggerProdMigration(req?.body);
+		return res.json({message: 'Production Migration Triggered'});
+	} catch (err) {
+		handleErr(err, res);
+	}
+};
