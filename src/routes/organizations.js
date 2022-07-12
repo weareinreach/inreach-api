@@ -17,7 +17,15 @@ import mongoose from 'mongoose';
 const ObjectId = mongoose.Types.ObjectId;
 
 export const getOrgs = async (req, res) => {
-	const {limit, offset} = parsePageQuery(req?.query?.page);
+	let limit = '';
+	let offset = '';
+
+	if(req?.query?.page == -1) {
+		offset = 0;
+	} else {
+		limit = parsePageQuery(req?.query?.page).limit;
+		offset = parsePageQuery(req?.query?.page).offset;
+	}
 	const {query} = req;
 	let dbQuery = getOrganizationQuery(query);
 	var obj = {};
