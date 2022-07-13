@@ -32,7 +32,7 @@ class OrgData {
 		this.is_deleted = Math.random() < 0.1;
 		this.owners = seedFunctions.getArray(randNumber).map(() => {
 			return {
-				isApproved: true,
+				isApproved: Math.random() < 0.7,
 				name: faker.name.firstName(),
 				email: faker.internet.email(),
 				userId: randNumber
