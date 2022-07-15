@@ -3,5 +3,10 @@
 	"description": "Test organizations Description",
 	"slug": "surprisingly-unique-organizations-slug",
 	"website": "https://google.com",
-	"is_deleted":false
+	"is_deleted":false,
+	"owners": [{
+				"email": "random@email.com",
+				"isApproved": true,
+				"userId": "1223456789"
+			}]
 }

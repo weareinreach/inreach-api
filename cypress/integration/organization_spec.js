@@ -737,7 +737,7 @@ describe('Organization Routers', () => {
 									url: getOrgCompoundURL
 								}).should((response) => {
 									expect(response.status).to.be.eq(200);
-									expect(response.body.owners).to.be.empty;
+									expect(response.body.owners).to.be.an('array');
 								});
 							});
 						});
