@@ -19,6 +19,7 @@ Object {
         ],
       },
       "is_published": true,
+      "owners.isApproved": true,
       "services": Object {
         "$elemMatch": Object {
           "$and": Array [

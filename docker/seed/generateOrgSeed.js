@@ -30,6 +30,14 @@ class OrgData {
 		this.description = `Organization ${this.#uniqueOrgID} description`;
 		this.name = faker.company.companyName();
 		this.is_deleted = Math.random() < 0.1;
+		this.owners = seedFunctions.getArray(randNumber).map(() => {
+			return {
+				isApproved: Math.random() < 0.7,
+				name: faker.name.firstName(),
+				email: faker.internet.email(),
+				userId: randNumber
+			};
+		});
 		this.slug = `organization-seeded-number-${this.#uniqueOrgID}`;
 		this.slug_ES = `organization-seeded-number-${this.#uniqueOrgID}`;
 		this.verified_at = faker.date.past();
