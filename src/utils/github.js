@@ -4,8 +4,8 @@ import moment from 'moment';
 
 export const githubClient = async () => {
 	return new Octokit({
-		auth: process.env.TOKEN,
-		log: console
+		auth: process.env.TOKEN
+		//log: console
 	});
 };
 
