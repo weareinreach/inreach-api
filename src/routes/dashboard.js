@@ -8,10 +8,7 @@ import {
 	getReposContributors,
 	createHallFameObject
 } from '../utils/github';
-import {
-	triggerStagingMigration,
-	triggerProductionMigration
-} from '../utils/circleci';
+import {runStagingMigration, runProductionMigration} from '../utils/circleci';
 
 //Add dev Access
 
@@ -97,7 +94,7 @@ export const triggerStagMigration = async (req, res) => {
 	const {branch, parameters} = req?.body;
 	if (!branch || !parameters || branch !== 'dev') return handleBadRequest(res);
 	try {
-		const result = await triggerStagingMigration(req?.body);
+		const result = await runStagingMigration(req?.body);
 		return res.json({message: 'Staging Migration Triggered'});
 	} catch (err) {
 		handleErr(err, res);
@@ -108,7 +105,7 @@ export const triggerProdMigration = async (req, res) => {
 	const {branch, parameters} = req?.body;
 	if (!branch || !parameters || branch !== 'main') return handleBadRequest(res);
 	try {
-		const result = await triggerProdMigration(req?.body);
+		const result = await runProductionMigration(req?.body);
 		return res.json({message: 'Production Migration Triggered'});
 	} catch (err) {
 		handleErr(err, res);
