@@ -70,9 +70,10 @@ export const getOrganizationQuery = (params = {}) => {
 	}
 
 	//reverting for now - works with staging data but not prod data
-	// if (pendingOwnership) {
-	// 	query['owners.isApproved'] = false;
-	// } else {
+	if (pendingOwnership) {
+		query['owners.isApproved'] = false;
+	}
+	//else {
 	// 	query['owners.isApproved'] = true;
 	// }
 
