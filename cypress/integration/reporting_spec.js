@@ -204,7 +204,7 @@ describe('Reporting Routers', () => {
 		}).should((response) => {
 			expect(response.status).to.be.eq(200);
 			expect(response.body.result).to.be.an('array');
-			expect(response.body.result).to.have.lengthOf(14);
+			expect(response.body.result).to.have.lengthOf(15);
 		});
 	});
 

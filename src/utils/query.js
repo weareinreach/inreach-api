@@ -71,6 +71,8 @@ export const getOrganizationQuery = (params = {}) => {
 
 	if (pendingOwnership) {
 		query['owners.isApproved'] = false;
+	} else {
+		query['owners.isApproved'] = true;
 	}
 
 	if (deleted) {
