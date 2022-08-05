@@ -69,11 +69,12 @@ export const getOrganizationQuery = (params = {}) => {
 		query['owners.email'] = owner;
 	}
 
-	if (pendingOwnership) {
-		query['owners.isApproved'] = false;
-	} else {
-		query['owners.isApproved'] = true;
-	}
+	//reverting for now - works with staging data but not prod data
+	// if (pendingOwnership) {
+	// 	query['owners.isApproved'] = false;
+	// } else {
+	// 	query['owners.isApproved'] = true;
+	// }
 
 	if (deleted) {
 		query.is_deleted = true;
