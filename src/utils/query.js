@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 const ObjectId = mongoose.Types.ObjectId;
+import milesToMeters from './index';
 
 /**
  * Uses object shorthand to create a query based on if the values exist
@@ -189,6 +190,7 @@ export const getOrganizationQuery = (params = {}) => {
 		const national_service_usa = /service-national-united-states/;
 		const national_service_mexico = /service-national-mexico/;
 		const national_service_canada = /service-national-canada/;
+
 		// Either apply both queries or a single
 		if (serviceAreaQuery && tagQuery) {
 			if (lat?.length && long?.length) {
@@ -219,7 +221,9 @@ export const getOrganizationQuery = (params = {}) => {
 			$geoNear: {
 				near: {type: 'Point', coordinates: [parseFloat(long), parseFloat(lat)]},
 				distanceField: 'distance',
-				...(defaultDistance !== null && {maxDistance: defaultDistance}),
+				...(defaultDistance !== 'national' && {
+					maxDistance: milesToMeters(defaultDistance)
+				}),
 				query: {...query}
 			}
 		};
