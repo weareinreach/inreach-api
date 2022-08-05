@@ -69,11 +69,11 @@ export const getOrganizationQuery = (params = {}) => {
 		query['owners.email'] = owner;
 	}
 
-	if (pendingOwnership) {
-		query['owners.isApproved'] = false;
-	} else {
-		query['owners.isApproved'] = true;
-	}
+	// if (pendingOwnership) {
+	// 	query['owners.isApproved'] = false;
+	// } else {
+	// 	query['owners.isApproved'] = true;
+	// }
 
 	if (deleted) {
 		query.is_deleted = true;
