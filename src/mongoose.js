@@ -241,6 +241,7 @@ const UserSchema = new Schema(
 		sogIdentity: [String],
 		immigrationStatus: String,
 		isAdminDataManager: {type: Boolean, default: false},
+		isAdminDeveloper: {type: Boolean, default: false},
 		isDataManager: {type: Boolean, default: false},
 		isProfessional: {type: Boolean, default: false},
 		lists: [
