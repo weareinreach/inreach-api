@@ -8,7 +8,7 @@
 
 #Use the correct date pattern all the files with a release
 #The pattern should follow yyyy.mm.dd{.|_}
-export DATE_PATTERN=2022.02.01.
+export DATE_PATTERN=2022.09.01.
 
 #Check if which directory script was run from
 if [[ $PWD == *inrech-api ]]; then
@@ -27,6 +27,6 @@ for i in ${FILES//,/ }; do
     export MIGRATION_FILE=$i
     echo "Running Command..."
     #Uncomment the one you want to run
-    #yarn run-migration
+    yarn run-migration
     #yarn rollback-migration
  done
