@@ -22,7 +22,7 @@ jobs:
         uses: zaproxy/action-baseline@v0.3.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          target: 'https://asylum-connect-api-staging.herokuapp.com/'
+          target: 'https://inreach-api-staging.herokuapp.com/'
           cmd_options: '-a'
 
   zap_scan_production_baseline:
@@ -37,7 +37,7 @@ jobs:
         uses: zaproxy/action-baseline@v0.3.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          target: 'https://asylum-connect-api.herokuapp.com'
+          target: 'https://inreach-api.herokuapp.com'
           cmd_options: '-a'
 
   zap_scan_staging_full:
@@ -52,7 +52,7 @@ jobs:
         uses: zaproxy/action-full-scan@v0.3.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          target: 'https://asylum-connect-api-staging.herokuapp.com/'
+          target: 'https://inreach-api-staging.herokuapp.com/'
           cmd_options: '-a'
 
   zap_scan_production_full:
@@ -67,7 +67,7 @@ jobs:
         uses: zaproxy/action-full-scan@v0.3.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          target: 'https://asylum-connect-api.herokuapp.com'
+          target: 'https://inreach-api.herokuapp.com'
           cmd_options: '-a'
 
   zap_scan_staging_api:
@@ -82,7 +82,7 @@ jobs:
         uses: zaproxy/action-api-scan@v0.1.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          target: 'https://asylum-connect-api-staging.herokuapp.com/'
+          target: 'https://inreach-api-staging.herokuapp.com/'
           cmd_options: '-a'
 
   zap_scan_production_api:
@@ -97,6 +97,6 @@ jobs:
         uses: zaproxy/action-api-scan@v0.1.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          target: 'https://asylum-connect-api.herokuapp.com'
+          target: 'https://inreach-api.herokuapp.com'
           cmd_options: '-a'
   
