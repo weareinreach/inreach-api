@@ -1,0 +1,102 @@
+on:
+  pull_request:
+    types: [opened,reopened]
+  # push:
+  #   branches:
+  #     - main
+
+env:
+  PR_NUMBER: ${{ github.event.number }}
+  BASE_BRANCH: ${{ github.base_ref }}
+    
+jobs:
+  zap_scan_staging_baseline:
+    runs-on: ubuntu-latest
+    name: Scan ZAP website Baseline Staging
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          ref: code-security
+      - name: ZAP Scan
+        uses: zaproxy/action-baseline@v0.3.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          target: 'https://inreach-api-staging.herokuapp.com/'
+          cmd_options: '-a'
+
+  zap_scan_production_baseline:
+    runs-on: ubuntu-latest
+    name: Scan ZAP website Baseline Production
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          ref: main
+      - name: ZAP Scan
+        uses: zaproxy/action-baseline@v0.3.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          target: 'https://inreach-api.herokuapp.com'
+          cmd_options: '-a'
+
+  zap_scan_staging_full:
+    runs-on: ubuntu-latest
+    name: Scan ZAP website Full Staging
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          ref: code-security
+      - name: ZAP Scan
+        uses: zaproxy/action-full-scan@v0.3.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          target: 'https://inreach-api-staging.herokuapp.com/'
+          cmd_options: '-a'
+
+  zap_scan_production_full:
+    runs-on: ubuntu-latest
+    name: Scan ZAP website Full Production
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          ref: main
+      - name: ZAP Scan
+        uses: zaproxy/action-full-scan@v0.3.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          target: 'https://inreach-api.herokuapp.com'
+          cmd_options: '-a'
+
+  zap_scan_staging_api:
+    runs-on: ubuntu-latest
+    name: Scan ZAP website API Staging
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          ref: code-security
+      - name: ZAP Scan
+        uses: zaproxy/action-api-scan@v0.1.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          target: 'https://inreach-api-staging.herokuapp.com/'
+          cmd_options: '-a'
+
+  zap_scan_production_api:
+    runs-on: ubuntu-latest
+    name: Scan ZAP website API Production
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          ref: main
+      - name: ZAP Scan
+        uses: zaproxy/action-api-scan@v0.1.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          target: 'https://inreach-api.herokuapp.com'
+          cmd_options: '-a'
+  
