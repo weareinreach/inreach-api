@@ -3,11 +3,10 @@
   *  Issue:  https://app.asana.com/0/1132189118126148/1202522027612226
   *  Description: This schema change will update the medical tag Abortion services to 
   *  Abortion Care.Abortion Providers across US, Mexico and Canadian regions. This will take care of the
-  *  Mexico Migration
+  *  US Migration
   * ********************************************************************************
   
 
- 
  /* eslint-disable no-console */
 require('babel-register')({
 	presets: ['env']
@@ -19,9 +18,9 @@ require('dotenv').config({
 	path: '.env'
 });
 // Import DB Connection
-require('../src/db');
-var migrationFunctions = require('./migrationsFunctions');
-var mongoose = require('../src/mongoose');
+require('../../src/db');
+var migrationFunctions = require('../migrationsFunctions');
+var mongoose = require('../../src/mongoose');
 
 //Scripts
 async function runMigrationScript() {
@@ -35,7 +34,7 @@ async function runMigrationScript() {
 			},
 			{
 				$match: {
-					'services.tags.mexico.Medical.Abortion services': {
+					'services.tags.united_states.Medical.Abortion services': {
 						$exists: true
 					}
 				}
@@ -43,7 +42,7 @@ async function runMigrationScript() {
 			{
 				$project: {
 					service_id: '$services._id',
-					tags: '$services.tags.mexico.Medical'
+					tags: '$services.tags.united_states.Medical'
 				}
 			}
 		]);
@@ -58,8 +57,8 @@ async function runMigrationScript() {
 						_id: org._id
 					},
 					update: {
-						'services.$[elem].tags.mexico.Medical': org.tags,
-						'services.$[elem].tags.mexico.Abortion Care': updatedTags
+						'services.$[elem].tags.united_states.Medical': org.tags,
+						'services.$[elem].tags.united_states.Abortion Care': updatedTags
 					},
 					arrayFilters: [{'elem._id': {$eq: org.service_id}}]
 				}
@@ -71,7 +70,7 @@ async function runMigrationScript() {
 		console.log(
 			`Number of modified rows: ${JSON.stringify(updateResponse.nModified)}`
 		);
-		console.log('Migration Mexico executed');
+		console.log('Migration United States executed');
 		process.exit(0);
 	} catch (err) {
 		console.log(err);
@@ -91,7 +90,7 @@ async function runRollbackScript() {
 			},
 			{
 				$match: {
-					'services.tags.mexico.Abortion Care.Abortion services': {
+					'services.tags.united_states.Abortion Care.Abortion services': {
 						$exists: true
 					}
 				}
@@ -99,7 +98,7 @@ async function runRollbackScript() {
 			{
 				$project: {
 					service_id: '$services._id',
-					tags: '$services.tags.mexico.Abortion Care'
+					tags: '$services.tags.united_states.Abortion Care'
 				}
 			}
 		]);
@@ -117,7 +116,7 @@ async function runRollbackScript() {
 						_id: org._id
 					},
 					update: {
-						'services.$[elem].tags.mexico.Abortion Care': updatedTags
+						'services.$[elem].tags.united_states.Abortion Care': updatedTags
 					},
 					arrayFilters: [{'elem._id': {$eq: org.service_id}}]
 				}
@@ -129,7 +128,7 @@ async function runRollbackScript() {
 		console.log(
 			`Number of modified rows: ${JSON.stringify(updateResponse.nModified)}`
 		);
-		console.log('Rollback Mexico executed');
+		console.log('Rollback United States executed');
 		process.exit(0);
 	} catch (err) {
 		console.log(err);
