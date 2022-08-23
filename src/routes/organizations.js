@@ -12,7 +12,7 @@ import {
 } from '../utils/query';
 import {sendEmail} from '../utils/mail';
 import {shareResource} from '../utils/sendMail';
-import {Organization} from '../mongoose';
+import {Organization, User} from '../mongoose';
 import mongoose from 'mongoose';
 const ObjectId = mongoose.Types.ObjectId;
 
@@ -277,7 +277,7 @@ export const createOrgOwner = async (req, res) => {
 		const {orgId} = req?.params;
 		const {email, userId} = req?.body;
 
-		if (!email || !userId) {
+		if (!email || !userId || !isValidObjectId(userId)) {
 			return handleBadRequest(res);
 		}
 		const organization = await Organization.findById(orgId);
@@ -307,6 +307,15 @@ export const createOrgOwner = async (req, res) => {
 export const approveOrgOwner = async (req, res) => {
 	const {orgId, userId} = req?.params;
 
+	if (
+		!orgId ||
+		!userId ||
+		!isValidObjectId(orgId) ||
+		!isValidObjectId(userId)
+	) {
+		return handleBadRequest(res);
+	}
+
 	await Organization.findById(orgId)
 		.then(async (organization) => {
 			if (!organization) {
@@ -334,25 +343,38 @@ export const approveOrgOwner = async (req, res) => {
 export const deleteOrgOwner = async (req, res) => {
 	const {orgId, userId} = req?.params;
 
-	await Organization.findById(orgId)
-		.then(async (organization) => {
-			if (!organization) {
+	if (
+		!orgId ||
+		!userId ||
+		!isValidObjectId(orgId) ||
+		!isValidObjectId(userId)
+	) {
+		return handleBadRequest(res);
+	}
+	//Check if user exists
+	await User.findById(userId)
+		.then(async (user) => {
+			//Exit if user does not exist
+			if (user === null) {
 				return handleNotFound(res);
 			}
-
-			const ownerIndex = organization.owners.findIndex(
-				(owner) => owner.userId === userId
-			);
-
-			if (ownerIndex === -1) {
-				return handleNotFound(res);
-			}
-
-			organization.owners[ownerIndex].remove();
-
-			await organization
-				.save()
-				.then(() => res.json({deleted: true}))
+			//Remove User
+			await Organization.findById(orgId)
+				.then(async (organization) => {
+					if (!organization) {
+						return handleNotFound(res);
+					}
+					Organization.updateOne(
+						{_id: orgId},
+						{
+							$pull: {
+								owners: {userId: userId}
+							}
+						}
+					)
+						.then((org) => res.json({deleted: true}))
+						.catch((err) => handleErr(err, res));
+				})
 				.catch((err) => handleErr(err, res));
 		})
 		.catch((err) => handleErr(err, res));
@@ -364,19 +386,16 @@ export let sendOrgOwnerStatus = async (req, res, next) => {
 	let message;
 	let html;
 
-	console.log(recipient);
-	console.log(ownerStatus);
-
 	switch (ownerStatus) {
 		case 'approve':
-			subject = `You are now affiliated with ${org} on AsylumConnect`;
-			message = `Thank you for requesting to join ${org} on the AsylumConnect Catalog (https://asylumconnect.org). Our team has approved your request and your AsylumConnect user account is now connected to ${org}'s profile page on AsylumConnect.\n\nBest,\nThe AsylumConnect Team`;
-			html = `<html>Thank you for requesting to join ${org} on the <a href='https://asylumconnect.org'>AsylumConnect Catalog</a>. Our team has approved your request and your AsylumConnect user account is now connected to ${org}'s profile page on AsylumConnect.<br/><br/>Best,<br/>The AsylumConnect Team</html>`;
+			subject = `You are now affiliated with ${org} on InReach`;
+			message = `Thank you for requesting to join ${org} on the InReach App (https://InReach.org). Our team has approved your request and your InReach user account is now connected to ${org}'s profile page on InReach.\n\nBest,\nThe InReach Team`;
+			html = `<html>Thank you for requesting to join ${org} on the <a href='https://InReach.org'>InReach App</a>. Our team has approved your request and your InReach user account is now connected to ${org}'s profile page on InReach.<br/><br/>Best,<br/>The InReach Team</html>`;
 			break;
 		case 'deny':
-			subject = `Follow Up Re: Request to Join ${org} on AsylumConnect`;
-			message = `Thank you for requesting to join ${org} on the AsylumConnect Catalog <https://asylumconnect.org>. Our team was not able to verify your connection to ${org} based on your initial registration information. Please reply to this email with more details on how exactly you are affiliated with ${org}.\n\nBest,\nThe AsylumConnect Team`;
-			html = `<html>Thank you for requesting to join ${org} on the <a href='https://asylumconnect.org'>AsylumConnect Catalog</a>. Our team was not able to verify your connection to ${org} based on your initial registration information. Please reply to this email with more details on how exactly you are affiliated with ${org}.<br/><br/>Best,<br/>The AsylumConnect Team</html>`;
+			subject = `Follow Up Re: Request to Join ${org} on InReach`;
+			message = `Thank you for requesting to join ${org} on the InReach App <https://InReach.org>. Our team was not able to verify your connection to ${org} based on your initial registration information. Please reply to this email with more details on how exactly you are affiliated with ${org}.\n\nBest,\nThe InReach Team`;
+			html = `<html>Thank you for requesting to join ${org} on the <a href='https://InReach.org'>InReach App</a>. Our team was not able to verify your connection to ${org} based on your initial registration information. Please reply to this email with more details on how exactly you are affiliated with ${org}.<br/><br/>Best,<br/>The InReach Team</html>`;
 			break;
 	}
 	try {

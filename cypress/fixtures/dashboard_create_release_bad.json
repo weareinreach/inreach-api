@@ -1,0 +1,7 @@
+{
+    "repos": ["test-repo"],
+    "releaseBranch": "test-branch",
+    "sourceBranch": "dev-non-existent",
+    "targetBranch": "main",
+    "title": "test PR"
+}

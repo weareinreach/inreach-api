@@ -3,6 +3,12 @@
 #This file is to be used to run Github Status Checks
 version: 2.1
 parameters:
+  register_migration:
+    default: false
+    type: boolean
+  run_branch_pipeline:
+    default: true
+    type: boolean
   run_migration_prod:
     default: false
     type: boolean
@@ -21,32 +27,26 @@ parameters:
   date_pattern:
     default: ""
     type: string
+  pipeline_id:
+    default: ""
+    type: string
 orbs:
   node: circleci/node@3.0.0
   codecov: codecov/codecov@1.1.3
+  sonarcloud: sonarsource/sonarcloud@1.0.3
 jobs: 
   build:
     docker:
       - image: cimg/node:16.12.0
-    working_directory: ~/catalog-api
+    working_directory: ~/inreach-api
     steps:
       - checkout
-      # Download and cache dependencies
-    #   - restore_cache:
-    #       keys:
-    #       - v1-dependencies-{{ checksum "package.json" }}
-    #       # fallback to using the latest cache if no exact match is found
-    #       - v1-dependencies-
       - run: 
           name: Check Node Version
           command: node --version
       - run:
           name: Install Packages
           command: yarn install
-      - run:
-          name: Install Cypress
-          command: yarn add cypress
-      #save cache for use next tests
       - save_cache:
          paths:
           - node_modules
@@ -71,15 +71,9 @@ jobs:
   unit:
     docker:
       - image: cimg/node:16.12.0
-    working_directory: ~/catalog-api
+    working_directory: ~/inreach-api
     steps:
       - checkout
-      # Download and cache dependencies
-    #   - restore_cache:
-    #       keys:
-    #       - v1-dependencies-{{ checksum "package.json" }}
-    #       # fallback to using the latest cache if no exact match is found
-    #       - v1-dependencies-
       - run: 
           name: Check Node Version
           command: node --version
@@ -120,7 +114,7 @@ jobs:
           MONGO_INITDB_ROOT_USERNAME: user
           MONGO_INITDB_ROOT_PASSWORD: password
           MONGO_INITDB_DATABASE: asylum-connect
-    working_directory: ~/catalog-api
+    working_directory: ~/inreach-api
     steps:
       - checkout
       - run: 
@@ -138,7 +132,7 @@ jobs:
           command: yarn add nyc
       - run:
           name: Install Cypress
-          command: yarn add cypress
+          command: yarn add cypress@9.7.0
       #save cache for use next tests
       - save_cache:
          paths:
@@ -157,7 +151,7 @@ jobs:
            SHEETS_API_KEY=$SHEETS_API_KEY
            TEST_DB_URI=$TEST_DB_URI
            EOF
-      #Seeed Docker DB
+      #Seed Docker DB
       - run:
           name: "Seed Docker DB"
           command: yarn seed-docker-db
@@ -168,22 +162,21 @@ jobs:
       - run:
           name: "Show Coverage"
           command: "yarn show-coverage"
+      - run:
+          name: "Generate Report"
+          command: "yarn report:combined"
       - codecov/upload:
-          file: 'cypressCoverage/coverage-final.json'
+          file: 'coverageReports/coverage-final.json'
           flags: 'Integration'
+      - sonarcloud/scan
       - run:
           name: "Post E2E tasks"
           command: "yarn post-e2e-test"
-      - store_artifacts:
-          path: "reports/"
-          destination: E2E Test Reports
-      - store_artifacts:
-          path: ./cypressCoverage
-          destination: E2E Coverage Reports
+
   lint:
     docker:
       - image: cimg/node:16.12.0
-    working_directory: ~/catalog-api
+    working_directory: ~/inreach-api
     steps:
       - checkout
       - run: 
@@ -203,10 +196,70 @@ jobs:
           name: Run linting
           command: "yarn lint"
   
+  register_migration_stage:
+    docker:
+      - image: cimg/node:16.12.0
+    working_directory: ~/inreach-api
+    environment:
+      PIPELINE_ID: << pipeline.parameters.pipeline_id >>
+      TYPE: migration_stage
+      FILES: << pipeline.parameters.files >>
+    steps:
+      - checkout
+      #Recreate .env file from CircleCI Project Env Vars
+      - run:
+          name: Create .env file
+          command: |
+           cat \<< EOF > ./.env
+           DB_URI=$DB_URI_STAGING
+           PROFILE=CI
+           EOF
+      - run:
+          name: Install Packages
+          command: yarn install
+      - run: 
+          name: Register Migration Stage
+          command: |
+            for i in ${FILES//,/ }; do
+              export MIGRATION_FILE=$i
+              yarn register-migration
+            done
+
+  register_migration_prod:
+    docker:
+      - image: cimg/node:16.12.0
+    working_directory: ~/inreach-api
+    environment:
+      PIPELINE_ID: << pipeline.parameters.pipeline_id >>
+      DATE_PATTERN: << pipeline.parameters.date_pattern >>
+      TYPE: migration_prod
+    steps:
+      - checkout
+      #Recreate .env file from CircleCI Project Env Vars
+      - run:
+          name: Create .env file
+          command: |
+           cat \<< EOF > ./.env
+           DB_URI=$DB_URI_PROD
+           PROFILE=CI
+           EOF
+      - run:
+          name: Install Packages
+          command: yarn install
+      - run: 
+          name: Register Migration Prof
+          command: |
+            export  FILES=$(find . -type f -iname "*$DATE_PATTERN*" | cut -c 13-)
+            for i in ${FILES//,/ }; do
+              export MIGRATION_FILE=$i
+              yarn register-migration
+            done
+
+
   migration_prod:
     docker:
       - image: cimg/node:16.12.0
-    working_directory: ~/catalog-api
+    working_directory: ~/inreach-api
     environment:
       DATE_PATTERN: << pipeline.parameters.date_pattern>>
       PIPELINE_ID: << pipeline.id >>
@@ -232,11 +285,15 @@ jobs:
               export MIGRATION_FILE=$i
               yarn run-migration
             done
-  
+      # Unfortunately CircleCI does not allow user or Project Token, Personal Token was used of InReach Service Account. 
+      - run:  
+          name: Register migration
+          command: BRANCH=main node ./migrations/triggerRegistration.js
+ 
   migration_stage:
     docker:
       - image: cimg/node:16.12.0
-    working_directory: ~/catalog-api
+    working_directory: ~/inreach-api
     environment:
       FILES: << pipeline.parameters.files >>
       PIPELINE_ID: << pipeline.id >>
@@ -262,11 +319,15 @@ jobs:
               export MIGRATION_FILE=$i
               yarn run-migration
             done
-  
+      # Unfortunately CircleCI does not allow user or Project Token, Personal Token was used of InReach Service Account.
+      - run:  
+          name: Register migration
+          command: BRANCH=dev node ./migrations/triggerRegistration.js
+
   rollback_prod:
     docker:
       - image: cimg/node:16.12.0
-    working_directory: ~/catalog-api
+    working_directory: ~/inreach-api
     environment:
       DATE_PATTERN: << pipeline.parameters.date_pattern >>
       PIPELINE_ID: << pipeline.id >>
@@ -292,13 +353,17 @@ jobs:
               export MIGRATION_FILE=$i
               yarn run-rollback
             done
+      # Unfortunately CircleCI does not allow user or Project Token, Personal Token was used of InReach Service Account.
+      - run:  
+          name: Register migration
+          command: BRANCH=main node ./migrations/triggerRegistration.js
 
   rollback_stage:
     docker:
       - image: cimg/node:16.12.0
-    working_directory: ~/catalog-api
+    working_directory: ~/inreach-api
     environment:
-      FILES: << pipeline.parameters.date_pattern >>
+      FILES: << pipeline.parameters.files >>
       PIPELINE_ID: << pipeline.id >>
       TYPE: rollback_stage
     steps:
@@ -321,27 +386,60 @@ jobs:
               export MIGRATION_FILE=$i
               yarn run-rollback
             done
+     # Unfortunately CircleCI does not allow user or Project Token, Personal Token was used of InReach Service Account.
+      - run:  
+          name: Register migration
+          command: BRANCH=dev node ./migrations/triggerRegistration.js
 
 workflows:
   version: 2
+  development:
+    when: << pipeline.parameters.run_branch_pipeline >>
+    jobs:
+      - build:
+          filters:
+            branches:
+              only: dev
+      - e2e:
+         context: SonarCloud
+         filters:
+            branches:
+              only: dev
   pull_request:
     jobs:
       - build:
           filters:
             branches:
-              ignore: main
+              ignore: [main, dev]
       - e2e:
-          filters:
+         context: SonarCloud
+         filters:
             branches:
-              ignore: main
+              ignore: [main, dev]
       - unit:
           filters:
             branches:
-              ignore: main
+              ignore: [main, dev]
       - lint:
           filters:
             branches:
-              ignore: main
+              ignore: [main, dev]
+  
+  register_migration_stage:
+    when: << pipeline.parameters.register_migration >>
+    jobs:
+      - register_migration_stage:
+          filters:
+            branches:
+              only: dev
+  
+  register_migration_prod:
+    when: << pipeline.parameters.register_migration >>
+    jobs:
+      - register_migration_prod:
+          filters:
+            branches:
+              only: main
               
   migration_prod:
     when: << pipeline.parameters.run_migration_prod >>

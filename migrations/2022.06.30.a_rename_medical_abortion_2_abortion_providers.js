@@ -1,8 +1,8 @@
 /**********************************************************************************
-  *  Release 2022-02-01
-  *  Issue:  https://app.asana.com/0/1132189118126148/1201694772812876
-  *  Description: This schema change will update the medical tag Women's Health to 
-  *  OBGYN Services across US, Mexico and Canadian regions. This will take care of the
+  *  Release 2022-06-30
+  *  Issue:  https://app.asana.com/0/1132189118126148/1202522027612226
+  *  Description: This schema change will update the medical tag Abortion services to 
+  *  Abortion Care.Abortion Providers across US, Mexico and Canadian regions. This will take care of the
   *  US Migration
   * ********************************************************************************
   
@@ -19,20 +19,8 @@ require('dotenv').config({
 });
 // Import DB Connection
 require('../src/db');
-
+var migrationFunctions = require('./migrationsFunctions');
 var mongoose = require('../src/mongoose');
-
-//Helper Function
-let renameKeys = (keysMap, object) =>
-	Object.keys(object).reduce(
-		(acc, key) => ({
-			...acc,
-			...{
-				[keysMap[key] || key]: object[key]
-			}
-		}),
-		{}
-	);
 
 //Scripts
 async function runMigrationScript() {
@@ -46,7 +34,7 @@ async function runMigrationScript() {
 			},
 			{
 				$match: {
-					"services.tags.united_states.Medical.Women's health": {
+					'services.tags.united_states.Medical.Abortion services': {
 						$exists: true
 					}
 				}
@@ -61,19 +49,16 @@ async function runMigrationScript() {
 		let bulkOperations = [];
 		result.forEach((org) => {
 			//Account for both possibilities
-			let updatedTags = renameKeys(
-				{
-					"Women's health": 'OBGYN services'
-				},
-				org.tags
-			);
+			let updatedTags = {'Abortion Providers': 'true'};
+			delete org.tags['Abortion services'];
 			bulkOperations.push({
 				updateOne: {
 					filter: {
 						_id: org._id
 					},
 					update: {
-						'services.$[elem].tags.united_states.Medical': updatedTags
+						'services.$[elem].tags.united_states.Medical': org.tags,
+						'services.$[elem].tags.united_states.Abortion Care': updatedTags
 					},
 					arrayFilters: [{'elem._id': {$eq: org.service_id}}]
 				}
@@ -105,7 +90,7 @@ async function runRollbackScript() {
 			},
 			{
 				$match: {
-					'services.tags.united_states.Medical.OBGYN services': {
+					'services.tags.united_states.Abortion Care.Abortion services': {
 						$exists: true
 					}
 				}
@@ -113,7 +98,7 @@ async function runRollbackScript() {
 			{
 				$project: {
 					service_id: '$services._id',
-					tags: '$services.tags.united_states.Medical'
+					tags: '$services.tags.united_states.Abortion Care'
 				}
 			}
 		]);
@@ -121,7 +106,7 @@ async function runRollbackScript() {
 		result.forEach((org) => {
 			let updatedTags = renameKeys(
 				{
-					'OBGYN services': "Women's health"
+					'Abortion services': 'Abortion Providers'
 				},
 				org.tags
 			);
@@ -131,7 +116,7 @@ async function runRollbackScript() {
 						_id: org._id
 					},
 					update: {
-						'services.$[elem].tags.united_states.Medical': updatedTags
+						'services.$[elem].tags.united_states.Abortion Care': updatedTags
 					},
 					arrayFilters: [{'elem._id': {$eq: org.service_id}}]
 				}
@@ -152,9 +137,31 @@ async function runRollbackScript() {
 }
 
 if (process.env.MIGRATION) {
-	runMigrationScript();
+	switch (process.env.PROFILE) {
+		case 'CI':
+			migrationFunctions.checkIfMigrationHasRun().then((hasRun) => {
+				if (!hasRun) {
+					runMigrationScript();
+				}
+			});
+			break;
+		default:
+			runMigrationScript();
+			break;
+	}
 }
 
 if (process.env.ROLLBACK) {
-	runRollbackScript();
+	switch (process.env.PROFILE) {
+		case 'CI':
+			migrationFunctions.checkIfMigrationHasRun().then((hasRun) => {
+				if (!hasRun) {
+					runRollbackScript();
+				}
+			});
+			break;
+		default:
+			runRollbackScript();
+			break;
+	}
 }

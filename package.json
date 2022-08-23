@@ -1,5 +1,5 @@
 {
-	"name": "asylum-connect-catalog-api",
+	"name": "inreach-catalog-api",
 	"private": true,
 	"scripts": {
 		"cypress:open": "cypress open --config-file ./cypress.json",
@@ -8,12 +8,11 @@
 		"combine-reports": "mkdir ./reports && mochawesome-merge mochawesome-report/*.json > ./reports/reporte2e.json",
 		"generate-report": "marge ./reports/reporte2e.json -f e2e-report -o ./reports",
 		"post-e2e-test": "yarn combine-reports && yarn generate-report",
-		"show-coverage": "npx nyc report --reporter json --reporter=text",
+		"show-coverage": "npx nyc report --reporter=text",
 		"pre-e2e-test": "yarn clean:reports && yarn dev-background && (wait-on http://localhost:8080 -l -v -t 30000 && exit 0)",
 		"pre-unit-test": "yarn clean:reports",
-		"copy:reports": "mkdir coverageReports && cp cypressCoverage/coverage-final.json coverageReports/from-cypress.json && cp jestCoverage/coverage-final.json coverageReports/from-jest.json",
 		"combine:reports": "npx nyc merge coverageReports",
-		"report:combined": "npx nyc report --reporter lcov --reporter html --reporter text --report-dir coverageReports",
+		"report:combined": "npx nyc report --reporter lcov --reporter html --reporter json --report-dir coverageReports",
 		"combine:unit-e2e": "yarn copy:reports && yarn report:combined && yarn report:combined",
 		"unit-test": "jest",
 		"update-snapshot": "jest --updateSnapshot",
@@ -41,6 +40,8 @@
 		"seed-docker-db": "yarn run-s seed:*"
 	},
 	"dependencies": {
+		"@octokit/auth-token": "^2.5.0",
+		"@octokit/rest": "^18.12.0",
 		"backpack-core": "^0.8.4",
 		"body-parser": "^1.19.0",
 		"cors": "^2.8.5",
@@ -69,6 +70,7 @@
 		"babel-plugin-istanbul": "^6.0.0",
 		"babel-preset-env": "^1.7.0",
 		"babel-register": "^6.26.0",
+		"csv-writer": "^1.6.0",
 		"cypress": "^6.4.0",
 		"dotenv-webpack": "^1.7.0",
 		"eslint": "^6.8.0",

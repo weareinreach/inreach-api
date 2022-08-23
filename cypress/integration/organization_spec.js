@@ -698,7 +698,7 @@ describe('Organization Routers', () => {
 			url: compoundURL,
 			failOnStatusCode: false
 		}).should((response) => {
-			expect(response.status).to.be.eq(500);
+			expect(response.status).to.be.eq(400);
 		});
 	});
 
@@ -726,6 +726,19 @@ describe('Organization Routers', () => {
 								expect(response.status).to.be.eq(200);
 								expect(response.body.deleted).to.be.an('boolean');
 								expect(response.body.deleted).to.be.eq(true);
+								//Verify Owner was removed
+								let getOrgCompoundURL = Cypress.env('baseUrl').concat(
+									Cypress.env('version'),
+									Cypress.env('route_organizations'),
+									`/${createdOrgResponse.body.organization._id}`
+								);
+								cy.request({
+									method: 'GET',
+									url: getOrgCompoundURL
+								}).should((response) => {
+									expect(response.status).to.be.eq(200);
+									expect(response.body.owners).to.be.an('array');
+								});
 							});
 						});
 					});
@@ -756,7 +769,7 @@ describe('Organization Routers', () => {
 								url: compoundURL,
 								failOnStatusCode: false
 							}).should((response) => {
-								expect(response.status).to.be.eq(500);
+								expect(response.status).to.be.eq(400);
 								expect(response.body.error).to.be.an('boolean');
 								expect(response.body.error).to.be.eq(true);
 							});

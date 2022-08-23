@@ -136,3 +136,8 @@ lint/*
 #Docker
 docker/mongo-volume/
 docker/seedData/
+
+#Business Reports
+business_reports/output
+yarn.lock
+.vscode

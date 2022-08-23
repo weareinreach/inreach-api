@@ -8,7 +8,7 @@ require('dotenv').config({
 require('../src/db');
 const axios = require('axios');
 const mongoose = require('../src/mongoose');
-const options = {headers: {'Circle-Token': process.env.TOKEN}};
+const options = {headers: {'Circle-Token': process.env.PERSONAL_TOKEN}};
 
 const makeGetRequest = async (url, options) => {
 	try {
@@ -63,7 +63,20 @@ const saveMigration = async (migration) => {
 		});
 };
 
-export const registerMigration = async () => {
+export const registerMigrationStage = async () => {
+	console.log('Gathering Data...');
+	const workflowResponse = await makeGetRequest(
+		`https://circleci.com/api/v2/pipeline/${process.env.PIPELINE_ID}/workflow`,
+		options
+	);
+	saveMigration(
+		createMigrationObject(workflowResponse, null, {
+			name: 'Staging Auto Approver'
+		})
+	);
+};
+
+export const registerMigrationProd = async () => {
 	console.log('Gathering Data...');
 	const workflowResponse = await makeGetRequest(
 		`https://circleci.com/api/v2/pipeline/${process.env.PIPELINE_ID}/workflow`,
