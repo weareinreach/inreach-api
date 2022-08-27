@@ -75,24 +75,6 @@ export const getOrgs = async (req, res) => {
 				{$skip: offset},
 				{$limit: limit}
 			]);
-			console.log(organizations);
-			// //function to remove distance (organizations)
-			// let updatedOrg1 = organizations1.map(({distance, ...organizations1}) => {
-			// 	return organizations1;
-			//   });
-			// console.log(updatedOrg1);
-			// //get the other one
-			// let organizations2 = await Organization.find(dbQuery['$geoNear'].query)
-			// .skip(offset)
-			// .limit(limit);
-			// //reduce and remove common ones
-			// const organizations = [...updatedOrg1,...organizations2].filter(
-			// 	(s => o =>
-			// 		(k => !s.has(k) && s.add(k))
-			// 		(['_id'].map(k => o[k]).join('|'))
-			// 	)
-			// 	(new Set)
-			// );
 			return res.json({
 				organizations
 			});
