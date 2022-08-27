@@ -1,7 +1,12 @@
 import mongoose from 'mongoose';
 const ObjectId = mongoose.Types.ObjectId;
-import milesToMeters from './index';
+const ONE_MILE_TO_METER = 1609.344;
 
+export const milesToMeters = (miles) => {
+	return typeof miles === 'string'
+		? parseInt(miles) * ONE_MILE_TO_METER
+		: miles * ONE_MILE_TO_METER;
+};
 /**
  * Uses object shorthand to create a query based on if the values exist
  * @param  {String} organizationId id of the organization
@@ -51,7 +56,8 @@ export const getOrganizationQuery = (params = {}) => {
 		tagLocale,
 		tags,
 		long,
-		lat
+		lat,
+		selectedDistance
 	} = params;
 	let query = {};
 
@@ -70,9 +76,13 @@ export const getOrganizationQuery = (params = {}) => {
 		query['owners.email'] = owner;
 	}
 
+	//reverting for now - works with staging data but not prod data
 	if (pendingOwnership) {
 		query['owners.isApproved'] = false;
 	}
+	//else {
+	// 	query['owners.isApproved'] = true;
+	// }
 
 	if (deleted) {
 		query.is_deleted = true;
@@ -95,7 +105,6 @@ export const getOrganizationQuery = (params = {}) => {
 	const queryOnProperties = properties;
 	const queryOnTags = tagLocale && tags;
 	const queryOnServiceAreaCoverage = serviceArea;
-	let defaultDistance = 321869;
 
 	/**
 	 * For querying on an organizations services. Here is a plain english explanaiton of the logic:
@@ -185,26 +194,13 @@ export const getOrganizationQuery = (params = {}) => {
 		if (propertyQuery) {
 			$elemMatch = {...propertyQuery};
 		}
-		const national_service_usa = /service-national-united-states/;
-		const national_service_mexico = /service-national-mexico/;
-		const national_service_canada = /service-national-canada/;
 
 		// Either apply both queries or a single
 		if (serviceAreaQuery && tagQuery) {
-			if (lat?.length && long?.length) {
-				defaultDistance =
-					national_service_usa.test(serviceArea) ||
-					national_service_mexico.test(serviceArea) ||
-					national_service_canada.test(serviceArea)
-						? null
-						: defaultDistance;
-				$elemMatch.$and = [
-					{$or: serviceAreaQuery.concat(tagQuery)},
-					{$or: tagQuery}
-				];
-			} else {
-				$elemMatch.$and = [{$or: serviceAreaQuery}, {$or: tagQuery}];
-			}
+			$elemMatch.$and = [
+				{$or: serviceAreaQuery.concat(tagQuery)},
+				{$or: tagQuery}
+			];
 		} else if (serviceAreaQuery) {
 			$elemMatch.$or = serviceAreaQuery;
 		} else if (tagQuery) {
@@ -219,12 +215,13 @@ export const getOrganizationQuery = (params = {}) => {
 			$geoNear: {
 				near: {type: 'Point', coordinates: [parseFloat(long), parseFloat(lat)]},
 				distanceField: 'distance',
-				...(defaultDistance !== 'national' && {
-					maxDistance: milesToMeters(defaultDistance)
+				...(selectedDistance !== 'isNational' && {
+					maxDistance: milesToMeters(selectedDistance)
 				}),
 				query: {...query}
 			}
 		};
+		return query;
 	}
 	return query;
 };

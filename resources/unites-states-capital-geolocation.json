@@ -1,0 +1,513 @@
+[{
+    "geometry": {
+        "type": "Point",
+        "coordinates": [-86.279118, 32.361538]
+    },
+    "properties": {
+        "stateLong": "Alabama",
+        "name": "Montgomery",
+        "stateShort": "AL"
+    }
+}, {
+    "geometry": {
+        "type": "Point",
+        "coordinates": [-134.41974, 58.301935]
+    },
+    "properties": {
+        "stateLong": "Alaska",
+        "name": "Juneau",
+        "stateShort": "AK"
+    }
+}, {
+    "geometry": {
+        "type": "Point",
+        "coordinates": [-112.073844, 33.448457]
+    },
+    "properties": {
+        "stateLong": "Arizona",
+        "name": "Phoenix",
+        "stateShort": "AZ"
+    }
+}, {
+    "geometry": {
+        "type": "Point",
+        "coordinates": [-92.331122, 34.736009]
+    },
+    "properties": {
+        "stateLong": "Arkansas",
+        "name": "Little Rock",
+        "stateShort": "AR"
+    }
+}, {
+    "geometry": {
+        "type": "Point",
+        "coordinates": [-121.468926, 38.555605]
+    },
+    "properties": {
+        "stateLong": "California",
+        "name": "Sacramento",
+        "stateShort": "CA"
+    }
+}, {
+    "geometry": {
+        "type": "Point",
+        "coordinates": [-104.984167, 39.7391667]
+    },
+    "properties": {
+        "stateLong": "Colorado",
+        "name": "Denver",
+        "stateShort": "CO"
+    }
+}, {
+    "geometry": {
+        "type": "Point",
+        "coordinates": [-72.677, 41.767]
+    },
+    "properties": {
+        "stateLong": "Connecticut",
+        "name": "Hartford",
+        "stateShort": "CT"
+    }
+}, {
+    "geometry": {
+        "type": "Point",
+        "coordinates": [-75.526755, 39.161921]
+    },
+    "properties": {
+        "stateLong": "Delaware",
+        "name": "Dover",
+        "stateShort": "DE"
+    }
+}, {
+    "geometry": {
+        "type": "Point",
+        "coordinates": [-84.27277, 30.4518]
+    },
+    "properties": {
+        "stateLong": "Florida",
+        "name": "Tallahassee",
+        "stateShort": "FL"
+    }
+}, {
+    "geometry": {
+        "type": "Point",
+        "coordinates": [-84.39, 33.76]
+    },
+    "properties": {
+        "stateLong": "Georgia",
+        "name": "Atlanta",
+        "stateShort": "GA"
+    }
+}, {
+    "geometry": {
+        "type": "Point",
+        "coordinates": [-157.826182, 21.30895]
+    },
+    "properties": {
+        "stateLong": "Hawaii",
+        "name": "Honolulu",
+        "stateShort": "HI"
+    }
+}, {
+    "geometry": {
+        "type": "Point",
+        "coordinates": [-116.237651, 43.613739]
+    },
+    "properties": {
+        "stateLong": "Idaho",
+        "name": "Boise",
+        "stateShort": "ID"
+    }
+}, {
+    "geometry": {
+        "type": "Point",
+        "coordinates": [-89.650373, 39.78325]
+    },
+    "properties": {
+        "stateLong": "Illinois",
+        "name": "Springfield",
+        "stateShort": "IL"
+    }
+}, {
+    "geometry": {
+        "type": "Point",
+        "coordinates": [-86.147685, 39.790942]
+    },
+    "properties": {
+        "stateLong": "Indiana",
+        "name": "Indianapolis",
+        "stateShort": "IN"
+    }
+}, {
+    "geometry": {
+        "type": "Point",
+        "coordinates": [-93.620866, 41.590939]
+    },
+    "properties": {
+        "stateLong": "Iowa",
+        "name": "Des Moines",
+        "stateShort": "IA"
+    }
+}, {
+    "geometry": {
+        "type": "Point",
+        "coordinates": [-95.69, 39.04]
+    },
+    "properties": {
+        "stateLong": "Kansas",
+        "name": "Topeka",
+        "stateShort": "KS"
+    }
+}, {
+    "geometry": {
+        "type": "Point",
+        "coordinates": [-84.86311, 38.197274]
+    },
+    "properties": {
+        "stateLong": "Kentucky",
+        "name": "Frankfort",
+        "stateShort": "KY"
+    }
+}, {
+    "geometry": {
+        "type": "Point",
+        "coordinates": [-91.140229, 30.45809]
+    },
+    "properties": {
+        "stateLong": "Louisiana",
+        "name": "Baton Rouge",
+        "stateShort": "LA"
+    }
+}, {
+    "geometry": {
+        "type": "Point",
+        "coordinates": [-69.765261, 44.323535]
+    },
+    "properties": {
+        "stateLong": "Maine",
+        "name": "Augusta",
+        "stateShort": "ME"
+    }
+}, {
+    "geometry": {
+        "type": "Point",
+        "coordinates": [-76.501157, 38.972945]
+    },
+    "properties": {
+        "stateLong": "Maryland",
+        "name": "Annapolis",
+        "stateShort": "MD"
+    }
+}, {
+    "geometry": {
+        "type": "Point",
+        "coordinates": [-71.0275, 42.2352]
+    },
+    "properties": {
+        "stateLong": "Massachusetts",
+        "name": "Boston",
+        "stateShort": "MA"
+    }
+}, {
+    "geometry": {
+        "type": "Point",
+        "coordinates": [-84.5467, 42.7335]
+    },
+    "properties": {
+        "stateLong": "Michigan",
+        "name": "Lansing",
+        "stateShort": "MI"
+    }
+}, {
+    "geometry": {
+        "type": "Point",
+        "coordinates": [-93.094, 44.95]
+    },
+    "properties": {
+        "stateLong": "Minnesota",
+        "name": "Saint Paul",
+        "stateShort": "MN"
+    }
+}, {
+    "geometry": {
+        "type": "Point",
+        "coordinates": [-90.207, 32.32]
+    },
+    "properties": {
+        "stateLong": "Mississippi",
+        "name": "Jackson",
+        "stateShort": "MS"
+    }
+}, {
+    "geometry": {
+        "type": "Point",
+        "coordinates": [-92.189283, 38.572954]
+    },
+    "properties": {
+        "stateLong": "Missouri",
+        "name": "Jefferson City",
+        "stateShort": "MO"
+    }
+}, {
+    "geometry": {
+        "type": "Point",
+        "coordinates": [-112.027031, 46.595805]
+    },
+    "properties": {
+        "stateLong": "Montana",
+        "name": "Helana",
+        "stateShort": "MT"
+    }
+}, {
+    "geometry": {
+        "type": "Point",
+        "coordinates": [-96.675345, 40.809868]
+    },
+    "properties": {
+        "stateLong": "Nebraska",
+        "name": "Lincoln",
+        "stateShort": "NE"
+    }
+}, {
+    "geometry": {
+        "type": "Point",
+        "coordinates": [-119.753877, 39.160949]
+    },
+    "properties": {
+        "stateLong": "Nevada",
+        "name": "Carson City",
+        "stateShort": "NV"
+    }
+}, {
+    "geometry": {
+        "type": "Point",
+        "coordinates": [-71.549127, 43.220093]
+    },
+    "properties": {
+        "stateLong": "New Hampshire",
+        "name": "Concord",
+        "stateShort": "NH"
+    }
+}, {
+    "geometry": {
+        "type": "Point",
+        "coordinates": [-74.756138, 40.221741]
+    },
+    "properties": {
+        "stateLong": "New Jersey",
+        "name": "Trenton",
+        "stateShort": "NJ"
+    }
+}, {
+    "geometry": {
+        "type": "Point",
+        "coordinates": [-105.964575, 35.667231]
+    },
+    "properties": {
+        "stateLong": "New Mexico",
+        "name": "Santa Fe",
+        "stateShort": "NM"
+    }
+}, {
+    "geometry": {
+        "type": "Point",
+        "coordinates": [-73.781339, 42.659829]
+    },
+    "properties": {
+        "stateLong": "New York",
+        "name": "Albany",
+        "stateShort": "NY"
+    }
+}, {
+    "geometry": {
+        "type": "Point",
+        "coordinates": [-78.638, 35.771]
+    },
+    "properties": {
+        "stateLong": "North Carolina",
+        "name": "Raleigh",
+        "stateShort": "NC"
+    }
+}, {
+    "geometry": {
+        "type": "Point",
+        "coordinates": [-100.779004, 48.813343]
+    },
+    "properties": {
+        "stateLong": "North Dakota",
+        "name": "Bismarck",
+        "stateShort": "ND"
+    }
+}, {
+    "geometry": {
+        "type": "Point",
+        "coordinates": [-83.000647, 39.962245]
+    },
+    "properties": {
+        "stateLong": "Ohio",
+        "name": "Columbus",
+        "stateShort": "OH"
+    }
+}, {
+    "geometry": {
+        "type": "Point",
+        "coordinates": [-97.534994, 35.482309]
+    },
+    "properties": {
+        "stateLong": "Oklahoma",
+        "name": "Oklahoma City",
+        "stateShort": "OK"
+    }
+}, {
+    "geometry": {
+        "type": "Point",
+        "coordinates": [-123.029159, 44.931109]
+    },
+    "properties": {
+        "stateLong": "Oregon",
+        "name": "Salem",
+        "stateShort": "OR"
+    }
+}, {
+    "geometry": {
+        "type": "Point",
+        "coordinates": [-76.875613, 40.269789]
+    },
+    "properties": {
+        "stateLong": "Pennsylvania",
+        "name": "Harrisburg",
+        "stateShort": "PA"
+    }
+}, {
+    "geometry": {
+        "type": "Point",
+        "coordinates": [-71.422132, 41.82355]
+    },
+    "properties": {
+        "stateLong": "Rhode Island",
+        "name": "Providence",
+        "stateShort": "RI"
+    }
+}, {
+    "geometry": {
+        "type": "Point",
+        "coordinates": [-81.035, 34]
+    },
+    "properties": {
+        "stateLong": "South Carolina",
+        "name": "Columbia",
+        "stateShort": "SC"
+    }
+}, {
+    "geometry": {
+        "type": "Point",
+        "coordinates": [-100.336378, 44.367966]
+    },
+    "properties": {
+        "stateLong": "South Dakota",
+        "name": "Pierre",
+        "stateShort": "SD"
+    }
+}, {
+    "geometry": {
+        "type": "Point",
+        "coordinates": [-86.784, 36.165]
+    },
+    "properties": {
+        "stateLong": "Tennessee",
+        "name": "Nashville",
+        "stateShort": "TN"
+    }
+}, {
+    "geometry": {
+        "type": "Point",
+        "coordinates": [-97.75, 30.266667]
+    },
+    "properties": {
+        "stateLong": "Texas",
+        "name": "Austin",
+        "stateShort": "TX"
+    }
+}, {
+    "geometry": {
+        "type": "Point",
+        "coordinates": [-111.892622, 40.7547]
+    },
+    "properties": {
+        "stateLong": "Utah",
+        "name": "Salt Lake City",
+        "stateShort": "UT"
+    }
+}, {
+    "geometry": {
+        "type": "Point",
+        "coordinates": [-72.57194, 44.26639]
+    },
+    "properties": {
+        "stateLong": "Vermont",
+        "name": "Montpelier",
+        "stateShort": "VT"
+    }
+}, {
+    "geometry": {
+        "type": "Point",
+        "coordinates": [-77.46, 37.54]
+    },
+    "properties": {
+        "stateLong": "Virginia",
+        "name": "Richmond",
+        "stateShort": "VA"
+    }
+}, {
+    "geometry": {
+        "type": "Point",
+        "coordinates": [-122.893077, 47.042418]
+    },
+    "properties": {
+        "stateLong": "Washington",
+        "name": "Olympia",
+        "stateShort": "WA"
+    }
+}, {
+    "geometry": {
+        "type": "Point",
+        "coordinates": [-81.633294, 38.349497]
+    },
+    "properties": {
+        "stateLong": "West Virginia",
+        "name": "Charleston",
+        "stateShort": "WV"
+    }
+}, {
+    "geometry": {
+        "type": "Point",
+        "coordinates": [-89.384444, 43.074722]
+    },
+    "properties": {
+        "stateLong": "Wisconsin",
+        "name": "Madison",
+        "stateShort": "WI"
+    }
+},
+{
+    "geometry": {
+        "type": "Point",
+        "coordinates": [-77.009056, 38.889805]
+    },
+    "properties": {
+        "stateLong": "District of Columbia",
+        "name": "Washington",
+        "stateShort": "DC"
+    }
+}
+ ,{
+    "geometry": {
+        "type": "Point",
+        "coordinates": [-104.802042, 41.145548]
+    },
+    "properties": {
+        "stateLong": "Wyoming",
+        "name": "Cheyenne",
+        "stateShort": "WY"
+    }
+}]

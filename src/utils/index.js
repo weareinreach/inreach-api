@@ -3,7 +3,6 @@ import _omit from 'lodash/omit';
 import _orderBy from 'lodash/orderBy';
 import mongoose from 'mongoose';
 const ObjectId = mongoose.Types.ObjectId;
-const ONE_MILE_TO_METER = 1609.344;
 
 import config from './config';
 
@@ -116,13 +115,4 @@ export const isBodyEmpty = (body) => {
  */
 export const isValidObjectId = (id) => {
 	return ObjectId.isValid(id);
-};
-
-/**
- * Convert Miles to meters
- */
-export const milesToMeters = (miles) => {
-	return typeof miles === 'string'
-		? parseInt(miles) * ONE_MILE_TO_METER
-		: miles * ONE_MILE_TO_METER;
 };
