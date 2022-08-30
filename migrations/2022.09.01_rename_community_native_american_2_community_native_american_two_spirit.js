@@ -1,8 +1,8 @@
 /**********************************************************************************
   *  Release 2022-09-01
   *  Issue:  https://app.asana.com/0/1202317426899416/1202692325395625
-  *  Description: This schema change will update services.properties.latino to 
-  *  services.properties.latinx 
+  *  Description: This schema change will update services.properties.native-american to 
+  *  services.properties.native-american-two-spirit 
   * ********************************************************************************
   
 
@@ -19,6 +19,7 @@ require('dotenv').config({
 // Import DB Connection
 require('../src/db');
 var migrationFunctions = require('./migrationsFunctions');
+
 var mongoose = require('../src/mongoose');
 
 //Helper Function
@@ -45,7 +46,7 @@ async function runMigrationScript() {
 			},
 			{
 				$match: {
-					'services.properties.community-latino': {
+					'services.properties.community-native-american': {
 						$exists: true
 					}
 				}
@@ -62,7 +63,7 @@ async function runMigrationScript() {
 			//Account for both possibilities
 			let updatedProperties = renameKeys(
 				{
-					'community-latino': 'community-latinx'
+					'community-native-american': 'community-native-american-two-spirit'
 				},
 				org.tags
 			);
@@ -104,7 +105,7 @@ async function runRollbackScript() {
 			},
 			{
 				$match: {
-					'services.properties.community-latinx': {
+					'services.properties.community-native-american-two-spirit': {
 						$exists: true
 					}
 				}
@@ -120,7 +121,7 @@ async function runRollbackScript() {
 		result.forEach((org) => {
 			let updatedProperties = renameKeys(
 				{
-					'community-latinx': 'community-latino'
+					'community-native-american-two-spirit': 'community-native-american'
 				},
 				org.tags
 			);
