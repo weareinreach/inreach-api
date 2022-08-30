@@ -1,9 +1,8 @@
 /**********************************************************************************
   *  Release 2022-06-30
   *  Issue:  https://app.asana.com/0/1132189118126148/1202522027612226
-  *  Description: This schema change will update the medical tag Abortion services to 
-  *  Abortion Care.Abortion Providers across US, Mexico and Canadian regions. This will take care of the
-  *  US Migration
+  *  Description: This schema change will update US orgs with state info, lacking coordinates and add
+  *  default coordinates to the capital of the state
   * ********************************************************************************
   
 
