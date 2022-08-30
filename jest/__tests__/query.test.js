@@ -37,7 +37,8 @@ describe('getOrganizationQuery', () => {
 		const result = getOrganizationQuery();
 		expect(result).toEqual({
 			is_published: true,
-			is_deleted: false
+			is_deleted: false,
+			['owners.isApproved']: true
 		});
 	});
 

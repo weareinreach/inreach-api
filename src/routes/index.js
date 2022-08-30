@@ -69,6 +69,14 @@ import {
 	getServicesByStateInCountry,
 	getServicesByCategories
 } from './reporting';
+import {
+	createRelease,
+	deleteBranch,
+	getRepoContributors,
+	getRepoReleases,
+	triggerStagMigration,
+	triggerProdMigration
+} from './dashboard';
 export const baseRouter = Router();
 export const versionOneRouter = Router();
 
@@ -261,3 +269,17 @@ versionOneRouter.delete('/reviews/:reviewId', deleteReviewById);
 
 // Static -  Automation Tested
 versionOneRouter.get('/static/:pageId', getStaticPage);
+
+//Dashboard - Not tested
+versionOneRouter.post('/dashboard/createRelease', createRelease);
+versionOneRouter.delete('/dashboard/deleteBranch', deleteBranch);
+versionOneRouter.get('/dashboard/getRepoReleases/:repo', getRepoReleases);
+versionOneRouter.get('/dashboard/getContributors/:repo', getRepoContributors);
+versionOneRouter.post(
+	'/dashboard/triggerStagingMigration',
+	triggerStagMigration
+);
+versionOneRouter.post(
+	'/dashboard/dashboard/triggerProductionMigration',
+	triggerProdMigration
+);
