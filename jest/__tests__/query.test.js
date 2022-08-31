@@ -58,6 +58,57 @@ describe('getOrganizationQuery', () => {
 		expect(result).toMatchSnapshot();
 	});
 
+	it('should apply params and match snapshot claimed', () => {
+		const result = getOrganizationQuery({
+			ids: '5e7e4be1d54f1760921a557e, 5e7e4bdfd54f1760921a4fbf',
+			name: 'test',
+			owner: 'test@asylumconnect.com',
+			pending: 'true',
+			deleted: 'true',
+			claimedStatus: 'claimed',
+			serviceDeleted: 'true',
+			properties: 'hello=true,world=true,foo=$existsFalse,req-id=true',
+			serviceArea: 'city,state,other-place',
+			tagLocale: 'en_us',
+			tags: 'Food,Medical.Check Up,Legal'
+		});
+		expect(result).toMatchSnapshot();
+	});
+
+	it('should apply params and match snapshot not claimed', () => {
+		const result = getOrganizationQuery({
+			ids: '5e7e4be1d54f1760921a557e, 5e7e4bdfd54f1760921a4fbf',
+			name: 'test',
+			owner: 'test@asylumconnect.com',
+			pending: 'true',
+			deleted: 'true',
+			claimedStatus: 'notClaimed',
+			serviceDeleted: 'true',
+			properties: 'hello=true,world=true,foo=$existsFalse,req-id=true',
+			serviceArea: 'city,state,other-place',
+			tagLocale: 'en_us',
+			tags: 'Food,Medical.Check Up,Legal'
+		});
+		expect(result).toMatchSnapshot();
+	});
+
+	it('should apply params and match snapshot pending', () => {
+		const result = getOrganizationQuery({
+			ids: '5e7e4be1d54f1760921a557e, 5e7e4bdfd54f1760921a4fbf',
+			name: 'test',
+			owner: 'test@asylumconnect.com',
+			pending: 'true',
+			deleted: 'true',
+			claimedStatus: 'pending',
+			serviceDeleted: 'true',
+			properties: 'hello=true,world=true,foo=$existsFalse,req-id=true',
+			serviceArea: 'city,state,other-place',
+			tagLocale: 'en_us',
+			tags: 'Food,Medical.Check Up,Legal'
+		});
+		expect(result).toMatchSnapshot();
+	});
+
 	// with coordinates
 	it('should apply geoNear query and match snapshot', () => {
 		const result = getOrganizationQuery({
