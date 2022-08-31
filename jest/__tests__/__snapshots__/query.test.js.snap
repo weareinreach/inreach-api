@@ -134,7 +134,7 @@ Object {
     ],
   },
   "is_published": false,
-  "claimedStatus": claimed,
+  "claimedStatus": "claimed",
   "owners.email": "test@asylumconnect.com",
   "services": Object {
     "$elemMatch": Object {
@@ -199,7 +199,7 @@ Object {
     ],
   },
   "is_published": false,
-  "claimedStatus": notClaimed,
+  "claimedStatus": "notClaimed",
   "owners.email": "test@asylumconnect.com",
   "services": Object {
     "$elemMatch": Object {
@@ -264,7 +264,7 @@ Object {
     ],
   },
   "is_published": false,
-  "claimedStatus": pending,
+  "claimedStatus": "pending",
   "owners.email": "test@asylumconnect.com",
   "services": Object {
     "$elemMatch": Object {
