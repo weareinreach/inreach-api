@@ -138,7 +138,10 @@ describe('getOrganizationQuery', () => {
 		expect(result).toEqual({
 			is_published: true,
 			is_deleted: false,
-			$or: [{'owners.isApproved': [Object]}, {'owners.isApproved': [Object]}]
+			$or: [
+				{'owners.isApproved': {$in: [null]}},
+				{'owners.isApproved': {$exists: false}}
+			]
 		});
 	});
 
