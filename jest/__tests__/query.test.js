@@ -50,7 +50,6 @@ describe('getOrganizationQuery', () => {
 			pending: 'true',
 			deleted: 'true',
 			serviceDeleted: 'true',
-			pendingOwnership: 'true',
 			properties: 'hello=true,world=true,foo=$existsFalse,req-id=true',
 			serviceArea: 'city,state,other-place',
 			tagLocale: 'en_us',
