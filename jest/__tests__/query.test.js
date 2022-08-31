@@ -120,7 +120,7 @@ describe('getOrganizationQuery', () => {
 	});
 
 	//claimed status options
-	it('should apply params and match snapshot "claimed"', () => {
+	it('should apply claimed status filter - "claimed"', () => {
 		const result = getOrganizationQuery({
 			claimedStatus: 'claimed'
 		});
@@ -131,7 +131,7 @@ describe('getOrganizationQuery', () => {
 		});
 	});
 
-	it('should apply params and match snapshot "not claimed"', () => {
+	it('should apply claimed status filter - "not claimed"', () => {
 		const result = getOrganizationQuery({
 			claimedStatus: 'notClaimed'
 		});
@@ -145,7 +145,7 @@ describe('getOrganizationQuery', () => {
 		});
 	});
 
-	it('should apply params and match snapshot "pending"', () => {
+	it('should apply claimed status filter - "pending"', () => {
 		const result = getOrganizationQuery({
 			claimedStatus: 'pending'
 		});
@@ -156,7 +156,7 @@ describe('getOrganizationQuery', () => {
 		});
 	});
 
-	it('should apply params and match snapshot "all"', () => {
+	it('should not apply claimed status filter -  "all"', () => {
 		const result = getOrganizationQuery({
 			claimedStatus: 'all'
 		});
