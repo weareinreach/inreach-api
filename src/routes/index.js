@@ -282,6 +282,6 @@ versionOneRouter.post(
 	triggerStagMigration
 );
 versionOneRouter.post(
-	'/dashboard/dashboard/triggerProductionMigration',
+	'/dashboard/triggerProductionMigration',
 	triggerProdMigration
 );
