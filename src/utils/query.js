@@ -104,7 +104,11 @@ export const getOrganizationQuery = (params = {}) => {
 			default:
 			//('all - no need to specify')
 		}
+
 	}
+	//else {
+	// 	query['owners.isApproved'] = true;
+	// }
 
 	if (deleted) {
 		query.is_deleted = true;
