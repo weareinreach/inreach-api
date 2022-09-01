@@ -19,6 +19,7 @@ const ObjectId = mongoose.Types.ObjectId;
 export const getOrgs = async (req, res) => {
 	const {limit, offset} = parsePageQuery(req?.query?.page);
 	const {query} = req;
+
 	let dbQuery = getOrganizationQuery(query);
 	var obj = {};
 
@@ -69,7 +70,7 @@ export const getOrgs = async (req, res) => {
 
 	try {
 		if (dbQuery.$geoNear) {
-			const organizations = await Organization.aggregate([
+			let organizations = await Organization.aggregate([
 				dbQuery,
 				{$skip: offset},
 				{$limit: limit}
