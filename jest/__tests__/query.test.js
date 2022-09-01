@@ -37,8 +37,7 @@ describe('getOrganizationQuery', () => {
 		const result = getOrganizationQuery();
 		expect(result).toEqual({
 			is_published: true,
-			is_deleted: false,
-			['owners.isApproved']: true
+			is_deleted: false
 		});
 	});
 
@@ -51,7 +50,6 @@ describe('getOrganizationQuery', () => {
 			pending: 'true',
 			deleted: 'true',
 			serviceDeleted: 'true',
-			pendingOwnership: 'true',
 			properties: 'hello=true,world=true,foo=$existsFalse,req-id=true',
 			serviceArea: 'city,state,other-place',
 			tagLocale: 'en_us',
@@ -118,6 +116,53 @@ describe('getOrganizationQuery', () => {
 		expect(tagResult.services.$elemMatch).toEqual(tagOr);
 		expect(serviceAndTagResult.services.$elemMatch).toEqual({
 			$and: [serviceOr, tagOr]
+		});
+	});
+
+	//claimed status options
+	it('should apply claimed status filter - "claimed"', () => {
+		const result = getOrganizationQuery({
+			claimedStatus: 'claimed'
+		});
+		expect(result).toEqual({
+			is_published: true,
+			is_deleted: false,
+			'owners.isApproved': true
+		});
+	});
+
+	it('should apply claimed status filter - "not claimed"', () => {
+		const result = getOrganizationQuery({
+			claimedStatus: 'notClaimed'
+		});
+		expect(result).toEqual({
+			is_published: true,
+			is_deleted: false,
+			$or: [
+				{'owners.isApproved': {$in: [null]}},
+				{'owners.isApproved': {$exists: false}}
+			]
+		});
+	});
+
+	it('should apply claimed status filter - "pending"', () => {
+		const result = getOrganizationQuery({
+			claimedStatus: 'pending'
+		});
+		expect(result).toEqual({
+			is_published: true,
+			is_deleted: false,
+			'owners.isApproved': false
+		});
+	});
+
+	it('should not apply claimed status filter -  "all"', () => {
+		const result = getOrganizationQuery({
+			claimedStatus: 'all'
+		});
+		expect(result).toEqual({
+			is_published: true,
+			is_deleted: false
 		});
 	});
 });

@@ -70,7 +70,7 @@ export const getOrgs = async (req, res) => {
 
 	try {
 		if (dbQuery.$geoNear) {
-			const organizations = await Organization.aggregate([
+			let organizations = await Organization.aggregate([
 				dbQuery,
 				{$skip: offset},
 				{$limit: limit}
