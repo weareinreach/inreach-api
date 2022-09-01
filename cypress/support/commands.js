@@ -648,3 +648,20 @@ Cypress.Commands.add('deleteRatingById', (orgId, ratingId) => {
 		url: compoundURL
 	});
 });
+
+Cypress.Commands.add('deleteBranch', (branch, repo) => {
+	compoundURL = Cypress.env('baseUrl').concat(
+		Cypress.env('version'),
+		Cypress.env('route_dashboard'),
+		Cypress.env('route_dashboard_delete_branch')
+	);
+	cy.request({
+		method: 'DELETE',
+		url: compoundURL,
+		body: {
+			branch: branch,
+			repo: repo
+		},
+		failOnStatusCode: false
+	});
+});

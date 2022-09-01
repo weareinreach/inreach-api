@@ -139,3 +139,5 @@ docker/seedData/
 
 #Business Reports
 business_reports/output
+yarn.lock
+.vscode

@@ -135,6 +135,76 @@ describe('Suggestion Routes', () => {
 		});
 	});
 
+	it('GET - /v1/suggestions/count - Gets a count of the Suggestions', () => {
+		cy.get('@organization').then((org) => {
+			cy.addOrg(org).then((createdOrgResponse) => {
+				cy.get('@user_creds').then((user) => {
+					let suggestion = {
+						suggestions: [
+							{
+								organizationId: createdOrgResponse.body.organization._id,
+								userEmail: user.email,
+								field: 'Description',
+								value: 'The Description should be changed suggestion'
+							}
+						]
+					};
+					//Add the suggestion
+					cy.addSuggestionToOrg(suggestion).then(() => {
+						compoundURL = Cypress.env('baseUrl').concat(
+							Cypress.env('version'),
+							Cypress.env('route_suggestions')
+						);
+						cy.request({
+							method: 'GET',
+							url: compoundURL
+						}).should((response) => {
+							expect(response.status).to.be.eq(200);
+							let suggestionArray = response.body;
+							//Find the one i added
+							suggestionArray.forEach((suggestionItem) => {
+								//Find the ID of the Org
+								if (
+									suggestionItem.organizationId ===
+									createdOrgResponse.body.organization._id
+								) {
+									expect(suggestionItem.organizationId).to.be.eq(
+										createdOrgResponse.body.organization._id
+									);
+									expect(suggestionItem.userEmail).to.be.eq(
+										suggestion.suggestions[0].userEmail
+									);
+									expect(suggestionItem.field).to.be.eq(
+										suggestion.suggestions[0].field
+									);
+									expect(suggestionItem.value).to.be.eq(
+										suggestion.suggestions[0].value
+									);
+								}
+							});
+						});
+					});
+					//count the suggestions
+					compoundURL = Cypress.env('baseUrl').concat(
+						Cypress.env('version'),
+						Cypress.env('route_suggestions_count')
+					);
+					cy.request({
+						method: 'GET',
+						url: compoundURL
+					}).should((response) => {
+						expect(response.body).to.be.an('object');
+						expect(response.body).to.not.be.empty;
+						expect(response.body.count).to.be.an('number');
+						expect(response.body.count).to.be.greaterThan(0);
+						expect(response.body.pages).to.be.an('number');
+						expect(response.body.pages).to.be.greaterThan(0);
+					});
+				});
+			});
+		});
+	});
+
 	it('DELETE - /v1/suggestions/:suggestionId - Delete Suggestion', () => {
 		cy.get('@organization').then((org) => {
 			cy.addOrg(org).then((createdOrgResponse) => {

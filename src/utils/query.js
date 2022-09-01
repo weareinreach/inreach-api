@@ -1,6 +1,12 @@
 import mongoose from 'mongoose';
 const ObjectId = mongoose.Types.ObjectId;
+const ONE_MILE_TO_METER = 1609.344;
 
+export const milesToMeters = (miles) => {
+	return typeof miles === 'string'
+		? parseInt(miles) * ONE_MILE_TO_METER
+		: miles * ONE_MILE_TO_METER;
+};
 /**
  * Uses object shorthand to create a query based on if the values exist
  * @param  {String} organizationId id of the organization
@@ -45,12 +51,14 @@ export const getOrganizationQuery = (params = {}) => {
 		deleted,
 		serviceDeleted,
 		pendingOwnership,
+		claimedStatus,
 		properties,
 		serviceArea,
 		tagLocale,
 		tags,
 		long,
-		lat
+		lat,
+		selectedDistance
 	} = params;
 	let query = {};
 
@@ -72,6 +80,31 @@ export const getOrganizationQuery = (params = {}) => {
 	//reverting for now - works with staging data but not prod data
 	if (pendingOwnership) {
 		query['owners.isApproved'] = false;
+	}
+
+	if (claimedStatus) {
+		switch (claimedStatus) {
+			case 'claimed':
+				//('claimed - owners.isApproved exists and is true')
+				query['owners.isApproved'] = true;
+				break;
+			case 'notClaimed':
+				//('notClaimed - owners.isApproved, does not exist or exists and is null')
+				query = {
+					$or: [
+						{'owners.isApproved': {$in: [null]}},
+						{'owners.isApproved': {$exists: false}}
+					]
+				};
+				break;
+			case 'pending':
+				//('pending - owners.isApproved exists and is false')
+				query['owners.isApproved'] = false;
+				break;
+			default:
+			//('all - no need to specify')
+		}
+
 	}
 	//else {
 	// 	query['owners.isApproved'] = true;
@@ -190,7 +223,10 @@ export const getOrganizationQuery = (params = {}) => {
 
 		// Either apply both queries or a single
 		if (serviceAreaQuery && tagQuery) {
-			$elemMatch.$and = [{$or: serviceAreaQuery}, {$or: tagQuery}];
+			$elemMatch.$and = [
+				{$or: serviceAreaQuery.concat(tagQuery)},
+				{$or: tagQuery}
+			];
 		} else if (serviceAreaQuery) {
 			$elemMatch.$or = serviceAreaQuery;
 		} else if (tagQuery) {
@@ -205,6 +241,9 @@ export const getOrganizationQuery = (params = {}) => {
 			$geoNear: {
 				near: {type: 'Point', coordinates: [parseFloat(long), parseFloat(lat)]},
 				distanceField: 'distance',
+				...(selectedDistance !== 'isNational' && {
+					maxDistance: milesToMeters(selectedDistance)
+				}),
 				query: {...query}
 			}
 		};

@@ -9,6 +9,7 @@ import {
 	getRatings,
 	deleteRatingById,
 	getSuggestions,
+	getSuggestionsCount,
 	getUserSuggestionsByEmail,
 	updateComments,
 	deleteCommentById,
@@ -69,6 +70,14 @@ import {
 	getServicesByStateInCountry,
 	getServicesByCategories
 } from './reporting';
+import {
+	createRelease,
+	deleteBranch,
+	getRepoContributors,
+	getRepoReleases,
+	triggerStagMigration,
+	triggerProdMigration
+} from './dashboard';
 export const baseRouter = Router();
 export const versionOneRouter = Router();
 
@@ -187,6 +196,7 @@ versionOneRouter.patch(
 
 // Suggestions - Automated Tested
 versionOneRouter.get('/suggestions', getSuggestions);
+versionOneRouter.get('/suggestions/count', getSuggestionsCount);
 versionOneRouter.post('/suggestions', createSuggestions);
 versionOneRouter.delete('/suggestions/:suggestionId', deleteSuggestion);
 versionOneRouter.get('/suggestions/:email', getUserSuggestionsByEmail);
@@ -261,3 +271,17 @@ versionOneRouter.delete('/reviews/:reviewId', deleteReviewById);
 
 // Static -  Automation Tested
 versionOneRouter.get('/static/:pageId', getStaticPage);
+
+//Dashboard - Not tested
+versionOneRouter.post('/dashboard/createRelease', createRelease);
+versionOneRouter.delete('/dashboard/deleteBranch', deleteBranch);
+versionOneRouter.get('/dashboard/getRepoReleases/:repo', getRepoReleases);
+versionOneRouter.get('/dashboard/getContributors/:repo', getRepoContributors);
+versionOneRouter.post(
+	'/dashboard/triggerStagingMigration',
+	triggerStagMigration
+);
+versionOneRouter.post(
+	'/dashboard/dashboard/triggerProductionMigration',
+	triggerProdMigration
+);

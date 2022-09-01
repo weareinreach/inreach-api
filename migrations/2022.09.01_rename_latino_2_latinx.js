@@ -1,9 +1,8 @@
 /**********************************************************************************
-  *  Release 2022-06-30
-  *  Issue:  https://app.asana.com/0/1132189118126148/1202522027612226
-  *  Description: This schema change will update the medical tag Abortion services to 
-  *  Abortion Care.Abortion Providers across US, Mexico and Canadian regions. This will take care of the
-  *  Canada Migration
+  *  Release 2022-09-01
+  *  Issue:  https://app.asana.com/0/1202317426899416/1202692325395625
+  *  Description: This schema change will update services.properties.latino to 
+  *  services.properties.latinx 
   * ********************************************************************************
   
 
@@ -22,6 +21,18 @@ require('../src/db');
 var migrationFunctions = require('./migrationsFunctions');
 var mongoose = require('../src/mongoose');
 
+//Helper Function
+let renameKeys = (keysMap, object) =>
+	Object.keys(object).reduce(
+		(acc, key) => ({
+			...acc,
+			...{
+				[keysMap[key] || key]: object[key]
+			}
+		}),
+		{}
+	);
+
 //Scripts
 async function runMigrationScript() {
 	try {
@@ -34,7 +45,7 @@ async function runMigrationScript() {
 			},
 			{
 				$match: {
-					'services.tags.canada.Medical.Abortion services': {
+					'services.properties.community-latino': {
 						$exists: true
 					}
 				}
@@ -42,23 +53,26 @@ async function runMigrationScript() {
 			{
 				$project: {
 					service_id: '$services._id',
-					tags: '$services.tags.canada.Medical'
+					tags: '$services.properties'
 				}
 			}
 		]);
 		let bulkOperations = [];
 		result.forEach((org) => {
 			//Account for both possibilities
-			let updatedTags = {'Abortion Providers': 'true'};
-			delete org.tags['Abortion services'];
+			let updatedProperties = renameKeys(
+				{
+					'community-latino': 'community-latinx'
+				},
+				org.tags
+			);
 			bulkOperations.push({
 				updateOne: {
 					filter: {
 						_id: org._id
 					},
 					update: {
-						'services.$[elem].tags.canada.Medical': org.tags,
-						'services.$[elem].tags.canada.Abortion Care': updatedTags
+						'services.$[elem].properties': updatedProperties
 					},
 					arrayFilters: [{'elem._id': {$eq: org.service_id}}]
 				}
@@ -70,7 +84,7 @@ async function runMigrationScript() {
 		console.log(
 			`Number of modified rows: ${JSON.stringify(updateResponse.nModified)}`
 		);
-		console.log('Migration Canda executed');
+		console.log('Migration executed');
 		process.exit(0);
 	} catch (err) {
 		console.log(err);
@@ -90,7 +104,7 @@ async function runRollbackScript() {
 			},
 			{
 				$match: {
-					'services.tags.canada.Abortion Care.Abortion services': {
+					'services.properties.community-latinx': {
 						$exists: true
 					}
 				}
@@ -98,15 +112,15 @@ async function runRollbackScript() {
 			{
 				$project: {
 					service_id: '$services._id',
-					tags: '$services.tags.canada.Abortion Care'
+					tags: '$services.properties'
 				}
 			}
 		]);
 		let bulkOperations = [];
 		result.forEach((org) => {
-			let updatedTags = renameKeys(
+			let updatedProperties = renameKeys(
 				{
-					'Abortion services': 'Abortion Providers'
+					'community-latinx': 'community-latino'
 				},
 				org.tags
 			);
@@ -116,7 +130,7 @@ async function runRollbackScript() {
 						_id: org._id
 					},
 					update: {
-						'services.$[elem].tags.canada.Abortion Care': updatedTags
+						'services.$[elem].properties': updatedProperties
 					},
 					arrayFilters: [{'elem._id': {$eq: org.service_id}}]
 				}
@@ -128,7 +142,7 @@ async function runRollbackScript() {
 		console.log(
 			`Number of modified rows: ${JSON.stringify(updateResponse.nModified)}`
 		);
-		console.log('Rollback Canda executed');
+		console.log('Rollback executed');
 		process.exit(0);
 	} catch (err) {
 		console.log(err);
