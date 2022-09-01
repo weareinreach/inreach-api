@@ -45,6 +45,7 @@ export const getOrganizationQuery = (params = {}) => {
 		deleted,
 		serviceDeleted,
 		pendingOwnership,
+		claimedStatus,
 		properties,
 		serviceArea,
 		tagLocale,
@@ -71,8 +72,30 @@ export const getOrganizationQuery = (params = {}) => {
 
 	if (pendingOwnership) {
 		query['owners.isApproved'] = false;
-	} else {
-		query['owners.isApproved'] = true;
+	}
+
+	if (claimedStatus) {
+		switch (claimedStatus) {
+			case 'claimed':
+				//('claimed - owners.isApproved exists and is true')
+				query['owners.isApproved'] = true;
+				break;
+			case 'notClaimed':
+				//('notClaimed - owners.isApproved, does not exist or exists and is null')
+				query = {
+					$or: [
+						{'owners.isApproved': {$in: [null]}},
+						{'owners.isApproved': {$exists: false}}
+					]
+				};
+				break;
+			case 'pending':
+				//('pending - owners.isApproved exists and is false')
+				query['owners.isApproved'] = false;
+				break;
+			default:
+			//('all - no need to specify')
+		}
 	}
 
 	if (deleted) {
