@@ -115,9 +115,55 @@ export const getOrgsByName = async (req, res) => {
 };
 
 export const getOrgsCount = async (req, res) => {
-	const query = getOrganizationQuery(req?.query);
+	const {query} = req;
+	let dbQuery = getOrganizationQuery(query);
 
-	await Organization.countDocuments(query)
+	if (query.lastVerified) {
+		dbQuery = Object.assign(dbQuery, {
+			verified_at: {$lte: new Date(query.lastVerified)}
+		});
+	}
+
+	if (query.lastVerifiedStart) {
+		dbQuery = Object.assign(dbQuery, {
+			verified_at: {
+				$gte: new Date(query.lastVerifiedStart),
+				$lte: new Date(query.lastVerifiedEnd)
+			}
+		});
+	}
+
+	if (query.lastUpdated) {
+		dbQuery = Object.assign(dbQuery, {
+			updated_at: {$lte: new Date(query.lastUpdated)}
+		});
+	}
+
+	if (query.lastUpdatedStart) {
+		dbQuery = Object.assign(dbQuery, {
+			updated_at: {
+				$gte: new Date(query.lastUpdatedStart),
+				$lte: new Date(query.lastUpdatedEnd)
+			}
+		});
+	}
+
+	if (query.createdAt) {
+		dbQuery = Object.assign(dbQuery, {
+			created_at: {$lte: new Date(query.createdAt)}
+		});
+	}
+
+	if (query.createdAtStart) {
+		dbQuery = Object.assign(dbQuery, {
+			created_at: {
+				$gte: new Date(query.createdAtStart),
+				$lte: new Date(query.createdAtEnd)
+			}
+		});
+	}
+
+	await Organization.countDocuments(dbQuery)
 		.then((count) => {
 			const pages = Math.ceil(count / ITEM_PAGE_LIMIT);
 

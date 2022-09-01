@@ -9,6 +9,7 @@ import {
 	getRatings,
 	deleteRatingById,
 	getSuggestions,
+	getSuggestionsCount,
 	getUserSuggestionsByEmail,
 	updateComments,
 	deleteCommentById,
@@ -195,6 +196,7 @@ versionOneRouter.patch(
 
 // Suggestions - Automated Tested
 versionOneRouter.get('/suggestions', getSuggestions);
+versionOneRouter.get('/suggestions/count', getSuggestionsCount);
 versionOneRouter.post('/suggestions', createSuggestions);
 versionOneRouter.delete('/suggestions/:suggestionId', deleteSuggestion);
 versionOneRouter.get('/suggestions/:email', getUserSuggestionsByEmail);
