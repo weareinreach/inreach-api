@@ -227,7 +227,10 @@ export const Suggestion = model('Suggestion', SuggestionSchema);
 const UserSchema = new Schema(
 	{
 		age: String,
-		catalogType: {type: String, enum: ['lawyer', 'provider', 'seeker']},
+		catalogType: {
+			type: String,
+			enum: ['lawyer', 'provider', 'seeker', 'reviewer']
+		},
 		currentLocation: String,
 		email: {
 			type: String,
@@ -244,6 +247,7 @@ const UserSchema = new Schema(
 		isAdminDeveloper: {type: Boolean, default: false},
 		isDataManager: {type: Boolean, default: false},
 		isProfessional: {type: Boolean, default: false},
+		isReviwerApproved: {type: Boolean, default: false},
 		lists: [
 			{
 				name: String,
@@ -262,6 +266,7 @@ const UserSchema = new Schema(
 		orgPositionTitle: String,
 		orgType: String,
 		reasonForJoining: String,
+		verifyAnswer: {type: String, default: 'no'},
 		salt: {type: String, required: true}
 	},
 	schemaOptions

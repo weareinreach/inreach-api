@@ -104,7 +104,6 @@ export const getOrganizationQuery = (params = {}) => {
 			default:
 			//('all - no need to specify')
 		}
-
 	}
 	//else {
 	// 	query['owners.isApproved'] = true;
@@ -276,6 +275,9 @@ export const getUserQuery = (params = {}) => {
 			break;
 		case 'seeker':
 			query.catalogType = 'seeker';
+			break;
+		case 'reviewer':
+			query.catalogType = 'reviewer';
 			break;
 	}
 
