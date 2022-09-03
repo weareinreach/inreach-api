@@ -267,6 +267,8 @@ const UserSchema = new Schema(
 		orgType: String,
 		reasonForJoining: String,
 		verifyAnswer: {type: String, default: 'no'},
+		timeCommitAnswer: {type: String, default: 'no'},
+		specifiedTimeCommit: String,
 		salt: {type: String, required: true}
 	},
 	schemaOptions
