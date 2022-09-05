@@ -247,7 +247,7 @@ const UserSchema = new Schema(
 		isAdminDeveloper: {type: Boolean, default: false},
 		isDataManager: {type: Boolean, default: false},
 		isProfessional: {type: Boolean, default: false},
-		isReviwerApproved: {type: Boolean, default: false},
+		isReviewerApproved: {type: Boolean, default: false},
 		lists: [
 			{
 				name: String,
