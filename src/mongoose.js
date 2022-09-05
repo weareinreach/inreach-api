@@ -269,6 +269,11 @@ const UserSchema = new Schema(
 		verifyAnswer: {type: String, default: 'no'},
 		timeCommitAnswer: {type: String, default: 'no'},
 		specifiedTimeCommit: String,
+		auditAnswer: {type: String, default: 'no'},
+		suggestionsAnswer: {type: String, default: 'no'},
+		reviewsAnswer: {type: String, default: 'no'},
+		payAnswer: {type: String, default: 'no'},
+		specifiedOtherInfo: String,
 		salt: {type: String, required: true}
 	},
 	schemaOptions
