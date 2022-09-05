@@ -180,6 +180,7 @@ describe('getUserQuery', () => {
 		const lawyerQuery = getUserQuery({type: 'lawyer'});
 		const providerQuery = getUserQuery({type: 'provider'});
 		const seekerQuery = getUserQuery({type: 'seeker'});
+		const reviewerQuery = getUserQuery({type: 'reviewer'});
 		const unknownTypeQuery = getUserQuery({type: 'foo'});
 
 		expect(adminDataManagerQuery.isAdminDataManager).toEqual(true);
@@ -187,6 +188,7 @@ describe('getUserQuery', () => {
 		expect(lawyerQuery.catalogType).toEqual('lawyer');
 		expect(providerQuery.catalogType).toEqual('provider');
 		expect(seekerQuery.catalogType).toEqual('seeker');
+		expect(reviewerQuery.catalogType).toEqual('reviewer');
 		expect(unknownTypeQuery).toEqual({});
 	});
 });
