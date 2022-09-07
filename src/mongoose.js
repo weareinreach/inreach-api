@@ -170,7 +170,9 @@ const CommentSchema = new Schema(
 				created_at,
 				comment: String,
 				source: String,
-				userId: String
+				userId: String,
+				isVerified: {type: Boolean, default: false},
+				is_deleted: {type: Boolean, default: false}
 			}
 		]
 	},
@@ -204,7 +206,9 @@ const ReviewSchema = new Schema(
 		hasLeftFeedbackBefore: Boolean,
 		negativeReasons: [String],
 		rating: Number,
-		source: {type: String, default: 'catalog'}
+		source: {type: String, default: 'catalog'},
+		isVerified: {type: Boolean, default: false},
+		is_deleted: {type: Boolean, default: false}
 	},
 	schemaOptions
 );
