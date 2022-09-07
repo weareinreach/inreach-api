@@ -270,14 +270,16 @@ const UserSchema = new Schema(
 		orgPositionTitle: String,
 		orgType: String,
 		reasonForJoining: String,
-		verifyAnswer: {type: Boolean, default: false},
-		timeCommitAnswer: {type: Boolean, default: false},
-		specifiedTimeCommit: String,
-		auditAnswer: {type: Boolean, default: false},
-		suggestionsAnswer: {type: Boolean, default: false},
-		reviewsAnswer: {type: Boolean, default: false},
-		payAnswer: {type: Boolean, default: false},
-		specifiedOtherInfo: String,
+		reviewerQuestions: {
+			verifyAnswer: {type: Boolean, default: false},
+			timeCommitAnswer: {type: Boolean, default: false},
+			specifiedTimeCommit: String,
+			auditAnswer: {type: Boolean, default: false},
+			suggestionsAnswer: {type: Boolean, default: false},
+			reviewsAnswer: {type: Boolean, default: false},
+			payAnswer: {type: Boolean, default: false},
+			specifiedOtherInfo: String
+		},
 		salt: {type: String, required: true}
 	},
 	schemaOptions
