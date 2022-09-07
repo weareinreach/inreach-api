@@ -4,7 +4,11 @@ import crypto from 'crypto';
 import {model, Schema} from 'mongoose';
 
 const created_at = {type: Date, default: Date.now};
+const updated_at_function = function () {
+	this.updated_at = Date.now;
+};
 const is_published = {type: Boolean, default: true};
+const is_deleted = {type: Boolean, required: true, default: false};
 const schemaOptions = {
 	timestamps: {createdAt: 'created_at', updatedAt: 'updated_at'}
 };
@@ -19,7 +23,12 @@ const MigrationSchema = new Schema({
 	migration_type: {type: String, required: true}
 });
 
+MigrationSchema.pre('save', updated_at_function);
 export const Migration = model('Migration', MigrationSchema);
+
+//Notes
+// is published, set default to false to all services
+//make sure all services have slug
 
 const ServiceSchema = new Schema({
 	created_at,
@@ -37,7 +46,7 @@ const ServiceSchema = new Schema({
 	description_ES: String,
 	email_id: String,
 	is_published,
-	is_deleted: {type: Boolean, required: true, default: false},
+	is_deleted,
 	location_id: String,
 	name: {type: String, required: true},
 	name_ES: {type: String},
@@ -50,7 +59,7 @@ const ServiceSchema = new Schema({
 	phone_id: String,
 	properties: {},
 	schedule_id: String,
-	slug: String,
+	slug: {type: String, required: true},
 	slug_ES: String,
 	tags: {
 		canada: {},
@@ -58,6 +67,30 @@ const ServiceSchema = new Schema({
 		united_states: {}
 	}
 });
+ServiceSchema.pre('save', updated_at_function);
+
+const LocationSchema = new Schema({
+	address: {type: String, required: true},
+	city: {type: String, required: true},
+	city_ES: String,
+	country: {type: String, required: true},
+	country_ES: String,
+	created_at,
+	updated_at: Date,
+	is_primary: {type: Boolean, required: true, default: false},
+	lat: {type: String, required: true},
+	long: {type: String, required: true},
+	name: String,
+	name_ES: String,
+	show_on_organization: {type: Boolean, required: true, default: false},
+	state: String,
+	state_ES: String,
+	unit: String,
+	zip_code: String,
+	geolocation: {type: {type: String}, coordinates: [Decimal128]}
+});
+
+LocationSchema.pre('save', updated_at_function);
 
 const OrganizationSchema = new Schema(
 	{
@@ -65,61 +98,50 @@ const OrganizationSchema = new Schema(
 		alert_message_ES: String,
 		description: String,
 		description_ES: String,
+		created_at,
+		updated_at: Date,
 		emails: [
 			{
-				email: String,
+				email: {
+					type: String,
+					required: true,
+					lowercase: true,
+					match: [/\S+@\S+\.\S+/, 'is invalid']
+				},
 				first_name: String,
-				is_primary: Boolean,
+				is_primary: {type: Boolean, required: true, default: false},
 				last_name: String,
-				show_on_organization: Boolean,
-				title: String,
+				show_on_organization: {type: Boolean, required: true, default: false},
+				title: {type: String, required: true},
 				title_ES: String
 			}
 		],
 		name: {type: String, required: true},
 		name_ES: {type: String},
 		is_published,
-		is_deleted: {type: Boolean, required: true, default: false},
-		locations: [
-			{
-				address: String,
-				city: String,
-				city_ES: String,
-				country: String,
-				country_ES: String,
-				is_primary: Boolean,
-				lat: String,
-				long: String,
-				name: String,
-				name_ES: String,
-				show_on_organization: Boolean,
-				state: String,
-				state_ES: String,
-				unit: String,
-				zip_code: String,
-				geolocation: {type: {type: String}, coordinates: [Decimal128]}
-			}
-		],
+		is_deleted,
+		locations: [LocationSchema],
 		notes_log: [
 			{
-				note: String,
-				created_at: Date
+				note: {type: String, required: true},
+				created_at
 			}
 		],
 		owners: [
 			{
-				email: String,
-				isApproved: Boolean,
+				email: {type: String, required: true},
+				isApproved: {type: Boolean, required: true, default: false},
 				userId: String
 			}
 		],
 		phones: [
 			{
-				digits: String,
-				is_primary: Boolean,
+				digits: {type: String, required: true},
+				is_primary: {type: Boolean, required: true, default: false},
+				country_code: {type: String, required: true, default: '+1'},
 				phone_type: String,
 				phone_type_ES: String,
-				show_on_organization: Boolean
+				show_on_organization: {type: Boolean, required: true, default: false}
 			}
 		],
 		photos: [],
@@ -146,9 +168,14 @@ const OrganizationSchema = new Schema(
 			}
 		],
 		services: [ServiceSchema],
-		slug: String,
+		slug: {type: String, required: true},
 		slug_ES: String,
-		social_media: [{name: String, url: String}],
+		social_media: [
+			{
+				name: {type: String, required: true},
+				url: {type: String, required: true}
+			}
+		],
 		source: String,
 		verified_at: Date,
 		venue_id: String,
@@ -158,12 +185,13 @@ const OrganizationSchema = new Schema(
 	schemaOptions
 );
 
+OrganizationSchema.pre('save', updated_at_function);
 export const Organization = model('Organization', OrganizationSchema);
 
 const CommentSchema = new Schema(
 	{
-		organizationId: String,
-		serviceId: String,
+		organizationId: {type: String, required: true},
+		serviceId: {type: String, required: true},
 		is_deleted: {type: Boolean, required: true, default: false},
 		comments: [
 			{
@@ -181,14 +209,14 @@ export const Comment = model('Comment', CommentSchema);
 
 const RatingSchema = new Schema(
 	{
-		organizationId: String,
-		serviceId: String,
+		organizationId: {type: String, required: true},
+		serviceId: {type: String, required: true},
 		ratings: [
 			{
 				created_at,
-				rating: Number,
+				rating: {type: Number, required: true},
 				source: String,
-				userId: String
+				userId: {type: String, required: true}
 			}
 		]
 	},
@@ -197,24 +225,28 @@ const RatingSchema = new Schema(
 
 export const Rating = model('Rating', RatingSchema);
 
+//Change migration from catalog to app
 const ReviewSchema = new Schema(
 	{
-		comment: String,
-		hasAccount: Boolean,
-		hasLeftFeedbackBefore: Boolean,
+		comment: {type: String, required: true},
+		created_at,
+		updated_at: Date,
+		hasAccount: {type: Boolean, required: true},
+		hasLeftFeedbackBefore: {type: Boolean, required: true},
 		negativeReasons: [String],
-		rating: Number,
-		source: {type: String, default: 'catalog'}
+		rating: {type: Number, required: true},
+		source: {type: String, default: 'app'}
 	},
 	schemaOptions
 );
 
+ReviewSchema.pre('save', updated_at_function);
 export const Review = model('Review', ReviewSchema);
 
 const SuggestionSchema = new Schema(
 	{
-		field: String,
-		organizationId: String,
+		field: {type: String, required: true},
+		organizationId: {type: String, required: true},
 		serviceId: String,
 		userEmail: String,
 		value: String
@@ -226,7 +258,7 @@ export const Suggestion = model('Suggestion', SuggestionSchema);
 
 const UserSchema = new Schema(
 	{
-		age: String,
+		age: {type: String, required: true},
 		catalogType: {type: String, enum: ['lawyer', 'provider', 'seeker']},
 		currentLocation: String,
 		email: {
@@ -239,6 +271,8 @@ const UserSchema = new Schema(
 		hash: {type: String, required: true},
 		countryOfOrigin: String,
 		sogIdentity: [String],
+		created_at,
+		updated_at: Date,
 		immigrationStatus: String,
 		isAdminDataManager: {type: Boolean, default: false},
 		isAdminDeveloper: {type: Boolean, default: false},
@@ -280,5 +314,26 @@ UserSchema.methods.validPassword = function (password) {
 		.toString('hex');
 	return this.hash === hash;
 };
-
+UserSchema.pre('save', updated_at_function);
 export const User = model('User', UserSchema);
+
+const DeveloperSchema = new Schema({
+	email: {type: String, required: true},
+	created_at,
+	updated_at: Date,
+	github_access: {type: Boolean, required: true, default: false},
+	github_invite: Date,
+	slack_access: {type: Boolean, required: true, default: false},
+	slack_invite: Date,
+	asana_access: {type: Boolean, required: true, default: false},
+	asana_invite: Date,
+	status: {
+		type: String,
+		required: true,
+		enum: ['invited', 'removed'],
+		default: 'invited'
+	}
+});
+
+DeveloperSchema.pre('save', updated_at_function);
+export const Developer = model('Developer', DeveloperSchema);

@@ -1,4 +1,4 @@
-import {User} from '../mongoose';
+import {Migration, User} from '../mongoose';
 import {handleBadRequest, handleErr, handleNotFound} from '../utils';
 import {
 	createReleaseInRepo,
@@ -107,6 +107,15 @@ export const triggerProdMigration = async (req, res) => {
 	try {
 		const result = await runProductionMigration(req?.body);
 		return res.json({message: 'Production Migration Triggered'});
+	} catch (err) {
+		handleErr(err, res);
+	}
+};
+
+export const getMigrations = async (req, res) => {
+	try {
+		const migrations = await Migration.find({});
+		return res.json({migrations});
 	} catch (err) {
 		handleErr(err, res);
 	}

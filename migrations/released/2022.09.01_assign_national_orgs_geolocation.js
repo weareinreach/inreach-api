@@ -17,10 +17,10 @@ require('dotenv').config({
 	path: '.env'
 });
 // Import DB Connection
-require('../src/db');
-var migrationFunctions = require('./migrationsFunctions');
-var mongoose = require('../src/mongoose');
-const usStateInfo = require('../resources/unites-states-capital-geolocation.json');
+require('../../src/db');
+var migrationFunctions = require('../migrationsFunctions');
+var mongoose = require('../../src/mongoose');
+const usStateInfo = require('../../resources/unites-states-capital-geolocation.json');
 
 async function assignStateCoords(location) {
 	usStateInfo.forEach((state) => {
