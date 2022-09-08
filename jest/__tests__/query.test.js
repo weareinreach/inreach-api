@@ -115,7 +115,25 @@ describe('getOrganizationQuery', () => {
 		expect(serviceResult.services.$elemMatch).toEqual(serviceOr);
 		expect(tagResult.services.$elemMatch).toEqual(tagOr);
 		expect(serviceAndTagResult.services.$elemMatch).toEqual({
-			$and: [serviceOr, tagOr]
+			$and: [
+				{
+					$or: [
+						{'properties.city': 'true'},
+						{'properties.state': 'true'},
+						{'properties.other-place': 'true'},
+						{'tags.en_us.Food': 'true'},
+						{'tags.en_us.Medical.Check Up': 'true'},
+						{'tags.en_us.Legal': 'true'}
+					]
+				},
+				{
+					$or: [
+						{'tags.en_us.Food': 'true'},
+						{'tags.en_us.Medical.Check Up': 'true'},
+						{'tags.en_us.Legal': 'true'}
+					]
+				}
+			]
 		});
 	});
 
