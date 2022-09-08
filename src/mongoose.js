@@ -170,7 +170,9 @@ const CommentSchema = new Schema(
 				created_at,
 				comment: String,
 				source: String,
-				userId: String
+				userId: String,
+				isVerified: {type: Boolean, default: false},
+				is_deleted: {type: Boolean, default: false}
 			}
 		]
 	},
@@ -204,7 +206,9 @@ const ReviewSchema = new Schema(
 		hasLeftFeedbackBefore: Boolean,
 		negativeReasons: [String],
 		rating: Number,
-		source: {type: String, default: 'catalog'}
+		source: {type: String, default: 'catalog'},
+		isVerified: {type: Boolean, default: false},
+		is_deleted: {type: Boolean, default: false}
 	},
 	schemaOptions
 );
@@ -227,7 +231,10 @@ export const Suggestion = model('Suggestion', SuggestionSchema);
 const UserSchema = new Schema(
 	{
 		age: String,
-		catalogType: {type: String, enum: ['lawyer', 'provider', 'seeker']},
+		catalogType: {
+			type: String,
+			enum: ['lawyer', 'provider', 'seeker', 'reviewer']
+		},
 		currentLocation: String,
 		email: {
 			type: String,
@@ -244,6 +251,7 @@ const UserSchema = new Schema(
 		isAdminDeveloper: {type: Boolean, default: false},
 		isDataManager: {type: Boolean, default: false},
 		isProfessional: {type: Boolean, default: false},
+		isReviewerApproved: {type: Boolean, default: false},
 		lists: [
 			{
 				name: String,
@@ -262,6 +270,16 @@ const UserSchema = new Schema(
 		orgPositionTitle: String,
 		orgType: String,
 		reasonForJoining: String,
+		reviewerQuestions: {
+			verifyAnswer: {type: Boolean, default: false},
+			timeCommitAnswer: {type: Boolean, default: false},
+			specifiedTimeCommit: String,
+			auditAnswer: {type: Boolean, default: false},
+			suggestionsAnswer: {type: Boolean, default: false},
+			reviewsAnswer: {type: Boolean, default: false},
+			payAnswer: {type: Boolean, default: false},
+			specifiedOtherInfo: String
+		},
 		salt: {type: String, required: true}
 	},
 	schemaOptions

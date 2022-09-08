@@ -4,6 +4,7 @@ exports[`getOrganizationQuery should apply geoNear query and match snapshot 1`] 
 Object {
   "$geoNear": Object {
     "distanceField": "distance",
+    "maxDistance": NaN,
     "near": Object {
       "coordinates": Array [
         -11,
@@ -29,6 +30,12 @@ Object {
                 },
                 Object {
                   "properties.state": "true",
+                },
+                Object {
+                  "tags.en_us.Food": "true",
+                },
+                Object {
+                  "tags.en_us.Legal": "true",
                 },
               ],
             },
@@ -84,6 +91,15 @@ Object {
             },
             Object {
               "properties.other-place": "true",
+            },
+            Object {
+              "tags.en_us.Food": "true",
+            },
+            Object {
+              "tags.en_us.Medical.Check Up": "true",
+            },
+            Object {
+              "tags.en_us.Legal": "true",
             },
           ],
         },
