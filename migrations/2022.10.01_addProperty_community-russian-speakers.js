@@ -99,7 +99,7 @@ async function runRollbackScript() {
 			},
 			{
 				$match: {
-					'services.properties.lang-spanish': {
+					'services.properties.lang-russian': {
 						$exists: true
 					}
 				}
@@ -120,7 +120,7 @@ async function runRollbackScript() {
 				},
 				update: {
 					$unset: {
-						'services.$[elem].properties.community-russian-speakers': 'true'
+						'services.$[elem].properties.community-russian-speakers': ''
 					}
 				},
 				arrayFilters: [{'elem._id': {$eq: org.service_id}}]

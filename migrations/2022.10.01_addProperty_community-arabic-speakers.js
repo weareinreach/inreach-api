@@ -99,7 +99,7 @@ async function runRollbackScript() {
 			},
 			{
 				$match: {
-					'services.properties.lang-spanish': {
+					'services.properties.lang-arabic': {
 						$exists: true
 					}
 				}

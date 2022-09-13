@@ -120,7 +120,7 @@ async function runRollbackScript() {
 				},
 				update: {
 					$unset: {
-						'services.$[elem].properties.community-spanish-speakers': 'true'
+						'services.$[elem].properties.community-spanish-speakers': ''
 					}
 				},
 				arrayFilters: [{'elem._id': {$eq: org.service_id}}]
