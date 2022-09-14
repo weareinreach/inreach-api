@@ -98,7 +98,7 @@ export const maskCollection = async (env, maskingOptions) => {
 		env == STAGING ? process.env.DB_URI_STAGING : process.env.DB_URI_LOCAL
 	);
 
-	console.log(`Begging masking for ${maskingOptions.schema}`);
+	console.log(`Beginning masking for ${maskingOptions.schema}`);
 	try {
 		let bulkOperations = [];
 		const collection = await mongooseSchemas[`${maskingOptions.schema}`].find(
