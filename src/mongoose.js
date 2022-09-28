@@ -171,8 +171,9 @@ const CommentSchema = new Schema(
 				comment: String,
 				source: String,
 				userId: String,
+				userLocation: String,
 				isVerified: {type: Boolean, default: false},
-				is_deleted: {type: Boolean, default: false}
+				isDeleted: {type: Boolean, default: false}
 			}
 		]
 	},
@@ -207,8 +208,9 @@ const ReviewSchema = new Schema(
 		negativeReasons: [String],
 		rating: Number,
 		source: {type: String, default: 'catalog'},
+		userLocation: String,
 		isVerified: {type: Boolean, default: false},
-		is_deleted: {type: Boolean, default: false}
+		isDeleted: {type: Boolean, default: false}
 	},
 	schemaOptions
 );

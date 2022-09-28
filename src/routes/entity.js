@@ -6,10 +6,10 @@ export const getComments = async (req, res) => {
 	const {orgId, serviceId} = req?.params;
 	const query = getEntityQuery({organizationId: orgId, serviceId});
 
-	await Comment.findOne(query)
-		.then((doc) => {
-			const {comments = []} = doc || {};
-
+	await Comment.find(query)
+		.sort({created_at: 1})
+		.then((docs) => {
+			const comments = ({} = docs.map((doc) => doc.comments[0]));
 			return res.json({comments});
 		})
 		.catch((err) => handleErr(err, res));
