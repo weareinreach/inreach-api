@@ -1,5 +1,8 @@
 {
     "userId": "5fc980176f5ae50017248ae7",
     "comment": "This is a test comment",
-    "source": "Test Source"
+    "source": "Test Source",
+    "isVerified": true,
+    "isDeleted": false,
+    "userLocation": "happy town, usa"
 }
