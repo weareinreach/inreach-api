@@ -9,7 +9,7 @@ export const getComments = async (req, res) => {
 	await Comment.find(query)
 		.sort({created_at: 1})
 		.then((docs) => {
-			const comments = ({} = docs.map((doc) => doc.comments[0]));
+			const comments = ({} = docs.map((doc) => doc.comments));
 			return res.json({comments});
 		})
 		.catch((err) => handleErr(err, res));
