@@ -141,3 +141,6 @@ docker/seedData/
 business_reports/output
 yarn.lock
 .vscode
+
+#Backup process
+backup/inreach/*.gz

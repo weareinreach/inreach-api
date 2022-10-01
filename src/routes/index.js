@@ -76,7 +76,8 @@ import {
 	getRepoContributors,
 	getRepoReleases,
 	triggerStagMigration,
-	triggerProdMigration
+	triggerProdMigration,
+	triggerBackUpAndRestore
 } from './dashboard';
 export const baseRouter = Router();
 export const versionOneRouter = Router();
@@ -284,4 +285,8 @@ versionOneRouter.post(
 versionOneRouter.post(
 	'/dashboard/triggerProductionMigration',
 	triggerProdMigration
+);
+versionOneRouter.post(
+	'/dashboard/triggerBackUpAndRestore',
+	triggerBackUpAndRestore
 );

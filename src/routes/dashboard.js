@@ -8,7 +8,7 @@ import {
 	getReposContributors,
 	createHallFameObject
 } from '../utils/github';
-import {runStagingMigration, runProductionMigration} from '../utils/circleci';
+import {runCircleCIPostCommand} from '../utils/circleci';
 
 //Add dev Access
 
@@ -94,7 +94,7 @@ export const triggerStagMigration = async (req, res) => {
 	const {branch, parameters} = req?.body;
 	if (!branch || !parameters || branch !== 'dev') return handleBadRequest(res);
 	try {
-		const result = await runStagingMigration(req?.body);
+		const result = await runCircleCIPostCommand(req?.body);
 		return res.json({message: 'Staging Migration Triggered'});
 	} catch (err) {
 		handleErr(err, res);
@@ -105,8 +105,19 @@ export const triggerProdMigration = async (req, res) => {
 	const {branch, parameters} = req?.body;
 	if (!branch || !parameters || branch !== 'main') return handleBadRequest(res);
 	try {
-		const result = await runProductionMigration(req?.body);
+		const result = await runCircleCIPostCommand(req?.body);
 		return res.json({message: 'Production Migration Triggered'});
+	} catch (err) {
+		handleErr(err, res);
+	}
+};
+
+export const triggerBackUpAndRestore = async (req, res) => {
+	const {parameters} = req?.body;
+	if (!parameters) return handleBadRequest(res);
+	try {
+		const result = await runCircleCIPostCommand(req?.body);
+		return res.json({message: 'Production Backup and Restore Triggered'});
 	} catch (err) {
 		handleErr(err, res);
 	}
