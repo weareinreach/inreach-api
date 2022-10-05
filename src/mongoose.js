@@ -171,8 +171,9 @@ const CommentSchema = new Schema(
 				comment: String,
 				source: String,
 				userId: String,
+				userLocation: String,
 				isVerified: {type: Boolean, default: false},
-				is_deleted: {type: Boolean, default: false}
+				isDeleted: {type: Boolean, default: false}
 			}
 		]
 	},
