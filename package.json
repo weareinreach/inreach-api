@@ -38,8 +38,8 @@
 		"seed:suggestion": "node ./docker/seed/generateSuggestionSeed.js",
 		"seed:indexes": "node ./docker/seed/addIndexes.js",
 		"seed-docker-db": "yarn run-s seed:*",
-		"backup:prod-staging":"PROD_TO_STAGING=true node ./backup/runBackUp.js",
-		"backup:staging-local":"STAGING_TO_LOCAL=node ./backup/runBackUp.js"
+		"backup:prod-staging": "PROD_TO_STAGING=true node ./backup/runBackUp.js",
+		"backup:staging-local": "STAGING_TO_LOCAL=true node ./backup/runBackUp.js"
 	},
 	"dependencies": {
 		"@octokit/auth-token": "^2.5.0",
