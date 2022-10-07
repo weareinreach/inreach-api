@@ -11,17 +11,19 @@ require('dotenv').config({
 });
 //Static variables
 const BACKUP_PATH = 'backup/inreach';
-const PROD = 'PROD';
-const STAGING = 'STAGING';
-const LOCAL = 'LOCAL';
+export const PROD = 'PROD';
+export const STAGING = 'STAGING';
+export const LOCAL = 'LOCAL';
 const STAGING_DB_NAME = 'heroku_tn9l3cc3';
 const PROD_DB_NAME = 'heroku_52km7d5h';
 //Update your Local DB name here
-const LOCAL_DB_NAME = '';
+const LOCAL_DB_NAME = 'inReach';
 
 const {MongoTools} = require('node-mongotools');
 const mongoTools = new MongoTools();
 const mongooseSchemas = require('../src/mongoose');
+
+const serverRegex = /(mongodb.*)\//i;
 
 //Connect to DB
 const connectDB = (uri) => {
@@ -39,7 +41,7 @@ const connectDB = (uri) => {
 
 //Backup
 export const backUpDatabase = async (options) => {
-	return mongoTools
+	return await mongoTools
 		.mongodump(options)
 		.then((success) => {
 			console.log(
@@ -57,11 +59,13 @@ export const backUpDatabase = async (options) => {
 };
 
 export const restoreDatabase = async (options) => {
-	return mongoTools
+	await mongoTools
 		.mongorestore(options)
 		.then((success) => {
 			console.log('Restore completed');
-			console.log(success);
+			console.log(
+				`Message: ${success.message} \nStatus: ${success.status} \nOutput: ${success.stderr}`
+			);
 			return success;
 		})
 		.catch((err) => {
@@ -70,6 +74,7 @@ export const restoreDatabase = async (options) => {
 };
 
 export const createSourceOptionsObject = (env) => {
+	console.log(`Creating backup options for ${env}`);
 	return {
 		uri: env == PROD ? process.env.DB_URI_PROD : process.env.DB_URI_STAGING,
 		path: BACKUP_PATH
@@ -77,8 +82,11 @@ export const createSourceOptionsObject = (env) => {
 };
 
 export const createTargetOptionsObject = (file, env) => {
+	console.info(`Creating restore options for ${env}`);
 	const DB_CONNECTION =
-		env == STAGING ? process.env.DB_URI_STAGING : process.env.DB_URI_LOCAL;
+		env == STAGING
+			? process.env.DB_URI_STAGING.match(serverRegex)[1]
+			: process.env.DB_URI_LOCAL.match(serverRegex)[1];
 	const OPTIONS =
 		env == STAGING
 			? `--nsFrom "${PROD_DB_NAME}.*" --nsTo "${STAGING_DB_NAME}.*"`
@@ -94,6 +102,8 @@ export const createTargetOptionsObject = (file, env) => {
 
 export const maskCollection = async (env, maskingOptions) => {
 	//Connect to DB
+	console.info(`Connecting to db: ${env}`);
+
 	connectDB(
 		env == STAGING ? process.env.DB_URI_STAGING : process.env.DB_URI_LOCAL
 	);
@@ -106,12 +116,13 @@ export const maskCollection = async (env, maskingOptions) => {
 		);
 		//Masking
 		collection.forEach((item) => {
+			const {masking} = getMaskingOptions(maskingOptions.schema);
 			bulkOperations.push({
 				updateOne: {
 					filter: {
 						_id: item._id
 					},
-					update: maskingOptions.masking
+					update: masking
 				}
 			});
 		});
