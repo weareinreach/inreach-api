@@ -98,43 +98,18 @@ async function runMigrationScript() {
 					// 	arrayFilters: [{'elem._id': {$eq: org.service_id}}]
 					// };
 				} else if (removeService.includes(org.service_id[i].toString())) {
-					// updateOne = {
-					// 	filter: {
-					// 		_id: org._id
-					// 	},
-					// 	update: {
-					// 		$unset: {
-					// 			'services.$[elem].properties.community-asylum-seeker' : ''
-					// 		}
-					// 	},
-					// 	arrayFilters: [{'elem._id': {$eq: org.service_id}}]
-					// };
-
+					console.log(org.service_id[i].toString());
+					console.log(' ');
 					updateOne = {
 						filter: {
 							_id: org._id,
-							services: {
-								_id: org.service_id
-							}
+							'services._id': org.service_id
 						},
-						update: [
-							{
-								$unwind: {
-									path: '$services',
-									includeArrayIndex: '_svc_arr_idx'
-								}
-							},
-							{
-								$match: {
-									'services._id': {
-										$eq: org.service_id
-									}
-								}
-							},
-							{
-								$unset: 'services.properties.community-asylum-seeker'
+						update: {
+							$unset: {
+								'services.$.properties.community-asylum-seeker': ''
 							}
-						]
+						}
 					};
 				}
 				bulkOperations.push({
