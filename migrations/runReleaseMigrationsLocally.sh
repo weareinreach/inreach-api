@@ -8,7 +8,7 @@
 
 #Use the correct date pattern all the files with a release
 #The pattern should follow yyyy.mm.dd{.|_}
-export DATE_PATTERN=2022.09.01_
+export DATE_PATTERN=2002.10.02
 
 #Check if which directory script was run from
 if [[ $PWD == *inrech-api ]]; then
