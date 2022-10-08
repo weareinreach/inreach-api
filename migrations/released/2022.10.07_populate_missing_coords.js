@@ -16,10 +16,10 @@ require('dotenv').config({
 	path: '.env'
 });
 // Import DB Connection
-require('../src/db');
-var migrationFunctions = require('./migrationsFunctions');
-var mongoose = require('../src/mongoose');
-const updatedData = require('./lib/2022-10-07_missing_coords/out.json');
+require('../../src/db');
+var migrationFunctions = require('../migrationsFunctions');
+var mongoose = require('../../src/mongoose');
+const updatedData = require('../lib/2022-10-07_missing_coords/out.json');
 const {Decimal128} = require('mongodb');
 
 //Scripts
