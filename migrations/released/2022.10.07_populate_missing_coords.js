@@ -25,6 +25,7 @@ const {Decimal128} = require('mongodb');
 //Scripts
 async function runMigrationScript() {
 	try {
+		console.log(`Loaded ${updatedData.length} records.`);
 		const bulkOperations = updatedData.map((org) => ({
 			updateOne: {
 				filter: {
@@ -44,10 +45,10 @@ async function runMigrationScript() {
 				}
 			}
 		}));
-
 		const updateResponse = await mongoose.Organization.bulkWrite(
 			bulkOperations
 		);
+
 		console.log(
 			`Number of modified rows: ${JSON.stringify(updateResponse.nModified)}`
 		);
