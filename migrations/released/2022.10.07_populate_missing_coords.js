@@ -16,10 +16,11 @@ require('dotenv').config({
 	path: '.env'
 });
 // Import DB Connection
-require('../../src/db');
-var migrationFunctions = require('../migrationsFunctions');
-var mongoose = require('../../src/mongoose');
-const updatedData = require('../lib/2022-10-07_missing_coords/out.json');
+require('../src/db');
+var migrationFunctions = require('./migrationsFunctions');
+var mongoose = require('../src/mongoose');
+const updatedData = require('./lib/2022-10-07_missing_coords/out.json');
+const {Decimal128} = require('mongodb');
 
 //Scripts
 async function runMigrationScript() {
@@ -33,7 +34,12 @@ async function runMigrationScript() {
 				update: {
 					$set: {
 						'locations.$.lat': org.lat,
-						'locations.$.long': org.long
+						'locations.$.long': org.long,
+						'locations.$.geolocation.coordinates': [
+							Decimal128.fromString(org.long),
+							Decimal128.fromString(org.lat)
+						],
+						'locations.$.geolocation.type': 'Point'
 					}
 				}
 			}
