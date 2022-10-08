@@ -17,7 +17,7 @@ export const LOCAL = 'LOCAL';
 const STAGING_DB_NAME = 'heroku_tn9l3cc3';
 const PROD_DB_NAME = 'heroku_52km7d5h';
 //Update your Local DB name here
-const LOCAL_DB_NAME = 'inReach';
+const LOCAL_DB_NAME = '';
 
 const {MongoTools} = require('node-mongotools');
 const mongoTools = new MongoTools();
