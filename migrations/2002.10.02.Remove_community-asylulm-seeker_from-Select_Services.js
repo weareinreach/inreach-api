@@ -30,10 +30,12 @@ var migrationFunctions = require('./migrationsFunctions');
 var mongoose = require('../src/mongoose');
 var servicesRemove = require('./services-remove-property.json');
 var servicesKeep = require('./services-keep-property.json');
-var organizations = require('./all_services.json');
+var organizations = require('./allOrganizations.json');
 const {sort} = require('ramda');
 const ObjectID = require('mongodb').ObjectID;
-var allOrgs = [];
+var allOrgs = {
+	table: []
+};
 var keepService = [];
 var removeService = [];
 
@@ -45,17 +47,19 @@ for (var k in servicesRemove) {
 	removeService.push(servicesRemove[k].id);
 }
 
-for (var i in organizations) {
-	if (
-		removeService.includes(organizations[i].service) ||
-		keepService.includes(organizations[i].service)
-	) {
-		allOrgs.push(new ObjectID.createFromHexString(organizations[i].org));
-	}
-}
-
 //Scripts
 async function runMigrationScript() {
+	for (var i in organizations) {
+		if (
+			removeService.includes(organizations[i].service) ||
+			keepService.includes(organizations[i].service)
+		) {
+			allOrgs.table.push({
+				org: organizations[i].org,
+				service: organizations[i].service
+			});
+		}
+	}
 	try {
 		const result = await mongoose.Organization.aggregate([
 			{
@@ -64,59 +68,72 @@ async function runMigrationScript() {
 					preserveNullAndEmptyArrays: true
 				}
 			},
-
-			{
-				$match: {
-					_id: {$in: allOrgs}
-				}
-			},
-
 			{
 				$project: {
 					service_id: '$services._id',
-					properties: '$services.properties',
-					org_property: '$properties'
+					properties: '$services.properties.community-asylum-seeker',
+					org_property: '$properties.community-asylum-seeker'
 				}
 			}
 		]);
-
 		let bulkOperations = [];
 		let updateOne = {};
-
 		result.forEach((org) => {
+			let orgRemove = true;
 			for (let i in org.service_id) {
 				if (keepService.includes(org.service_id[i].toString())) {
-					// updateOne = {
-					// 	filter: {
-					// 		_id: org._id
-					// 	},
-					// 	update: {
-					// 		$set: {
-					// 			'services.[elem].properties.community-asylum-seeker':'true'
-					// 		}
-					// 	},
-					// 	arrayFilters: [{'elem._id': {$eq: org.service_id}}]
-					// };
-				} else if (removeService.includes(org.service_id[i].toString())) {
-					console.log(org.service_id[i].toString());
-					console.log(' ');
+					orgRemove = false;
 					updateOne = {
 						filter: {
 							_id: org._id,
-							'services._id': org.service_id
+							'services._id': org.service_id[i],
+							'services.properties.community-asylum-seeker': '' || null
 						},
 						update: {
-							$unset: {
+							$set: {
+								'services.$.properties.community-asylum-seeker': 'true'
+							}
+						}
+					};
+				} else if (removeService.includes(org.service_id[i].toString())) {
+					updateOne = {
+						filter: {
+							_id: org._id,
+							'services._id': org.service_id[i]
+						},
+						update: {
+							$set: {
 								'services.$.properties.community-asylum-seeker': ''
 							}
 						}
 					};
+				} else if (org.properties[i] === 'true') {
+					orgRemove = false;
 				}
 				bulkOperations.push({
 					updateOne
 				});
 			}
+			if (orgRemove) {
+				allOrgs.table.push({org: org._id, service: org.service_id[0]});
+				updateOne = {
+					filter: {
+						_id: org._id
+					},
+					update: {
+						$set: {
+							'properties.community-asylum-seeker': ''
+						}
+					}
+				};
+				bulkOperations.push({
+					updateOne
+				});
+			}
 		});
+
+		const fs = require('fs');
+		fs.writeFileSync('allOrganizations.json', allOrgs);
 
 		const updateResponse = await mongoose.Organization.bulkWrite(
 			bulkOperations
@@ -128,6 +145,36 @@ async function runMigrationScript() {
 		console.log(
 			'Migration to add the "Trans Health - Hormone Therapy" tag and rename "Trans health" to "Trans Health - Primary Care" complete'
 		);
+
+		// let checkChanges = [];
+		// for (entry in keepService) {
+		// 	checkChanges.push(new ObjectID.createFromHexString(keepService[entry]))
+		// }
+
+		// const result2 = await mongoose.Organization.aggregate([
+		// 	{
+		// 		$unwind: {
+		// 			path: '$services',
+		// 			preserveNullAndEmptyArrays: true
+		// 		}
+		// 	},
+
+		// 	{
+		// 		$match: {
+		// 			_id: {$in: checkChanges}
+		// 		}
+		// 	},
+
+		// 	{
+		// 		$project: {
+		// 			properties: '$services.properties.community-asylum-seeker'
+		// 		}
+		// 	}
+
+		// ]);
+
+		// console.log(result2)
+
 		process.exit(0);
 	} catch (err) {
 		console.log(err);
@@ -166,17 +213,17 @@ async function runRollbackScript() {
 		result.forEach((org) => {
 			for (let i in org.service_id) {
 				if (keepService.includes(org.service_id[i].toString())) {
-					// updateOne = {
-					// 	filter: {
-					// 		_id: org._id
-					// 	},
-					// 	update: {
-					// 		$set: {
-					// 			'services.[elem].properties.community-asylum-seeker':'true'
-					// 		}
-					// 	},
-					// 	arrayFilters: [{'elem._id': {$eq: org.service_id}}]
-					// };
+					updateOne = {
+						filter: {
+							_id: org._id,
+							'services._id': org.service_id[i]
+						},
+						update: {
+							$set: {
+								'services.$.properties.community-asylum-seeker': ''
+							}
+						}
+					};
 				} else if (removeService.includes(org.service_id[i].toString())) {
 					updateOne = {
 						filter: {
@@ -184,10 +231,23 @@ async function runRollbackScript() {
 						},
 						update: {
 							$set: {
-								'services.$[elem].properties.community-asylum-seeker': ''
+								'properties.community-asylum-seeker': 'true'
 							}
+						}
+					};
+					bulkOperations.push({
+						updateOne
+					});
+					updateOne = {
+						filter: {
+							_id: org._id,
+							'services._id': org.service_id[i]
 						},
-						arrayFilters: [{'elem._id': {$eq: org.service_id}}]
+						update: {
+							$set: {
+								'services.$.properties.community-asylum-seeker': 'true'
+							}
+						}
 					};
 				}
 			}
