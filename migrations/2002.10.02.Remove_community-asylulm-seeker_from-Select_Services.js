@@ -32,28 +32,26 @@ var servicesRemove = require('./services-remove-property.json');
 var servicesKeep = require('./services-keep-property.json');
 var organizations = require('./allOrganizations.json');
 const ObjectID = require('mongodb').ObjectID;
+const fs = require('fs');
 var rollbackOrgs = [];
-var allOrgs = {
-	table: []
-};
+var allOrgs = [];
 var keepService = [];
 var removeService = [];
-for (var j in servicesKeep) {
-	keepService.push(servicesKeep[j].id);
-}
-
-for (var k in servicesRemove) {
-	removeService.push(servicesRemove[k].id);
-}
 
 //Scripts
 async function runMigrationScript() {
+	for (var i in servicesRemove) {
+		removeService.push(servicesRemove[k].id);
+	}
+	for (var i in servicesKeep) {
+		keepService.push(servicesKeep[j].id);
+	}
 	for (var i in organizations) {
 		if (
 			removeService.includes(organizations[i].service) ||
 			keepService.includes(organizations[i].service)
 		) {
-			allOrgs.table.push({
+			allOrgs.push({
 				org: organizations[i].org,
 				service: organizations[i].service
 			});
@@ -83,16 +81,13 @@ async function runMigrationScript() {
 			let orgRemove = true;
 			for (let i in org.service_id) {
 				if (keepService.includes(org.service_id[i].toString())) {
-					for (let key in org.properties[i]) {
-						if (key === 'community-asylum-seeker') {
-							if (org.properties[i][key] === 'true') {
-								let index = keepService.indexOf(org.service_id[i].toString());
-								keepService.splice(index, 1);
-							}
-						}
-					}
-
 					orgRemove = false;
+					if (org.properties[i][key] === 'true') {
+						keepService.splice(
+							keepService.indexOf(org.service_id[i].toString()),
+							1
+						);
+					}
 					updateOne = {
 						filter: {
 							_id: org._id,
@@ -106,6 +101,15 @@ async function runMigrationScript() {
 						}
 					};
 				} else if (removeService.includes(org.service_id[i].toString())) {
+					if (
+						!('community-asylum-seeker' in org.properties[i]) ||
+						org.properties[i]['community-asylum-seeker'] === ''
+					) {
+						removeService.splice(
+							removeService.indexOf(org.service_id[i].toString()),
+							1
+						);
+					}
 					updateOne = {
 						filter: {
 							_id: org._id,
@@ -126,7 +130,7 @@ async function runMigrationScript() {
 			}
 
 			if (orgRemove) {
-				allOrgs.table.push({org: org._id, service: org.service_id[0]});
+				allOrgs.push({org: org._id, service: org.service_id[0]});
 				updateOne = {
 					filter: {
 						_id: org._id
@@ -144,25 +148,39 @@ async function runMigrationScript() {
 			}
 		});
 
-		let rollbackServices = [];
+		let rollbackKeep = [];
 		for (let i in keepService) {
-			rollbackServices.push({
+			rollbackKeep.push({
 				id: keepService[i]
 			});
 		}
 
-		const fs = require('fs');
+		let rollbackRemove = [];
+		for (let i in removeService) {
+			rollbackServices.push({
+				id: removeService[i]
+			});
+		}
+
 		fs.writeFile(
 			'./migrations/rollbackOrganizations.json',
-			JSON.stringify(allOrgs.table),
+			JSON.stringify(allOrgs),
 			(error) => {
 				if (error) throw error;
 			}
 		);
 
 		fs.writeFile(
-			'./migrations/rollbackServices.json',
-			JSON.stringify(rollbackServices),
+			'./migrations/rollbackKeep.json',
+			JSON.stringify(rollbackKeep),
+			(error) => {
+				if (error) throw error;
+			}
+		);
+
+		fs.writeFile(
+			'./migrations/rollbackRemove.json',
+			JSON.stringify(rollbackRemove),
 			(error) => {
 				if (error) throw error;
 			}
@@ -189,16 +207,21 @@ async function runMigrationScript() {
 // Rollback Script
 async function runRollbackScript() {
 	var organizations = require('./rollbackOrganizations.json');
-	var services = require('./rollbackServices.json');
+	var keep = require('./rollbackKeep.json');
+	var remove = require('./rollbackRemove.json');
 
-	for (var j in services) {
-		keepService.push(services[j].id);
+	for (var i in keep) {
+		keepService.push(keep[i].id);
+	}
+
+	for (var i in remove) {
+		removeService.push(keep[i].id);
 	}
 
 	for (var i in organizations) {
 		if (
-			removeService.includes(organizations[i].service) ||
-			services.includes(organizations[i].service)
+			remove.includes(organizations[i].service) ||
+			keep.includes(organizations[i].service)
 		) {
 			rollbackOrgs.push(new ObjectID.createFromHexString(organizations[i].org));
 		}
