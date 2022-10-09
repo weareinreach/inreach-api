@@ -10,7 +10,6 @@
   *  has no services that do have the property, the organization itself will have
   *  this property removed from it as well.
   * ********************************************************************************
-  
 
  /* eslint-disable no-console */
 
@@ -210,7 +209,7 @@ async function runMigrationScript() {
 
 // Rollback Script
 async function runRollbackScript() {
-	var organizations = require('./rollbackOrganizations.json');
+	var organizationsRollback = require('./rollbackOrganizations.json');
 	var keep = require('./rollbackKeep.json');
 	var remove = require('./rollbackRemove.json');
 
@@ -219,15 +218,17 @@ async function runRollbackScript() {
 	}
 
 	for (let i in remove) {
-		removeService.push(keep[i].id);
+		removeService.push(remove[i].id);
 	}
 
-	for (let i in organizations) {
+	for (let i in organizationsRollback) {
 		if (
-			remove.includes(organizations[i].service) ||
-			keep.includes(organizations[i].service)
+			removeService.includes(organizationsRollback[i].service) ||
+			keepService.includes(organizationsRollback[i].service)
 		) {
-			rollbackOrgs.push(new ObjectID.createFromHexString(organizations[i].org));
+			rollbackOrgs.push(
+				new ObjectID.createFromHexString(organizationsRollback[i].org)
+			);
 		}
 	}
 
@@ -248,7 +249,7 @@ async function runRollbackScript() {
 				$project: {
 					service_id: '$services._id',
 					properties: '$services.properties',
-					org_property: '$properties'
+					org_property: '$properties.community-asylum-seeker'
 				}
 			}
 		]);
@@ -269,6 +270,9 @@ async function runRollbackScript() {
 							}
 						}
 					};
+					bulkOperations.push({
+						updateOne
+					});
 				} else if (removeService.includes(org.service_id[index].toString())) {
 					updateOne = {
 						filter: {
@@ -294,11 +298,11 @@ async function runRollbackScript() {
 							}
 						}
 					};
+					bulkOperations.push({
+						updateOne
+					});
 				}
 			}
-			bulkOperations.push({
-				updateOne
-			});
 		});
 
 		const updateResponse = await mongoose.Organization.bulkWrite(
@@ -309,7 +313,7 @@ async function runRollbackScript() {
 			`Number of modified rows: ${JSON.stringify(updateResponse.nModified)}`
 		);
 		console.log(
-			'Rollback to remove the "Trans Health - Hormone Therapy" tag and rename "Trans Health - Primary Care" to "Trans health" complete'
+			'Rollback to reinstate and take away the "community-asylum-seeker" service and organization property from the services and organizatons affected by the migration'
 		);
 		process.exit(0);
 	} catch (err) {
