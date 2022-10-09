@@ -31,14 +31,13 @@ var mongoose = require('../src/mongoose');
 var servicesRemove = require('./services-remove-property.json');
 var servicesKeep = require('./services-keep-property.json');
 var organizations = require('./allOrganizations.json');
-const {sort} = require('ramda');
 const ObjectID = require('mongodb').ObjectID;
+var rollbackOrgs = [];
 var allOrgs = {
 	table: []
 };
 var keepService = [];
 var removeService = [];
-
 for (var j in servicesKeep) {
 	keepService.push(servicesKeep[j].id);
 }
@@ -71,17 +70,28 @@ async function runMigrationScript() {
 			{
 				$project: {
 					service_id: '$services._id',
-					properties: '$services.properties.community-asylum-seeker',
+					properties: '$services.properties',
 					org_property: '$properties.community-asylum-seeker'
 				}
 			}
 		]);
+
 		let bulkOperations = [];
 		let updateOne = {};
+
 		result.forEach((org) => {
 			let orgRemove = true;
 			for (let i in org.service_id) {
 				if (keepService.includes(org.service_id[i].toString())) {
+					for (let key in org.properties[i]) {
+						if (key === 'community-asylum-seeker') {
+							if (org.properties[i][key] === 'true') {
+								let index = keepService.indexOf(org.service_id[i].toString());
+								keepService.splice(index, 1);
+							}
+						}
+					}
+
 					orgRemove = false;
 					updateOne = {
 						filter: {
@@ -102,7 +112,7 @@ async function runMigrationScript() {
 							'services._id': org.service_id[i]
 						},
 						update: {
-							$set: {
+							$unset: {
 								'services.$.properties.community-asylum-seeker': ''
 							}
 						}
@@ -114,6 +124,7 @@ async function runMigrationScript() {
 					updateOne
 				});
 			}
+
 			if (orgRemove) {
 				allOrgs.table.push({org: org._id, service: org.service_id[0]});
 				updateOne = {
@@ -121,19 +132,41 @@ async function runMigrationScript() {
 						_id: org._id
 					},
 					update: {
-						$set: {
+						$unset: {
 							'properties.community-asylum-seeker': ''
 						}
 					}
 				};
+
 				bulkOperations.push({
 					updateOne
 				});
 			}
 		});
 
+		let rollbackServices = [];
+		for (let i in keepService) {
+			rollbackServices.push({
+				id: keepService[i]
+			});
+		}
+
 		const fs = require('fs');
-		fs.writeFileSync('allOrganizations.json', allOrgs);
+		fs.writeFile(
+			'./migrations/rollbackOrganizations.json',
+			JSON.stringify(allOrgs.table),
+			(error) => {
+				if (error) throw error;
+			}
+		);
+
+		fs.writeFile(
+			'./migrations/rollbackServices.json',
+			JSON.stringify(rollbackServices),
+			(error) => {
+				if (error) throw error;
+			}
+		);
 
 		const updateResponse = await mongoose.Organization.bulkWrite(
 			bulkOperations
@@ -146,35 +179,6 @@ async function runMigrationScript() {
 			'Migration to add the "Trans Health - Hormone Therapy" tag and rename "Trans health" to "Trans Health - Primary Care" complete'
 		);
 
-		// let checkChanges = [];
-		// for (entry in keepService) {
-		// 	checkChanges.push(new ObjectID.createFromHexString(keepService[entry]))
-		// }
-
-		// const result2 = await mongoose.Organization.aggregate([
-		// 	{
-		// 		$unwind: {
-		// 			path: '$services',
-		// 			preserveNullAndEmptyArrays: true
-		// 		}
-		// 	},
-
-		// 	{
-		// 		$match: {
-		// 			_id: {$in: checkChanges}
-		// 		}
-		// 	},
-
-		// 	{
-		// 		$project: {
-		// 			properties: '$services.properties.community-asylum-seeker'
-		// 		}
-		// 	}
-
-		// ]);
-
-		// console.log(result2)
-
 		process.exit(0);
 	} catch (err) {
 		console.log(err);
@@ -184,6 +188,22 @@ async function runMigrationScript() {
 
 // Rollback Script
 async function runRollbackScript() {
+	var organizations = require('./rollbackOrganizations.json');
+	var services = require('./rollbackServices.json');
+
+	for (var j in services) {
+		keepService.push(services[j].id);
+	}
+
+	for (var i in organizations) {
+		if (
+			removeService.includes(organizations[i].service) ||
+			services.includes(organizations[i].service)
+		) {
+			rollbackOrgs.push(new ObjectID.createFromHexString(organizations[i].org));
+		}
+	}
+
 	try {
 		const result = await mongoose.Organization.aggregate([
 			{
@@ -192,13 +212,11 @@ async function runRollbackScript() {
 					preserveNullAndEmptyArrays: true
 				}
 			},
-
 			{
 				$match: {
-					_id: {$in: allOrgs}
+					_id: {$in: rollbackOrgs}
 				}
 			},
-
 			{
 				$project: {
 					service_id: '$services._id',
@@ -219,7 +237,7 @@ async function runRollbackScript() {
 							'services._id': org.service_id[i]
 						},
 						update: {
-							$set: {
+							$unset: {
 								'services.$.properties.community-asylum-seeker': ''
 							}
 						}
@@ -251,7 +269,6 @@ async function runRollbackScript() {
 					};
 				}
 			}
-
 			bulkOperations.push({
 				updateOne
 			});
