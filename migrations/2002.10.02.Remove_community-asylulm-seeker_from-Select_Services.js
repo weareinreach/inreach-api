@@ -45,17 +45,7 @@ async function runMigrationScript() {
 	for (let i in servicesKeep) {
 		keepService.push(servicesKeep[i].id);
 	}
-	for (let i in organizations) {
-		if (
-			removeService.includes(organizations[i].service) ||
-			keepService.includes(organizations[i].service)
-		) {
-			allOrgs.push({
-				org: organizations[i].org,
-				service: organizations[i].service
-			});
-		}
-	}
+
 	try {
 		const result = await mongoose.Organization.aggregate([
 			{
@@ -133,7 +123,7 @@ async function runMigrationScript() {
 			}
 
 			if (orgRemove) {
-				allOrgs.push({org: org._id, service: org.service_id[0]});
+				allOrgs.push({org: org._id, service: 'keep me'});
 				updateOne = {
 					filter: {
 						_id: org._id
@@ -150,6 +140,18 @@ async function runMigrationScript() {
 				});
 			}
 		});
+
+		for (let i in organizations) {
+			if (
+				removeService.includes(organizations[i].service) ||
+				keepService.includes(organizations[i].service)
+			) {
+				allOrgs.push({
+					org: organizations[i].org,
+					service: organizations[i].service
+				});
+			}
+		}
 
 		let rollbackKeep = [];
 		for (let i in keepService) {
