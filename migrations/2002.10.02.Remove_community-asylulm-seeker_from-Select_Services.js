@@ -275,7 +275,9 @@ async function runRollbackScript() {
 					bulkOperations.push({
 						updateOne
 					});
-				} else if (removeService.includes(org.service_id[index].toString())) {
+				} else if (
+					[removeService, 'keep me'].includes(org.service_id[index].toString())
+				) {
 					updateOne = {
 						filter: {
 							_id: org._id
@@ -289,20 +291,23 @@ async function runRollbackScript() {
 					bulkOperations.push({
 						updateOne
 					});
-					updateOne = {
-						filter: {
-							_id: org._id,
-							'services._id': org.service_id[index]
-						},
-						update: {
-							$set: {
-								'services.$.properties.community-asylum-seeker': 'true'
+
+					if ([removeService].includes(org.service_id[index].toString())) {
+						updateOne = {
+							filter: {
+								_id: org._id,
+								'services._id': org.service_id[index]
+							},
+							update: {
+								$set: {
+									'services.$.properties.community-asylum-seeker': 'true'
+								}
 							}
-						}
-					};
-					bulkOperations.push({
-						updateOne
-					});
+						};
+						bulkOperations.push({
+							updateOne
+						});
+					}
 				}
 			}
 		});
