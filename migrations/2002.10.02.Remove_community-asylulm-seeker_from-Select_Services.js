@@ -40,13 +40,13 @@ var removeService = [];
 
 //Scripts
 async function runMigrationScript() {
-	for (var i in servicesRemove) {
-		removeService.push(servicesRemove[k].id);
+	for (let i in servicesRemove) {
+		removeService.push(servicesRemove[i].id);
 	}
-	for (var i in servicesKeep) {
-		keepService.push(servicesKeep[j].id);
+	for (let i in servicesKeep) {
+		keepService.push(servicesKeep[i].id);
 	}
-	for (var i in organizations) {
+	for (let i in organizations) {
 		if (
 			removeService.includes(organizations[i].service) ||
 			keepService.includes(organizations[i].service)
@@ -79,20 +79,19 @@ async function runMigrationScript() {
 
 		result.forEach((org) => {
 			let orgRemove = true;
-			for (let i in org.service_id) {
-				if (keepService.includes(org.service_id[i].toString())) {
+			for (let index in org.service_id) {
+				if (keepService.includes(org.service_id[index].toString())) {
 					orgRemove = false;
-					if (org.properties[i][key] === 'true') {
+					if (org.properties[index]['community-asylum-seeker'] === 'true') {
 						keepService.splice(
-							keepService.indexOf(org.service_id[i].toString()),
+							keepService.indexOf(org.service_id[index].toString()),
 							1
 						);
 					}
 					updateOne = {
 						filter: {
 							_id: org._id,
-							'services._id': org.service_id[i],
-							'services.properties.community-asylum-seeker': '' || null
+							'services._id': org.service_id[index]
 						},
 						update: {
 							$set: {
@@ -100,20 +99,21 @@ async function runMigrationScript() {
 							}
 						}
 					};
-				} else if (removeService.includes(org.service_id[i].toString())) {
+				} else if (removeService.includes(org.service_id[index].toString())) {
 					if (
-						!('community-asylum-seeker' in org.properties[i]) ||
-						org.properties[i]['community-asylum-seeker'] === ''
+						org.properties[index] &&
+						(!('community-asylum-seeker' in org.properties[index]) ||
+							org.properties[index]['community-asylum-seeker'] === '')
 					) {
 						removeService.splice(
-							removeService.indexOf(org.service_id[i].toString()),
+							removeService.indexOf(org.service_id[index].toString()),
 							1
 						);
 					}
 					updateOne = {
 						filter: {
 							_id: org._id,
-							'services._id': org.service_id[i]
+							'services._id': org.service_id[index]
 						},
 						update: {
 							$unset: {
@@ -121,7 +121,11 @@ async function runMigrationScript() {
 							}
 						}
 					};
-				} else if (org.properties[i] === 'true') {
+				} else if (
+					org.properties[index] &&
+					'community-asylum-seeker' in org.properties[index] &&
+					org.properties[index]['community-asylum-seeker'] === 'true'
+				) {
 					orgRemove = false;
 				}
 				bulkOperations.push({
@@ -157,7 +161,7 @@ async function runMigrationScript() {
 
 		let rollbackRemove = [];
 		for (let i in removeService) {
-			rollbackServices.push({
+			rollbackRemove.push({
 				id: removeService[i]
 			});
 		}
@@ -194,7 +198,7 @@ async function runMigrationScript() {
 			`Number of modified rows: ${JSON.stringify(updateResponse.nModified)}`
 		);
 		console.log(
-			'Migration to add the "Trans Health - Hormone Therapy" tag and rename "Trans health" to "Trans Health - Primary Care" complete'
+			'Migration to remove and add the "community-asylum-seeker" property from specified services and resultant organizations complete'
 		);
 
 		process.exit(0);
@@ -210,15 +214,15 @@ async function runRollbackScript() {
 	var keep = require('./rollbackKeep.json');
 	var remove = require('./rollbackRemove.json');
 
-	for (var i in keep) {
+	for (let i in keep) {
 		keepService.push(keep[i].id);
 	}
 
-	for (var i in remove) {
+	for (let i in remove) {
 		removeService.push(keep[i].id);
 	}
 
-	for (var i in organizations) {
+	for (let i in organizations) {
 		if (
 			remove.includes(organizations[i].service) ||
 			keep.includes(organizations[i].service)
@@ -252,12 +256,12 @@ async function runRollbackScript() {
 		let bulkOperations = [];
 		let updateOne = {};
 		result.forEach((org) => {
-			for (let i in org.service_id) {
-				if (keepService.includes(org.service_id[i].toString())) {
+			for (let index in org.service_id) {
+				if (keepService.includes(org.service_id[index].toString())) {
 					updateOne = {
 						filter: {
 							_id: org._id,
-							'services._id': org.service_id[i]
+							'services._id': org.service_id[index]
 						},
 						update: {
 							$unset: {
@@ -265,7 +269,7 @@ async function runRollbackScript() {
 							}
 						}
 					};
-				} else if (removeService.includes(org.service_id[i].toString())) {
+				} else if (removeService.includes(org.service_id[index].toString())) {
 					updateOne = {
 						filter: {
 							_id: org._id
@@ -282,7 +286,7 @@ async function runRollbackScript() {
 					updateOne = {
 						filter: {
 							_id: org._id,
-							'services._id': org.service_id[i]
+							'services._id': org.service_id[index]
 						},
 						update: {
 							$set: {
