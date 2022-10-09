@@ -27,6 +27,6 @@ for i in ${FILES//,/ }; do
     export MIGRATION_FILE=$i
     echo "Running Command..."
     #Uncomment the one you want to run
-    #yarn run-migration
-    yarn rollback-migration
+    yarn run-migration
+    #yarn rollback-migration
  done
