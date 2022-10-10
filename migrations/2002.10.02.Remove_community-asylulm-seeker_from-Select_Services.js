@@ -66,7 +66,7 @@ async function runMigrationScript() {
 		let updateOne = {};
 
 		result.forEach((org) => {
-			let orgRemove = true;
+			let orgRemove = org.org_property;
 			for (let index in org.service_id) {
 				if (keepService.includes(org.service_id[index].toString())) {
 					orgRemove = false;
