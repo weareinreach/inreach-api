@@ -33,7 +33,7 @@ var organizations = require('./allOrganizations.json');
 const ObjectID = require('mongodb').ObjectID;
 const fs = require('fs');
 var orgs = [];
-var keepService = [];
+var keepService = ['keep me'];
 var removeService = [];
 
 //Scripts
@@ -141,9 +141,7 @@ async function runMigrationScript() {
 
 		for (let i in organizations) {
 			if (
-				[removeService, keepService, 'keep me'].includes(
-					organizations[i].service
-				)
+				removeService.concat(keepService).includes(organizations[i].service)
 			) {
 				orgs.push({
 					org: organizations[i].org,
@@ -201,7 +199,7 @@ async function runRollbackScript() {
 	var remove = require('./rollbackRemove.json');
 
 	for (let i in organizationsRollback) {
-		if ([keep, remove, 'keep me'].includes(organizationsRollback[i].service)) {
+		if (keep.concat(remove).includes(organizationsRollback[i].service)) {
 			orgs.push(new ObjectID.createFromHexString(organizationsRollback[i].org));
 		}
 	}
