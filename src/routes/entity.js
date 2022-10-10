@@ -37,7 +37,7 @@ export const deleteCommentById = async (req, res) => {
 
 export const updateComments = async (req, res) => {
 	const {orgId, serviceId} = req?.params;
-	const {comment, source, userId, userLocation} = req?.body;
+	const {comment, source, userId, userLocation, isUserApproved} = req?.body;
 	const query = getEntityQuery({organizationId: orgId, serviceId});
 
 	if (!comment) {
@@ -46,7 +46,9 @@ export const updateComments = async (req, res) => {
 
 	await Comment.updateOne(
 		query,
-		{$push: {comments: {comment, source, userId, userLocation}}},
+		{
+			$push: {comments: {comment, source, userId, userLocation, isUserApproved}}
+		},
 		{upsert: true}
 	)
 		.then((doc) => {

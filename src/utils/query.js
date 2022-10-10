@@ -23,7 +23,6 @@ export const getEntityQuery = ({organizationId, serviceId} = {}) => {
 	if (serviceId) {
 		query.serviceId = serviceId;
 	}
-
 	return query;
 };
 
