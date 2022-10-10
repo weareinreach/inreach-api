@@ -32,8 +32,7 @@ var servicesKeep = require('./services-keep-property.json');
 var organizations = require('./allOrganizations.json');
 const ObjectID = require('mongodb').ObjectID;
 const fs = require('fs');
-var rollbackOrgs = [];
-var allOrgs = [];
+var orgs = [];
 var keepService = [];
 var removeService = [];
 
@@ -123,7 +122,7 @@ async function runMigrationScript() {
 			}
 
 			if (orgRemove) {
-				allOrgs.push({org: org._id, service: 'keep me'});
+				orgs.push({org: org._id, service: 'keep me'});
 				updateOne = {
 					filter: {
 						_id: org._id
@@ -144,32 +143,19 @@ async function runMigrationScript() {
 		for (let i in organizations) {
 			if (
 				removeService.includes(organizations[i].service) ||
-				keepService.includes(organizations[i].service)
+				keepService.includes(organizations[i].service) ||
+				organizations[i].service === 'keep me'
 			) {
-				allOrgs.push({
+				orgs.push({
 					org: organizations[i].org,
 					service: organizations[i].service
 				});
 			}
 		}
 
-		let rollbackKeep = [];
-		for (let i in keepService) {
-			rollbackKeep.push({
-				id: keepService[i]
-			});
-		}
-
-		let rollbackRemove = [];
-		for (let i in removeService) {
-			rollbackRemove.push({
-				id: removeService[i]
-			});
-		}
-
 		fs.writeFile(
 			'./migrations/rollbackOrganizations.json',
-			JSON.stringify(allOrgs),
+			JSON.stringify(orgs),
 			(error) => {
 				if (error) throw error;
 			}
@@ -177,7 +163,7 @@ async function runMigrationScript() {
 
 		fs.writeFile(
 			'./migrations/rollbackKeep.json',
-			JSON.stringify(rollbackKeep),
+			JSON.stringify(keepService),
 			(error) => {
 				if (error) throw error;
 			}
@@ -185,7 +171,7 @@ async function runMigrationScript() {
 
 		fs.writeFile(
 			'./migrations/rollbackRemove.json',
-			JSON.stringify(rollbackRemove),
+			JSON.stringify(removeService),
 			(error) => {
 				if (error) throw error;
 			}
@@ -215,22 +201,16 @@ async function runRollbackScript() {
 	var keep = require('./rollbackKeep.json');
 	var remove = require('./rollbackRemove.json');
 
-	for (let i in keep) {
-		keepService.push(keep[i].id);
-	}
-
-	for (let i in remove) {
-		removeService.push(remove[i].id);
-	}
-
 	for (let i in organizationsRollback) {
+		if (organizationsRollback[i].service === '5e8f93a4cf5e26ae4eb3bb2f') {
+			console.log('it here');
+		}
 		if (
-			removeService.includes(organizationsRollback[i].service) ||
-			keepService.includes(organizationsRollback[i].service)
+			remove.includes(organizationsRollback[i].service) ||
+			keep.includes(organizationsRollback[i].service) ||
+			organizationsRollback[i].service === 'keep me'
 		) {
-			rollbackOrgs.push(
-				new ObjectID.createFromHexString(organizationsRollback[i].org)
-			);
+			orgs.push(new ObjectID.createFromHexString(organizationsRollback[i].org));
 		}
 	}
 
@@ -244,7 +224,7 @@ async function runRollbackScript() {
 			},
 			{
 				$match: {
-					_id: {$in: rollbackOrgs}
+					_id: {$in: orgs}
 				}
 			},
 			{
@@ -260,7 +240,8 @@ async function runRollbackScript() {
 		let updateOne = {};
 		result.forEach((org) => {
 			for (let index in org.service_id) {
-				if (keepService.includes(org.service_id[index].toString())) {
+				console.log(org.service_id[index].toString());
+				if (keep.includes(org.service_id[index].toString())) {
 					updateOne = {
 						filter: {
 							_id: org._id,
@@ -276,7 +257,7 @@ async function runRollbackScript() {
 						updateOne
 					});
 				} else if (
-					[removeService, 'keep me'].includes(org.service_id[index].toString())
+					[remove, 'keep me'].includes(org.service_id[index].toString())
 				) {
 					updateOne = {
 						filter: {
@@ -292,7 +273,7 @@ async function runRollbackScript() {
 						updateOne
 					});
 
-					if ([removeService].includes(org.service_id[index].toString())) {
+					if ([remove].includes(org.service_id[index].toString())) {
 						updateOne = {
 							filter: {
 								_id: org._id,
