@@ -133,7 +133,6 @@ async function runMigrationScript() {
 						}
 					}
 				};
-
 				bulkOperations.push({
 					updateOne
 				});
@@ -200,17 +199,10 @@ async function runRollbackScript() {
 	var organizationsRollback = require('./rollbackOrganizations.json');
 	var keep = require('./rollbackKeep.json');
 	var remove = require('./rollbackRemove.json');
-	var orgKeep = [];
 
 	for (let i in organizationsRollback) {
-		if (
-			remove.includes(organizationsRollback[i].service) ||
-			[keep, 'keep me'].includes(organizationsRollback[i].service)
-		) {
+		if ([keep, remove, 'keep me'].includes(organizationsRollback[i].service)) {
 			orgs.push(new ObjectID.createFromHexString(organizationsRollback[i].org));
-		}
-		if (organizationsRollback[i].service === 'keep me') {
-			orgKeep.push(organizationsRollback[i].org);
 		}
 	}
 
@@ -239,6 +231,7 @@ async function runRollbackScript() {
 		let bulkOperations = [];
 		let updateOne = {};
 		result.forEach((org) => {
+			let id = org._id.toString();
 			for (let index in org.service_id) {
 				if (keep.includes(org.service_id[index].toString())) {
 					updateOne = {
@@ -257,7 +250,9 @@ async function runRollbackScript() {
 					});
 				} else if (
 					remove.includes(org.service_id[index].toString()) ||
-					orgKeep.includes(org._id.toString())
+					organizationsRollback.find(
+						(org) => org['service'] === 'keep me' && org['org'] === id
+					)
 				) {
 					updateOne = {
 						filter: {
@@ -273,7 +268,7 @@ async function runRollbackScript() {
 						updateOne
 					});
 
-					if ([remove].includes(org.service_id[index].toString())) {
+					if (remove.includes(org.service_id[index].toString())) {
 						updateOne = {
 							filter: {
 								_id: org._id,
