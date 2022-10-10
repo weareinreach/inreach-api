@@ -141,9 +141,9 @@ async function runMigrationScript() {
 
 		for (let i in organizations) {
 			if (
-				removeService.includes(organizations[i].service) ||
-				keepService.includes(organizations[i].service) ||
-				organizations[i].service === 'keep me'
+				[removeService, keepService, 'keep me'].includes(
+					organizations[i].service
+				)
 			) {
 				orgs.push({
 					org: organizations[i].org,
