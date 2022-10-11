@@ -29,7 +29,6 @@ var migrationFunctions = require('./migrationsFunctions');
 var mongoose = require('../src/mongoose');
 var servicesRemove = require('./services-remove-property.json');
 var servicesKeep = require('./services-keep-property.json');
-var organizations = require('./allOrganizations.json');
 const ObjectID = require('mongodb').ObjectID;
 const fs = require('fs');
 var orgs = [];
@@ -100,6 +99,9 @@ async function runMigrationScript() {
 						bulkOperations.push({
 							updateOne
 						});
+						/** this pushes the organization to the orgs array only once so that only the organizations
+						 * that have undergone changes will be queried in the rollback
+						 */
 						if (orgPush) {
 							orgPush = false;
 							orgs.push({
@@ -138,6 +140,9 @@ async function runMigrationScript() {
 						bulkOperations.push({
 							updateOne
 						});
+						/** this pushes the organization to the orgs array only once so that only the organizations
+						 * that have undergone changes will be queried in the rollback
+						 */
 						if (orgPush) {
 							orgPush = false;
 							orgs.push({
@@ -147,7 +152,6 @@ async function runMigrationScript() {
 							});
 						}
 					}
-
 					/** this final branch of this if/else statement tests for services not specified to be
 					 * removed or added to see if any of the services have the 'community-asylum-seeker' property
 					 * so that it can be deteremined whether or not the parent organization property should be
@@ -307,6 +311,9 @@ async function runRollbackScript() {
 					});
 				}
 			}
+			/** this checks what the original status of the organization property was to add it back if it
+			 * was removed by tghe inital migration
+			 */
 			if (
 				organizationsRollback.find(
 					(org) => org['org'] === id && org['org_status'] === 'true'
