@@ -34,7 +34,6 @@ const fs = require('fs');
 var orgs = [];
 var keepService = [];
 var removeService = [];
-var nonOrgs = [];
 
 //Scripts
 async function runMigrationScript() {
