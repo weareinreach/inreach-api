@@ -141,3 +141,9 @@ docker/seedData/
 business_reports/output
 yarn.lock
 .vscode
+
+#Backup process
+backup/inreach/*.gz
+
+#Non-public migration data -> Files stored in Google Drive
+migrations/lib/**/*.json
