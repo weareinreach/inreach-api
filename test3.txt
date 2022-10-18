@@ -1,1 +1,0 @@
-[{"updateOne":{"filter":{"_id":"5e7e4bdad54f1760921a3ec5"},"update":{"$unset":{"services.$[elem].tags.united_states.Medical.Trans Health - Hormone Therapy":"true"},"$rename":{"services.$[elem].tags.united_states.Medical.Trans Health - Primary Care":"services.$[elem].tags.united_states.Medical.Trans health"}},"arrayFilters":[{"elem._id":{"$eq":"5e7e4bdad54f1760921a3ed9"}}]}}]
