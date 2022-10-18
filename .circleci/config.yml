@@ -3,6 +3,9 @@
 #This file is to be used to run Github Status Checks
 version: 2.1
 parameters:
+  backup_and_restore:
+    default: false
+    type: boolean
   register_migration:
     default: false
     type: boolean
@@ -196,6 +199,29 @@ jobs:
           name: Run linting
           command: "yarn lint"
   
+  backup_and_restore:
+    docker:
+      - image: cimg/node:16.12.0
+    working_directory: ~/inreach-api
+    steps:
+      - checkout
+      #Recreate .env file from CircleCI Project Env Vars
+      - run:
+          name: Create .env file
+          command: |
+           cat \<< EOF > ./.env
+           DB_URI_STAGING=$DB_URI_STAGING
+           DB_URI_PROD=$DB_URI_PROD
+           EOF
+      - run:
+          name: Install Packages
+          command: yarn install
+      - run:
+          name: Run Backup and Restore
+          command: yarn backup:prod-staging
+          
+         
+
   register_migration_stage:
     docker:
       - image: cimg/node:16.12.0
@@ -424,6 +450,14 @@ workflows:
           filters:
             branches:
               ignore: [main, dev]
+
+  run_back_up_restore:
+    when: << pipeline.parameters.backup_and_restore >>
+    jobs:
+      - backup_and_restore:
+         filters:
+            branches:
+              only: main
   
   register_migration_stage:
     when: << pipeline.parameters.register_migration >>
