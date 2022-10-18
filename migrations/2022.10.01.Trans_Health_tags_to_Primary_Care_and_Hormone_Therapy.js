@@ -192,9 +192,9 @@ async function runRollbackScript() {
 			});
 		});
 
-		// const updateResponse = await mongoose.Organization.bulkWrite(
-		// 	bulkOperations
-		// );
+		const updateResponse = await mongoose.Organization.bulkWrite(
+			bulkOperations
+		);
 
 		console.log(
 			`Number of modified rows: ${JSON.stringify(updateResponse.nModified)}`
