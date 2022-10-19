@@ -121,6 +121,9 @@ jobs:
     steps:
       - checkout
       - run:
+          name: Install OS dependencies
+          command: apt-get update && apt-get install curl git gpg unzip -y
+      - run:
           name: Check Node Version
           command: node --version
       # Fix to ignore as Cypress:base does not have node version 15.x
