@@ -107,7 +107,7 @@ jobs:
 
   e2e:
     docker:
-      - image: cypress/base:16.17.1
+      - image: cypress/base:18.6.0
         environment:
           ## this enables colors in the output
           TERM: xterm
