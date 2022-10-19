@@ -40,7 +40,7 @@ orbs:
 jobs:
   build:
     docker:
-      - image: cimg/node:16.18.0
+      - image: cimg/node:18.11.0
     working_directory: ~/inreach-api
     steps:
       - checkout
@@ -73,7 +73,7 @@ jobs:
 
   unit:
     docker:
-      - image: cimg/node:16.18.0
+      - image: cimg/node:18.11.0
     working_directory: ~/inreach-api
     steps:
       - checkout
@@ -178,7 +178,7 @@ jobs:
 
   lint:
     docker:
-      - image: cimg/node:16.18.0
+      - image: cimg/node:18.11.0
     working_directory: ~/inreach-api
     steps:
       - checkout
@@ -201,7 +201,7 @@ jobs:
 
   backup_and_restore:
     docker:
-      - image: cimg/node:16.18.0
+      - image: cimg/node:18.11.0
     working_directory: ~/inreach-api
     steps:
       - checkout
@@ -222,7 +222,7 @@ jobs:
 
   register_migration_stage:
     docker:
-      - image: cimg/node:16.18.0
+      - image: cimg/node:18.11.0
     working_directory: ~/inreach-api
     environment:
       PIPELINE_ID: << pipeline.parameters.pipeline_id >>
@@ -251,7 +251,7 @@ jobs:
 
   register_migration_prod:
     docker:
-      - image: cimg/node:16.18.0
+      - image: cimg/node:18.11.0
     working_directory: ~/inreach-api
     environment:
       PIPELINE_ID: << pipeline.parameters.pipeline_id >>
@@ -281,7 +281,7 @@ jobs:
 
   migration_prod:
     docker:
-      - image: cimg/node:16.18.0
+      - image: cimg/node:18.11.0
     working_directory: ~/inreach-api
     environment:
       DATE_PATTERN: << pipeline.parameters.date_pattern>>
@@ -315,7 +315,7 @@ jobs:
 
   migration_stage:
     docker:
-      - image: cimg/node:16.18.0
+      - image: cimg/node:18.11.0
     working_directory: ~/inreach-api
     environment:
       FILES: << pipeline.parameters.files >>
@@ -349,7 +349,7 @@ jobs:
 
   rollback_prod:
     docker:
-      - image: cimg/node:16.18.0
+      - image: cimg/node:18.11.0
     working_directory: ~/inreach-api
     environment:
       DATE_PATTERN: << pipeline.parameters.date_pattern >>
@@ -383,7 +383,7 @@ jobs:
 
   rollback_stage:
     docker:
-      - image: cimg/node:16.18.0
+      - image: cimg/node:18.11.0
     working_directory: ~/inreach-api
     environment:
       FILES: << pipeline.parameters.files >>
