@@ -78,11 +78,31 @@ async function runMigrationScript() {
 			// {
 			// 	$project: {
 			// 		service_id: '$services._id',
-			// 		isDeleted: '$services.is_deleted',
 			// 		properties: '$services.properties',
 			// 		org_property: '$properties.community-asylum-seeker'
 			// 	}
 			// }
+
+			/** Unwinding the services and then regrouping them makes the data easier to work with.
+			 *
+			 * The data structure becomes
+			 * 	{
+			 * 		_id: org id
+			 * 		services: {
+			 * 			_id: service id
+			 * 			community-asylum-seeker: value - null if property not set
+			 * 		}
+			 * 		org_property: org level community-asylum-seeker value
+			 * 	}
+			 *
+			 * The initial verision was trying to index two separate arrays in tandem, but would fail
+			 * if the 'community-asylum-seeker' was missing in the 'properties' array.
+			 *
+			 * Example: an organization could have returned 5 results, but properties could have returned 4.
+			 *		If org #2 was missing the community-asylum-seeker property, it would appear that org #5
+			 * 		was missing the property.
+			 *
+			 */
 			{
 				$unwind: {
 					path: '$services',
@@ -333,8 +353,13 @@ async function runMigrationScript() {
 }
 
 // Rollback Script - revised
+/**
+ * It reads the migration changelog, parses it, and then uses the data to perform a bulkWrite operation on
+ * the database
+ */
 async function rollback() {
 	try {
+		/* Load changelog, parse as JSON */
 		const transactions = JSON.parse(
 			fs.readFileSync(
 				`./migrations/changelogs/migration-${path
@@ -343,26 +368,41 @@ async function rollback() {
 				'utf8'
 			)
 		);
+
+		/**
+		 * > It returns true if the string is a hexadecimal number, otherwise it returns false
+		 * @param {string} str - The string to be tested.
+		 * @returns {boolean} The function isHex is being returned.
+		 */
 		const isHex = (str) => {
 			const regexp = /^[0-9a-fA-F]+$/;
 			return regexp.test(str) ? true : false;
 		};
 
+		/* Value is the opposite action of the key */
 		const undo = {
 			$set: '$unset',
 			$unset: '$set'
 		};
 
 		const bulkOperations = transactions.changes.map((item) => {
+			/* Look for hex values in the filters, convert to ObjectID if found */
+
 			for (const [key, value] of Object.entries(item.filter)) {
 				item.filter[key] = isHex(value)
 					? new ObjectID.createFromHexString(value)
 					: value;
 			}
+
 			const update = {};
+
+			/* Loop through the actions , prepping to do the opposite. */
 			for (const [key, value] of Object.entries(item.to)) {
 				const action = undo[key];
 				update[action] = {};
+
+				/* Loop through items in the "to" block, setting their value to the corresponding key from the "from" block */
+
 				for (const [subkey, subval] of Object.entries(value)) {
 					update[action][subkey] =
 						item.from[subkey] === null ? '' : item.from[subkey];
