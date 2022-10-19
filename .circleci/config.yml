@@ -45,6 +45,9 @@ jobs:
     steps:
       - checkout
       - run:
+          name: Install OS dependencies
+          command: apt-get update && apt-get install curl git -y
+      - run:
           name: Check Node Version
           command: node --version
       - run:
@@ -77,6 +80,9 @@ jobs:
     working_directory: ~/inreach-api
     steps:
       - checkout
+      - run:
+          name: Install OS dependencies
+          command: apt-get update && apt-get install curl git -y
       - run:
           name: Check Node Version
           command: node --version
@@ -120,6 +126,9 @@ jobs:
     working_directory: ~/inreach-api
     steps:
       - checkout
+      - run:
+          name: Install OS dependencies
+          command: apt-get update && apt-get install curl git -y
       - run:
           name: Check Node Version
           command: node --version
@@ -183,6 +192,9 @@ jobs:
     steps:
       - checkout
       - run:
+          name: Install OS dependencies
+          command: apt-get update && apt-get install curl git -y
+      - run:
           name: Check Node Version
           command: node --version
       - run:
@@ -205,6 +217,9 @@ jobs:
     working_directory: ~/inreach-api
     steps:
       - checkout
+      - run:
+          name: Install OS dependencies
+          command: apt-get update && apt-get install curl git -y
       #Recreate .env file from CircleCI Project Env Vars
       - run:
           name: Create .env file
@@ -230,6 +245,9 @@ jobs:
       FILES: << pipeline.parameters.files >>
     steps:
       - checkout
+      - run:
+          name: Install OS dependencies
+          command: apt-get update && apt-get install curl git -y
       #Recreate .env file from CircleCI Project Env Vars
       - run:
           name: Create .env file
@@ -259,6 +277,9 @@ jobs:
       TYPE: migration_prod
     steps:
       - checkout
+      - run:
+          name: Install OS dependencies
+          command: apt-get update && apt-get install curl git -y
       #Recreate .env file from CircleCI Project Env Vars
       - run:
           name: Create .env file
@@ -289,6 +310,9 @@ jobs:
       TYPE: migration_prod
     steps:
       - checkout
+      - run:
+          name: Install OS dependencies
+          command: apt-get update && apt-get install curl git -y
       #Recreate .env file from CircleCI Project Env Vars
       - run:
           name: Create .env file
@@ -323,6 +347,9 @@ jobs:
       TYPE: migration_stage
     steps:
       - checkout
+      - run:
+          name: Install OS dependencies
+          command: apt-get update && apt-get install curl git -y
       #Recreate .env file from CircleCI Project Env Vars
       - run:
           name: Create .env file
@@ -357,6 +384,9 @@ jobs:
       TYPE: rollback_prod
     steps:
       - checkout
+      - run:
+          name: Install OS dependencies
+          command: apt-get update && apt-get install curl git -y
       #Recreate .env file from CircleCI Project Env Vars
       - run:
           name: Create .env file
@@ -391,6 +421,9 @@ jobs:
       TYPE: rollback_stage
     steps:
       - checkout
+      - run:
+          name: Install OS dependencies
+          command: apt-get update && apt-get install curl git -y
       #Recreate .env file from CircleCI Project Env Vars
       - run:
           name: Create .env file
