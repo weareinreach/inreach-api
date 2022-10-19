@@ -1,7 +1,7 @@
 {
-    "repos": ["test-repo"],
-    "releaseBranch": "test-branch",
-    "sourceBranch": "dev",
-    "targetBranch": "main",
-    "title": "test PR"
+	"repos": ["test-repo"],
+	"releaseBranch": "test-branch2",
+	"sourceBranch": "dev",
+	"targetBranch": "main",
+	"title": "test PR"
 }

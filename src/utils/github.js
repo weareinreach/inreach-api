@@ -1,5 +1,5 @@
 import {Octokit} from '@octokit/rest';
-const OWNER = 'asylum-connect';
+const OWNER = 'weareinreach';
 import moment from 'moment';
 
 export const githubClient = async () => {
