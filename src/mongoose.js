@@ -168,6 +168,7 @@ const CommentSchema = new Schema(
 		comments: [
 			{
 				created_at,
+				updated_at: Date,
 				comment: String,
 				source: String,
 				userId: String,

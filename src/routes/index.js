@@ -13,6 +13,7 @@ import {
 	getUserSuggestionsByEmail,
 	updateComments,
 	deleteCommentById,
+	updateCommentById,
 	updateRatings
 } from './entity';
 import {
@@ -156,6 +157,11 @@ versionOneRouter.patch(
 	verifyToken,
 	updateComments
 );
+versionOneRouter.patch(
+	'/organizations/:orgId/comments/:commentId',
+	verifyToken,
+	updateCommentById
+);
 versionOneRouter.delete(
 	'/organizations/:orgId/comments/:commentId',
 	deleteCommentById
@@ -168,6 +174,11 @@ versionOneRouter.patch(
 	'/organizations/:orgId/services/:serviceId/comments',
 	verifyToken,
 	updateComments
+);
+versionOneRouter.patch(
+	'/organizations/:orgId/services/:serviceId/comments/:commentId',
+	verifyToken,
+	updateCommentById
 );
 versionOneRouter.delete(
 	'/organizations/:orgId/services/:serviceId/comments/:commentId',

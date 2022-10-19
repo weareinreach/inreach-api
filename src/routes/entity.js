@@ -1,6 +1,7 @@
 import {Comment, Rating, Suggestion} from '../mongoose';
 import {handleBadRequest, handleErr, handleNotFound} from '../utils';
 import {getEntityQuery, ITEM_PAGE_LIMIT} from '../utils/query';
+import {isBodyEmpty} from '../utils/index';
 
 export const getComments = async (req, res) => {
 	const {orgId, serviceId} = req?.params;
@@ -32,6 +33,33 @@ export const deleteCommentById = async (req, res) => {
 		.catch((err) => {
 			//console.log(err);
 			return handleNotFound(res);
+		});
+};
+
+export const updateCommentById = async (req, res) => {
+	const {orgId, serviceId, commentId} = req?.params;
+	const body = req?.body;
+	body.updated_at = Date.now();
+
+	if (isBodyEmpty(body)) {
+		return handleBadRequest(res);
+	}
+
+	await Comment.findOneAndUpdate(
+		{'comments._id': commentId},
+		{$set: {'comments.$': {...body}}},
+		{upsert: true, new: true}
+	)
+		.then((commentDoc) => {
+			if (!commentDoc) {
+				return handleNotFound(res);
+			}
+
+			return res.json({updated: true});
+		})
+		.catch((err) => {
+			console.log(err);
+			handleErr(err, res);
 		});
 };
 
