@@ -31,9 +31,27 @@ var servicesRemove = require('./services-remove-property.json');
 var servicesKeep = require('./services-keep-property.json');
 const ObjectID = require('mongodb').ObjectID;
 const fs = require('fs');
+const path = require('path');
 var orgs = [];
 var keepService = [];
 var removeService = [];
+const changelog = {
+	metadata: {},
+	changes: []
+};
+/**
+ * Appends to the changelog.
+ * @param {Object} filter - Key value pair(s) used as the record filter
+ * @param {Object} from - Original value(s) of record
+ * @param {Object} to - New value(s) of record
+ */
+const addChange = (filter, from, to) => {
+	changelog.changes.push({
+		filter,
+		from,
+		to
+	});
+};
 
 //Scripts
 async function runMigrationScript() {
@@ -57,37 +75,81 @@ async function runMigrationScript() {
 			 * with the 'community-asylum-seeker' property will have their 'community-asylum-seeker' organization
 			 * property removed
 			 * */
+			// {
+			// 	$project: {
+			// 		service_id: '$services._id',
+			// 		properties: '$services.properties',
+			// 		org_property: '$properties.community-asylum-seeker'
+			// 	}
+			// }
+
+			/** Unwinding the services and then regrouping them makes the data easier to work with.
+			 *
+			 * The data structure becomes
+			 * 	{
+			 * 		_id: org id
+			 * 		services: {
+			 * 			_id: service id
+			 * 			community-asylum-seeker: value - null if property not set
+			 * 		}
+			 * 		org_property: org level community-asylum-seeker value
+			 * 	}
+			 *
+			 * The initial verision was trying to index two separate arrays in tandem, but would fail
+			 * if the 'community-asylum-seeker' was missing in the 'properties' array.
+			 *
+			 * Example: an organization could have returned 5 results, but properties could have returned 4.
+			 *		If org #2 was missing the community-asylum-seeker property, it would appear that org #5
+			 * 		was missing the property.
+			 *
+			 */
 			{
-				$project: {
-					service_id: '$services._id',
-					properties: '$services.properties',
-					org_property: '$properties.community-asylum-seeker'
+				$unwind: {
+					path: '$services',
+					includeArrayIndex: 'string',
+					preserveNullAndEmptyArrays: false
+				}
+			},
+			{
+				$group: {
+					_id: '$_id',
+					services: {
+						$push: {
+							_id: '$services._id',
+							'community-asylum-seeker': {
+								$ifNull: ['$services.properties.community-asylum-seeker', null]
+							}
+						}
+					},
+					org_property: {
+						$first: '$properties.community-asylum-seeker'
+					}
 				}
 			}
 		]);
 
 		let bulkOperations = [];
 		let updateOne = {};
-
+		console.log(result.length);
 		result.forEach((org) => {
 			let orgRemove = org.org_property;
 			let orgPush = true;
-			for (let index in org.service_id) {
-				if (keepService.includes(org.service_id[index].toString())) {
+			for (let index in org.services) {
+				if (keepService.includes(org.services[index]._id.toString())) {
 					orgRemove = false;
 					/** if the property already has the 'true' condition, then it is removed from the keepService array
 					 * so that it is not removed in the consequent rollback
 					 */
-					if (org.properties[index]['community-asylum-seeker'] === 'true') {
+					if (org.services[index]['community-asylum-seeker'] === 'true') {
 						keepService.splice(
-							keepService.indexOf(org.service_id[index].toString()),
+							keepService.indexOf(org.services[index]._id.toString()),
 							1
 						);
 					} else {
 						updateOne = {
 							filter: {
 								_id: org._id,
-								'services._id': org.service_id[index]
+								'services._id': org.services[index]._id
 							},
 							update: {
 								$set: {
@@ -95,6 +157,20 @@ async function runMigrationScript() {
 								}
 							}
 						};
+						addChange(
+							{
+								_id: org._id,
+								'services._id': org.services[index]._id
+							},
+							{
+								'services.$.properties.community-asylum-seeker': null
+							},
+							{
+								$set: {
+									'services.$.properties.community-asylum-seeker': 'true'
+								}
+							}
+						);
 						bulkOperations.push({
 							updateOne
 						});
@@ -105,30 +181,29 @@ async function runMigrationScript() {
 							orgPush = false;
 							orgs.push({
 								org: org._id.toString(),
-								service: org.service_id[index].toString(),
+								service: org.services[index]._id.toString(),
 								org_status: org.org_property
 							});
 						}
 					}
-				} else if (removeService.includes(org.service_id[index].toString())) {
+				} else if (removeService.includes(org.services[index]._id.toString())) {
 					/** if the property already does not exist or has the condition set to an empty string,
 					 * then it is removed from the removeService array so that it is added back in the
 					 * consequent rollback
 					 */
 					if (
-						org.properties[index] &&
-						(!('community-asylum-seeker' in org.properties[index]) ||
-							org.properties[index]['community-asylum-seeker'] === '')
+						!org.services[index]['community-asylum-seeker'] ||
+						org.services[index]['community-asylum-seeker'] === ''
 					) {
 						removeService.splice(
-							removeService.indexOf(org.service_id[index].toString()),
+							removeService.indexOf(org.services[index]._id.toString()),
 							1
 						);
 					} else {
 						updateOne = {
 							filter: {
 								_id: org._id,
-								'services._id': org.service_id[index]
+								'services._id': org.services[index]._id
 							},
 							update: {
 								$unset: {
@@ -136,6 +211,21 @@ async function runMigrationScript() {
 								}
 							}
 						};
+						addChange(
+							{
+								_id: org._id,
+								'services._id': org.services[index]._id
+							},
+							{
+								'services.$.properties.community-asylum-seeker':
+									org.services[index]['community-asylum-seeker']
+							},
+							{
+								$unset: {
+									'services.$.properties.community-asylum-seeker': ''
+								}
+							}
+						);
 						bulkOperations.push({
 							updateOne
 						});
@@ -146,7 +236,7 @@ async function runMigrationScript() {
 							orgPush = false;
 							orgs.push({
 								org: org._id.toString(),
-								service: org.service_id[index].toString(),
+								service: org.services[index]._id.toString(),
 								org_status: org.org_property
 							});
 						}
@@ -156,11 +246,7 @@ async function runMigrationScript() {
 					 * so that it can be deteremined whether or not the parent organization property should be
 					 * removed
 					 */
-				} else if (
-					org.properties[index] &&
-					'community-asylum-seeker' in org.properties[index] &&
-					org.properties[index]['community-asylum-seeker'] === 'true'
-				) {
+				} else if (org.services[index]['community-asylum-seeker'] === 'true') {
 					orgRemove = false;
 				}
 			}
@@ -189,6 +275,19 @@ async function runMigrationScript() {
 						}
 					}
 				};
+				addChange(
+					{
+						_id: org._id
+					},
+					{
+						'properties.community-asylum-seeker': org.org_property
+					},
+					{
+						$unset: {
+							'properties.community-asylum-seeker': ''
+						}
+					}
+				);
 				bulkOperations.push({
 					updateOne
 				});
@@ -218,11 +317,27 @@ async function runMigrationScript() {
 				if (error) throw error;
 			}
 		);
-
 		const updateResponse = await mongoose.Organization.bulkWrite(
 			bulkOperations
 		);
 
+		const currTime = new Date();
+		changelog.metadata = {
+			time: currTime.toString(),
+			result: updateResponse.nModified,
+			changelogLength: changelog.changes.length,
+			migrationFile: path.basename(__filename)
+		};
+
+		fs.writeFileSync(
+			`./migrations/changelogs/migration-${path
+				.basename(__filename)
+				.replace('.js', '.json')}`,
+			JSON.stringify(changelog, null, 2),
+			(error) => {
+				if (error) throw error;
+			}
+		);
 		console.log(
 			`Number of modified rows: ${JSON.stringify(updateResponse.nModified)}`
 		);
@@ -237,107 +352,89 @@ async function runMigrationScript() {
 	}
 }
 
-// Rollback Script
-async function runRollbackScript() {
-	/** the Rollback script requires files that are written from the initial migration, so a rollback will result in an error if
-	 * a prior migration has not occured
-	 */
-	var organizationsRollback = require('./rollbackOrganizations.json');
-	var keep = require('./rollbackKeep.json');
-	var remove = require('./rollbackRemove.json');
-
-	// this converts the organization id's into ObjectID's so that they can be used in the filter query
-	for (let i in organizationsRollback) {
-		orgs.push(new ObjectID.createFromHexString(organizationsRollback[i].org));
-	}
-
+// Rollback Script - revised
+/**
+ * It reads the migration changelog, parses it, and then uses the data to perform a bulkWrite operation on
+ * the database
+ */
+async function rollback() {
 	try {
-		const result = await mongoose.Organization.aggregate([
-			{
-				$unwind: {
-					path: '$organizations',
-					preserveNullAndEmptyArrays: true
-				}
-			},
-			{
-				$match: {
-					_id: {$in: orgs}
-				}
-			},
-			{
-				$project: {
-					service_id: '$services._id',
-					properties: '$services.properties',
-					org_property: '$properties.community-asylum-seeker'
-				}
-			}
-		]);
+		/* Load changelog, parse as JSON */
+		const transactions = JSON.parse(
+			fs.readFileSync(
+				`./migrations/changelogs/migration-${path
+					.basename(__filename)
+					.replace('.js', '.json')}`,
+				'utf8'
+			)
+		);
 
-		let bulkOperations = [];
-		let updateOne = {};
-		result.forEach((org) => {
-			let id = org._id.toString();
-			for (let index in org.service_id) {
-				if (keep.includes(org.service_id[index].toString())) {
-					updateOne = {
-						filter: {
-							_id: org._id,
-							'services._id': org.service_id[index]
-						},
-						update: {
-							$unset: {
-								'services.$.properties.community-asylum-seeker': ''
-							}
-						}
-					};
-					bulkOperations.push({
-						updateOne
-					});
-				} else if (remove.includes(org.service_id[index].toString())) {
-					updateOne = {
-						filter: {
-							_id: org._id,
-							'services._id': org.service_id[index]
-						},
-						update: {
-							$set: {
-								'services.$.properties.community-asylum-seeker': 'true'
-							}
-						}
-					};
-					bulkOperations.push({
-						updateOne
-					});
+		/**
+		 * > It returns true if the string is a hexadecimal number, otherwise it returns false
+		 * @param {string} str - The string to be tested.
+		 * @returns {boolean} The function isHex is being returned.
+		 */
+		const isHex = (str) => {
+			const regexp = /^[0-9a-fA-F]+$/;
+			return regexp.test(str) ? true : false;
+		};
+
+		/* Value is the opposite action of the key */
+		const undo = {
+			$set: '$unset',
+			$unset: '$set'
+		};
+
+		const bulkOperations = transactions.changes.map((item) => {
+			/* Look for hex values in the filters, convert to ObjectID if found */
+
+			for (const [key, value] of Object.entries(item.filter)) {
+				item.filter[key] = isHex(value)
+					? new ObjectID.createFromHexString(value)
+					: value;
+			}
+
+			const update = {};
+
+			/* Loop through the actions , prepping to do the opposite. */
+			for (const [key, value] of Object.entries(item.to)) {
+				const action = undo[key];
+				update[action] = {};
+
+				/* Loop through items in the "to" block, setting their value to the corresponding key from the "from" block */
+
+				for (const [subkey, subval] of Object.entries(value)) {
+					update[action][subkey] =
+						item.from[subkey] === null ? '' : item.from[subkey];
 				}
 			}
-			/** this checks what the original status of the organization property was to add it back if it
-			 * was removed by tghe inital migration
-			 */
-			if (
-				organizationsRollback.find(
-					(org) => org['org'] === id && org['org_status'] === 'true'
-				)
-			) {
-				updateOne = {
-					filter: {
-						_id: org._id
-					},
-					update: {
-						$set: {
-							'properties.community-asylum-seeker': 'true'
-						}
-					}
-				};
-				bulkOperations.push({
-					updateOne
-				});
-			}
+			return {
+				updateOne: {
+					filter: item.filter,
+					update
+				}
+			};
 		});
-
 		const updateResponse = await mongoose.Organization.bulkWrite(
 			bulkOperations
 		);
 
+		const currTime = new Date();
+		changelog.metadata = {
+			time: currTime.toString(),
+			result: updateResponse.nModified,
+			changelogLength: changelog.changes.length,
+			migrationFile: path.basename(__filename)
+		};
+		fs.writeFileSync(
+			`./migrations/changelogs/rollback-${path
+				.basename(__filename)
+				.replace('.js', '.json')}`,
+			JSON.stringify(changelog, null, 2),
+			(error) => {
+				if (error) throw error;
+			}
+		);
 		console.log(
 			`Number of modified rows: ${JSON.stringify(updateResponse.nModified)}`
 		);
@@ -371,12 +468,12 @@ if (process.env.ROLLBACK) {
 		case 'CI':
 			migrationFunctions.checkIfMigrationHasRun().then((hasRun) => {
 				if (!hasRun) {
-					runRollbackScript();
+					rollback();
 				}
 			});
 			break;
 		default:
-			runRollbackScript();
+			rollback();
 			break;
 	}
 }
