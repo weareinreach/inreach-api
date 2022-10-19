@@ -80,6 +80,7 @@ import {
 	triggerProdMigration,
 	triggerBackUpAndRestore
 } from './dashboard';
+import {getCoords} from './helpers';
 export const baseRouter = Router();
 export const versionOneRouter = Router();
 
@@ -301,3 +302,6 @@ versionOneRouter.post(
 	'/dashboard/triggerBackUpAndRestore',
 	triggerBackUpAndRestore
 );
+
+// misc - helpers
+versionOneRouter.get('/getCoords', verifyToken, getCoords);
