@@ -25,59 +25,59 @@ parameters:
     default: false
     type: boolean
   files:
-    default: ""
+    default: ''
     type: string
   date_pattern:
-    default: ""
+    default: ''
     type: string
   pipeline_id:
-    default: ""
+    default: ''
     type: string
 orbs:
-  node: circleci/node@3.0.0
-  codecov: codecov/codecov@1.1.3
-  sonarcloud: sonarsource/sonarcloud@1.0.3
-jobs: 
+  node: circleci/node@5.0.3
+  codecov: codecov/codecov@3.2.4
+  sonarcloud: sonarsource/sonarcloud@1.1.1
+jobs:
   build:
     docker:
-      - image: cimg/node:16.12.0
+      - image: cimg/node:16.18.0
     working_directory: ~/inreach-api
     steps:
       - checkout
-      - run: 
+      - run:
           name: Check Node Version
           command: node --version
       - run:
           name: Install Packages
           command: yarn install
       - save_cache:
-         paths:
-          - node_modules
-          - "~/.cache/Cypress"
-         key: v1-dependencies-{{ checksum "package.json" }}
+          paths:
+            - node_modules
+            - '~/.cache/Cypress'
+          key: v1-dependencies-{{ checksum "package.json" }}
       #Recreate .env file from CircleCI Project Env Vars
       - run:
           name: Create .env file
           command: |
-           cat \<< EOF > ./.env
-           MAILGUN_API_KEY=$MAILGUN_API_KEY
-           MAILGUN_DOMAIN=$MAILGUN_DOMAIN
-           DB_URI=$DB_URI
-           SHEETS_API_KEY=$SHEETS_API_KEY
-           EOF
+            cat \<< EOF > ./.env
+            MAILGUN_API_KEY=$MAILGUN_API_KEY
+            MAILGUN_DOMAIN=$MAILGUN_DOMAIN
+            DB_URI=$DB_URI
+            SHEETS_API_KEY=$SHEETS_API_KEY
+            EOF
 
       #Building and Compiling Binary
-      - run: 
+      - run:
           name: Compile Binary
           command: yarn build
 
   unit:
     docker:
-      - image: cimg/node:16.12.0
+      - image: cimg/node:16.18.0
     working_directory: ~/inreach-api
     steps:
       - checkout
-      - run: 
+      - run:
           name: Check Node Version
           command: node --version
       - run:
@@ -88,14 +88,14 @@ jobs:
           command: yarn add cypress
       #save cache for use next tests
       - save_cache:
-         paths:
-          - node_modules
-          - "~/.cache/Cypress"
-         key: v1-dependencies-{{ checksum "package.json" }}
+          paths:
+            - node_modules
+            - '~/.cache/Cypress'
+          key: v1-dependencies-{{ checksum "package.json" }}
       #Unit Testing
-      - run: 
-          name: "Unit Testing"
-          command: "yarn pre-unit-test && yarn unit-test" 
+      - run:
+          name: 'Unit Testing'
+          command: 'yarn pre-unit-test && yarn unit-test'
       - codecov/upload:
           file: 'jestCoverage/coverage-final.json'
           flags: 'Unit-Tests'
@@ -104,15 +104,15 @@ jobs:
       - store_artifacts:
           path: ./jestCoverage
           destination: Unit
-    
+
   e2e:
     docker:
-      - image: cypress/base:16.5.0
+      - image: cypress/base:16.17.1
         environment:
           ## this enables colors in the output
           TERM: xterm
-      ## MongoDB 
-      - image: mongo:4.4.10
+      ## MongoDB
+      - image: mongo:4.4.17
         environment:
           MONGO_INITDB_ROOT_USERNAME: user
           MONGO_INITDB_ROOT_PASSWORD: password
@@ -120,10 +120,10 @@ jobs:
     working_directory: ~/inreach-api
     steps:
       - checkout
-      - run: 
+      - run:
           name: Check Node Version
           command: node --version
-    # Fix to ignore as Cypress:base does not have node version 15.x
+      # Fix to ignore as Cypress:base does not have node version 15.x
       - run:
           name: Ignore Engines
           command: yarn config set ignore-engines true
@@ -138,51 +138,51 @@ jobs:
           command: yarn add cypress@9.7.0
       #save cache for use next tests
       - save_cache:
-         paths:
-          - node_modules
-          - "~/.cache/Cypress"
-         key: v1-dependencies-{{ checksum "package.json" }}
+          paths:
+            - node_modules
+            - '~/.cache/Cypress'
+          key: v1-dependencies-{{ checksum "package.json" }}
       #Recreate .env file from CircleCI Project Env Vars
       - run:
           name: Create .env file
           command: |
-           cat \<< EOF > ./.env
-           MAILGUN_API_KEY=$MAILGUN_API_KEY
-           MAILGUN_DOMAIN=$MAILGUN_DOMAIN
-           DB_URI=$DB_URI_STAGING
-           ENV=TEST
-           SHEETS_API_KEY=$SHEETS_API_KEY
-           TEST_DB_URI=$TEST_DB_URI
-           EOF
+            cat \<< EOF > ./.env
+            MAILGUN_API_KEY=$MAILGUN_API_KEY
+            MAILGUN_DOMAIN=$MAILGUN_DOMAIN
+            DB_URI=$DB_URI_STAGING
+            ENV=TEST
+            SHEETS_API_KEY=$SHEETS_API_KEY
+            TEST_DB_URI=$TEST_DB_URI
+            EOF
       #Seed Docker DB
       - run:
-          name: "Seed Docker DB"
+          name: 'Seed Docker DB'
           command: yarn seed-docker-db
       #Testing
-      - run: 
-          name: "E2E Automation"
-          command: "yarn pre-e2e-test && yarn e2e"
       - run:
-          name: "Show Coverage"
-          command: "yarn show-coverage"
+          name: 'E2E Automation'
+          command: 'yarn pre-e2e-test && yarn e2e'
       - run:
-          name: "Generate Report"
-          command: "yarn report:combined"
+          name: 'Show Coverage'
+          command: 'yarn show-coverage'
+      - run:
+          name: 'Generate Report'
+          command: 'yarn report:combined'
       - codecov/upload:
           file: 'coverageReports/coverage-final.json'
           flags: 'Integration'
       - sonarcloud/scan
       - run:
-          name: "Post E2E tasks"
-          command: "yarn post-e2e-test"
+          name: 'Post E2E tasks'
+          command: 'yarn post-e2e-test'
 
   lint:
     docker:
-      - image: cimg/node:16.12.0
+      - image: cimg/node:16.18.0
     working_directory: ~/inreach-api
     steps:
       - checkout
-      - run: 
+      - run:
           name: Check Node Version
           command: node --version
       - run:
@@ -190,18 +190,18 @@ jobs:
           command: yarn install
       #save cache for use next tests
       - save_cache:
-         paths:
-          - node_modules
-          - "~/.cache/Cypress"
-         key: v1-dependencies-{{ checksum "package.json" }}
+          paths:
+            - node_modules
+            - '~/.cache/Cypress'
+          key: v1-dependencies-{{ checksum "package.json" }}
       #Run linting
       - run:
           name: Run linting
-          command: "yarn lint"
-  
+          command: 'yarn lint'
+
   backup_and_restore:
     docker:
-      - image: cimg/node:16.12.0
+      - image: cimg/node:16.18.0
     working_directory: ~/inreach-api
     steps:
       - checkout
@@ -209,22 +209,20 @@ jobs:
       - run:
           name: Create .env file
           command: |
-           cat \<< EOF > ./.env
-           DB_URI_STAGING=$DB_URI_STAGING
-           DB_URI_PROD=$DB_URI_PROD
-           EOF
+            cat \<< EOF > ./.env
+            DB_URI_STAGING=$DB_URI_STAGING
+            DB_URI_PROD=$DB_URI_PROD
+            EOF
       - run:
           name: Install Packages
           command: yarn install
       - run:
           name: Run Backup and Restore
           command: yarn backup:prod-staging
-          
-         
 
   register_migration_stage:
     docker:
-      - image: cimg/node:16.12.0
+      - image: cimg/node:16.18.0
     working_directory: ~/inreach-api
     environment:
       PIPELINE_ID: << pipeline.parameters.pipeline_id >>
@@ -236,14 +234,14 @@ jobs:
       - run:
           name: Create .env file
           command: |
-           cat \<< EOF > ./.env
-           DB_URI=$DB_URI_STAGING
-           PROFILE=CI
-           EOF
+            cat \<< EOF > ./.env
+            DB_URI=$DB_URI_STAGING
+            PROFILE=CI
+            EOF
       - run:
           name: Install Packages
           command: yarn install
-      - run: 
+      - run:
           name: Register Migration Stage
           command: |
             for i in ${FILES//,/ }; do
@@ -253,7 +251,7 @@ jobs:
 
   register_migration_prod:
     docker:
-      - image: cimg/node:16.12.0
+      - image: cimg/node:16.18.0
     working_directory: ~/inreach-api
     environment:
       PIPELINE_ID: << pipeline.parameters.pipeline_id >>
@@ -265,14 +263,14 @@ jobs:
       - run:
           name: Create .env file
           command: |
-           cat \<< EOF > ./.env
-           DB_URI=$DB_URI_PROD
-           PROFILE=CI
-           EOF
+            cat \<< EOF > ./.env
+            DB_URI=$DB_URI_PROD
+            PROFILE=CI
+            EOF
       - run:
           name: Install Packages
           command: yarn install
-      - run: 
+      - run:
           name: Register Migration Prof
           command: |
             export  FILES=$(find . -type f -iname "*$DATE_PATTERN*" | cut -c 13-)
@@ -281,10 +279,9 @@ jobs:
               yarn register-migration
             done
 
-
   migration_prod:
     docker:
-      - image: cimg/node:16.12.0
+      - image: cimg/node:16.18.0
     working_directory: ~/inreach-api
     environment:
       DATE_PATTERN: << pipeline.parameters.date_pattern>>
@@ -296,14 +293,14 @@ jobs:
       - run:
           name: Create .env file
           command: |
-           cat \<< EOF > ./.env
-           DB_URI=$DB_URI_PROD
-           PROFILE=CI
-           EOF
+            cat \<< EOF > ./.env
+            DB_URI=$DB_URI_PROD
+            PROFILE=CI
+            EOF
       - run:
           name: Install Packages
           command: yarn install
-      - run: 
+      - run:
           name: Run migration
           command: |
             export  FILES=$(find . -type f -iname "*$DATE_PATTERN*" | cut -c 13-)
@@ -311,14 +308,14 @@ jobs:
               export MIGRATION_FILE=$i
               yarn run-migration
             done
-      # Unfortunately CircleCI does not allow user or Project Token, Personal Token was used of InReach Service Account. 
-      - run:  
+      # Unfortunately CircleCI does not allow user or Project Token, Personal Token was used of InReach Service Account.
+      - run:
           name: Register migration
           command: BRANCH=main node ./migrations/triggerRegistration.js
- 
+
   migration_stage:
     docker:
-      - image: cimg/node:16.12.0
+      - image: cimg/node:16.18.0
     working_directory: ~/inreach-api
     environment:
       FILES: << pipeline.parameters.files >>
@@ -330,14 +327,14 @@ jobs:
       - run:
           name: Create .env file
           command: |
-           cat \<< EOF > ./.env
-           DB_URI=$DB_URI_STAGING
-           PROFILE=CI
-           EOF
+            cat \<< EOF > ./.env
+            DB_URI=$DB_URI_STAGING
+            PROFILE=CI
+            EOF
       - run:
           name: Install Packages
           command: yarn install
-      - run: 
+      - run:
           name: Run migration
           #Find all files matching regex
           command: |
@@ -346,13 +343,13 @@ jobs:
               yarn run-migration
             done
       # Unfortunately CircleCI does not allow user or Project Token, Personal Token was used of InReach Service Account.
-      - run:  
+      - run:
           name: Register migration
           command: BRANCH=dev node ./migrations/triggerRegistration.js
 
   rollback_prod:
     docker:
-      - image: cimg/node:16.12.0
+      - image: cimg/node:16.18.0
     working_directory: ~/inreach-api
     environment:
       DATE_PATTERN: << pipeline.parameters.date_pattern >>
@@ -364,14 +361,14 @@ jobs:
       - run:
           name: Create .env file
           command: |
-           cat \<< EOF > ./.env
-           DB_URI=$DB_URI_PROD
-           PROFILE=CI
-           EOF
+            cat \<< EOF > ./.env
+            DB_URI=$DB_URI_PROD
+            PROFILE=CI
+            EOF
       - run:
           name: Install Packages
           command: yarn install
-      - run: 
+      - run:
           name: Run rollback
           command: |
             export  FILES=$(find . -type f -iname "*$DATE_PATTERN*" | cut -c 13-)
@@ -380,13 +377,13 @@ jobs:
               yarn run-rollback
             done
       # Unfortunately CircleCI does not allow user or Project Token, Personal Token was used of InReach Service Account.
-      - run:  
+      - run:
           name: Register migration
           command: BRANCH=main node ./migrations/triggerRegistration.js
 
   rollback_stage:
     docker:
-      - image: cimg/node:16.12.0
+      - image: cimg/node:16.18.0
     working_directory: ~/inreach-api
     environment:
       FILES: << pipeline.parameters.files >>
@@ -398,22 +395,22 @@ jobs:
       - run:
           name: Create .env file
           command: |
-           cat \<< EOF > ./.env
-           DB_URI=$DB_URI_STAGING
-           PROFILE=CI
-           EOF
+            cat \<< EOF > ./.env
+            DB_URI=$DB_URI_STAGING
+            PROFILE=CI
+            EOF
       - run:
           name: Install Packages
           command: yarn install
-      - run: 
+      - run:
           name: Run rollback
           command: |
             for i in ${FILES//,/ }; do
               export MIGRATION_FILE=$i
               yarn run-rollback
             done
-     # Unfortunately CircleCI does not allow user or Project Token, Personal Token was used of InReach Service Account.
-      - run:  
+      # Unfortunately CircleCI does not allow user or Project Token, Personal Token was used of InReach Service Account.
+      - run:
           name: Register migration
           command: BRANCH=dev node ./migrations/triggerRegistration.js
 
@@ -427,8 +424,8 @@ workflows:
             branches:
               only: dev
       - e2e:
-         context: SonarCloud
-         filters:
+          context: SonarCloud
+          filters:
             branches:
               only: dev
   pull_request:
@@ -438,8 +435,8 @@ workflows:
             branches:
               ignore: [main, dev]
       - e2e:
-         context: SonarCloud
-         filters:
+          context: SonarCloud
+          filters:
             branches:
               ignore: [main, dev]
       - unit:
@@ -455,10 +452,10 @@ workflows:
     when: << pipeline.parameters.backup_and_restore >>
     jobs:
       - backup_and_restore:
-         filters:
+          filters:
             branches:
               only: main
-  
+
   register_migration_stage:
     when: << pipeline.parameters.register_migration >>
     jobs:
@@ -466,7 +463,7 @@ workflows:
           filters:
             branches:
               only: dev
-  
+
   register_migration_prod:
     when: << pipeline.parameters.register_migration >>
     jobs:
@@ -474,7 +471,7 @@ workflows:
           filters:
             branches:
               only: main
-              
+
   migration_prod:
     when: << pipeline.parameters.run_migration_prod >>
     jobs:
@@ -486,15 +483,15 @@ workflows:
               only: main
           requires:
             - hold
-  
+
   migration_stage:
     when: << pipeline.parameters.run_migration_stage >>
     jobs:
       - migration_stage:
           filters:
             branches:
-             only: dev 
-  
+              only: dev
+
   rollback_prod:
     when: << pipeline.parameters.run_rollback_prod >>
     jobs:
@@ -506,7 +503,7 @@ workflows:
               only: main
           requires:
             - hold
-  
+
   rollback_stage:
     when: << pipeline.parameters.run_rollback_stage >>
     jobs:
