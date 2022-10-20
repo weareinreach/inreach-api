@@ -41,6 +41,7 @@ executors:
   docker-publisher:
     environment:
       IMAGE_TAG: weareinreach/inreach-api:dev
+      IMAGE_DEST: ghcr.io/weareinreach/inreach-api:dev
     docker:
       - image: docker:stable
 jobs:
@@ -83,14 +84,11 @@ jobs:
   dockerbuild:
     executor: docker-publisher
     steps:
-      - run:
-          name: Install OS dependencies
-          command: apt update && apt install git -y
       - checkout
       - setup_remote_docker
       - run:
           name: Build Docker Image
-          command: docker build --tag ${IMAGE_TAG} .
+          command: docker build --tag "${IMAGE_TAG}" .
       - run:
           name: Archive Docker image
           command: docker save --output image.tar "${IMAGE_TAG}"
@@ -113,7 +111,7 @@ jobs:
           command: docker login ghcr.io -u ${CR_USER} -p ${CR_PAT}
       - run:
           name: Push Docker Image to Github Container Registry
-          command: docker push ghcr.io/${IMAGE_TAG}
+          command: docker push ${IMAGE_DEST}
 
   unit:
     docker:
