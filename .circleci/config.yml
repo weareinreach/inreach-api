@@ -126,11 +126,6 @@ jobs:
           MONGO_INITDB_DATABASE: asylum-connect
     working_directory: ~/inreach-api
     steps:
-      - restore_cache:
-          name: Restore Cache
-          keys:
-            - inreach-api-deps-{{ checksum "yarn.lock" }}
-            - inreach-api-cypress-{{ checksum "yarn.lock" }}
       - run:
           name: Install OS dependencies
           command: apt-get update && apt-get install curl git gpg unzip -y
@@ -139,6 +134,11 @@ jobs:
           command: node --version
       # Fix to ignore as Cypress:base does not have node version 15.x
       - checkout
+      - restore_cache:
+          name: Restore Cache
+          keys:
+            - inreach-api-deps-{{ checksum "yarn.lock" }}
+            - inreach-api-cypress-{{ checksum "yarn.lock" }}
       - run:
           name: Ignore Engines
           command: yarn config set ignore-engines true
