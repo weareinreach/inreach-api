@@ -83,6 +83,9 @@ jobs:
   dockerbuild:
     executor: docker-publisher
     steps:
+      - run:
+          name: Install OS dependencies
+          command: apt update && apt install git -y
       - checkout
       - setup_remote_docker
       - run:
