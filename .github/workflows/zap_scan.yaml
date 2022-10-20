@@ -19,7 +19,7 @@ jobs:
         with:
           ref: code-security
       - name: ZAP Scan
-        uses: zaproxy/action-baseline@v0.3.0
+        uses: zaproxy/action-baseline@v0.7.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           target: 'https://inreach-api-staging.herokuapp.com/'
@@ -34,7 +34,7 @@ jobs:
         with:
           ref: main
       - name: ZAP Scan
-        uses: zaproxy/action-baseline@v0.3.0
+        uses: zaproxy/action-baseline@v0.7.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           target: 'https://inreach-api.herokuapp.com'
@@ -49,7 +49,7 @@ jobs:
         with:
           ref: code-security
       - name: ZAP Scan
-        uses: zaproxy/action-full-scan@v0.3.0
+        uses: zaproxy/action-full-scan@v0.4.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           target: 'https://inreach-api-staging.herokuapp.com/'
@@ -64,7 +64,7 @@ jobs:
         with:
           ref: main
       - name: ZAP Scan
-        uses: zaproxy/action-full-scan@v0.3.0
+        uses: zaproxy/action-full-scan@v0.4.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           target: 'https://inreach-api.herokuapp.com'
@@ -79,7 +79,7 @@ jobs:
         with:
           ref: code-security
       - name: ZAP Scan
-        uses: zaproxy/action-api-scan@v0.1.0
+        uses: zaproxy/action-api-scan@v0.2.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           target: 'https://inreach-api-staging.herokuapp.com/'
@@ -94,7 +94,7 @@ jobs:
         with:
           ref: main
       - name: ZAP Scan
-        uses: zaproxy/action-api-scan@v0.1.0
+        uses: zaproxy/action-api-scan@v0.2.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           target: 'https://inreach-api.herokuapp.com'
