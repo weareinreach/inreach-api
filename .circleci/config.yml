@@ -44,17 +44,16 @@ jobs:
     working_directory: ~/inreach-api
     steps:
       - checkout
+      - restore_cache:
+          name: Restore Yarn Package Cache
+          keys:
+            - inreach-api-deps-{{ checksum "yarn.lock" }}
       - run:
           name: Check Node Version
           command: node --version
       - run:
           name: Install Packages
-          command: yarn install
-      - save_cache:
-          paths:
-            - node_modules
-            - '~/.cache/Cypress'
-          key: v1-dependencies-{{ checksum "package.json" }}
+          command: yarn install --frozen-lockfile --cache-folder ~/.cache/yarn
       #Recreate .env file from CircleCI Project Env Vars
       - run:
           name: Create .env file
@@ -70,6 +69,10 @@ jobs:
       - run:
           name: Compile Binary
           command: yarn build
+      - save_cache:
+          paths:
+            - '~/.cache/yarn'
+          key: inreach-api-deps-{{ checksum "yarn.lock" }}
 
   unit:
     docker:
@@ -77,21 +80,21 @@ jobs:
     working_directory: ~/inreach-api
     steps:
       - checkout
+      - restore_cache:
+          name: Restore Cache
+          keys:
+            - inreach-api-deps-{{ checksum "yarn.lock" }}
+            # - inreach-api-cypress-{{ checksum "yarn.lock" }}
       - run:
           name: Check Node Version
           command: node --version
       - run:
           name: Install Packages
-          command: yarn install
-      - run:
-          name: Install Cypress
-          command: yarn add cypress
+          command: yarn install --frozen-lockfile --cache-folder ~/.cache/yarn
+      # - run:
+      #     name: Install Cypress
+      #     command: yarn add cypress
       #save cache for use next tests
-      - save_cache:
-          paths:
-            - node_modules
-            - '~/.cache/Cypress'
-          key: v1-dependencies-{{ checksum "package.json" }}
       #Unit Testing
       - run:
           name: 'Unit Testing'
@@ -104,6 +107,10 @@ jobs:
       - store_artifacts:
           path: ./jestCoverage
           destination: Unit
+      - save_cache:
+          paths:
+            - '~/.cache/yarn'
+          key: inreach-api-deps-{{ checksum "yarn.lock" }}
 
   e2e:
     docker:
@@ -120,6 +127,11 @@ jobs:
     working_directory: ~/inreach-api
     steps:
       - checkout
+      - restore_cache:
+          name: Restore Cache
+          keys:
+            - inreach-api-deps-{{ checksum "yarn.lock" }}
+            - inreach-api-cypress-{{ checksum "yarn.lock" }}
       - run:
           name: Install OS dependencies
           command: apt-get update && apt-get install curl git gpg unzip -y
@@ -132,19 +144,13 @@ jobs:
           command: yarn config set ignore-engines true
       - run:
           name: Install Packages
-          command: yarn install
+          command: yarn install --frozen-lockfile --cache-folder ~/.cache/yarn
       - run:
           name: Install NYC
           command: yarn add nyc
       - run:
           name: Install Cypress
           command: yarn add cypress@9.7.0
-      #save cache for use next tests
-      - save_cache:
-          paths:
-            - node_modules
-            - '~/.cache/Cypress'
-          key: v1-dependencies-{{ checksum "package.json" }}
       #Recreate .env file from CircleCI Project Env Vars
       - run:
           name: Create .env file
@@ -177,7 +183,13 @@ jobs:
       - sonarcloud/scan
       - run:
           name: 'Post E2E tasks'
-          command: 'yarn post-e2e-test'
+          command:
+            'yarn post-e2e-test'
+            #save cache for use next tests
+      - save_cache:
+          paths:
+            - '~/.cache/Cypress'
+          key: inreach-api-cypress-{{ checksum "yarn.lock" }}
 
   lint:
     docker:
@@ -185,22 +197,24 @@ jobs:
     working_directory: ~/inreach-api
     steps:
       - checkout
+      - restore_cache:
+          name: Restore Cache
+          keys:
+            - inreach-api-deps-{{ checksum "yarn.lock" }}
       - run:
           name: Check Node Version
           command: node --version
       - run:
           name: Install Packages
-          command: yarn install
-      #save cache for use next tests
-      - save_cache:
-          paths:
-            - node_modules
-            - '~/.cache/Cypress'
-          key: v1-dependencies-{{ checksum "package.json" }}
+          command: yarn install --frozen-lockfile --cache-folder ~/.cache/yarn
       #Run linting
       - run:
           name: Run linting
           command: 'yarn lint'
+      - save_cache:
+          paths:
+            - '~/.cache/yarn'
+          key: inreach-api-deps-{{ checksum "yarn.lock" }}
 
   backup_and_restore:
     docker:
@@ -208,6 +222,10 @@ jobs:
     working_directory: ~/inreach-api
     steps:
       - checkout
+      - restore_cache:
+          name: Restore Cache
+          keys:
+            - inreach-api-deps-{{ checksum "yarn.lock" }}
       #Recreate .env file from CircleCI Project Env Vars
       - run:
           name: Create .env file
@@ -218,7 +236,7 @@ jobs:
             EOF
       - run:
           name: Install Packages
-          command: yarn install
+          command: yarn install --frozen-lockfile --cache-folder ~/.cache/yarn
       - run:
           name: Run Backup and Restore
           command: yarn backup:prod-staging
@@ -233,6 +251,10 @@ jobs:
       FILES: << pipeline.parameters.files >>
     steps:
       - checkout
+      - restore_cache:
+          name: Restore Cache
+          keys:
+            - inreach-api-deps-{{ checksum "yarn.lock" }}
       #Recreate .env file from CircleCI Project Env Vars
       - run:
           name: Create .env file
@@ -243,7 +265,7 @@ jobs:
             EOF
       - run:
           name: Install Packages
-          command: yarn install
+          command: yarn install --frozen-lockfile --cache-folder ~/.cache/yarn
       - run:
           name: Register Migration Stage
           command: |
@@ -262,6 +284,10 @@ jobs:
       TYPE: migration_prod
     steps:
       - checkout
+      - restore_cache:
+          name: Restore Cache
+          keys:
+            - inreach-api-deps-{{ checksum "yarn.lock" }}
       #Recreate .env file from CircleCI Project Env Vars
       - run:
           name: Create .env file
@@ -272,7 +298,7 @@ jobs:
             EOF
       - run:
           name: Install Packages
-          command: yarn install
+          command: yarn install --frozen-lockfile --cache-folder ~/.cache/yarn
       - run:
           name: Register Migration Prof
           command: |
@@ -292,6 +318,10 @@ jobs:
       TYPE: migration_prod
     steps:
       - checkout
+      - restore_cache:
+          name: Restore Cache
+          keys:
+            - inreach-api-deps-{{ checksum "yarn.lock" }}
       #Recreate .env file from CircleCI Project Env Vars
       - run:
           name: Create .env file
@@ -302,7 +332,7 @@ jobs:
             EOF
       - run:
           name: Install Packages
-          command: yarn install
+          command: yarn install --frozen-lockfile --cache-folder ~/.cache/yarn
       - run:
           name: Run migration
           command: |
@@ -326,6 +356,10 @@ jobs:
       TYPE: migration_stage
     steps:
       - checkout
+      - restore_cache:
+          name: Restore Cache
+          keys:
+            - inreach-api-deps-{{ checksum "yarn.lock" }}
       #Recreate .env file from CircleCI Project Env Vars
       - run:
           name: Create .env file
@@ -336,7 +370,7 @@ jobs:
             EOF
       - run:
           name: Install Packages
-          command: yarn install
+          command: yarn install --frozen-lockfile --cache-folder ~/.cache/yarn
       - run:
           name: Run migration
           #Find all files matching regex
@@ -360,6 +394,10 @@ jobs:
       TYPE: rollback_prod
     steps:
       - checkout
+      - restore_cache:
+          name: Restore Cache
+          keys:
+            - inreach-api-deps-{{ checksum "yarn.lock" }}
       #Recreate .env file from CircleCI Project Env Vars
       - run:
           name: Create .env file
@@ -370,7 +408,7 @@ jobs:
             EOF
       - run:
           name: Install Packages
-          command: yarn install
+          command: yarn install --frozen-lockfile --cache-folder ~/.cache/yarn
       - run:
           name: Run rollback
           command: |
@@ -394,6 +432,10 @@ jobs:
       TYPE: rollback_stage
     steps:
       - checkout
+      - restore_cache:
+          name: Restore Cache
+          keys:
+            - inreach-api-deps-{{ checksum "yarn.lock" }}
       #Recreate .env file from CircleCI Project Env Vars
       - run:
           name: Create .env file
@@ -404,7 +446,7 @@ jobs:
             EOF
       - run:
           name: Install Packages
-          command: yarn install
+          command: yarn install --frozen-lockfile --cache-folder ~/.cache/yarn
       - run:
           name: Run rollback
           command: |
