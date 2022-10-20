@@ -37,6 +37,12 @@ orbs:
   node: circleci/node@5.0.3
   codecov: codecov/codecov@3.2.4
   sonarcloud: sonarsource/sonarcloud@1.1.1
+executors:
+  docker-publisher:
+    environment:
+      IMAGE_TAG: weareinreach/inreach-api:dev
+    docker:
+      - image: docker:stable
 jobs:
   build:
     docker:
@@ -73,6 +79,38 @@ jobs:
           paths:
             - '~/.cache/yarn'
           key: inreach-api-deps-{{ checksum "yarn.lock" }}
+
+  dockerbuild:
+    executor: docker-publisher
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Build Docker Image
+          command: docker build --tag ${IMAGE_TAG} .
+      - run:
+          name: Archive Docker image
+          command: docker save --output image.tar "${IMAGE_TAG}"
+      - persist_to_workspace:
+          root: .
+          paths:
+            - ./image.tar
+
+  dockerpublish:
+    executor: docker-publisher
+    steps:
+      - setup_remote_docker
+      - attach_workspace:
+          at: /tmp/workspace
+      - run:
+          name: Load Docker image
+          command: docker load --input /tmp/workspace/image.tar
+      - run:
+          name: Login to Github Container Registry
+          command: docker login ghcr.io -u ${CR_USER} -p ${CR_PAT}
+      - run:
+          name: Push Docker Image to Github Container Registry
+          command: docker push ghcr.io/${IMAGE_TAG}
 
   unit:
     docker:
@@ -473,6 +511,17 @@ workflows:
           filters:
             branches:
               only: dev
+      - dockerbuild:
+          filters:
+            branches:
+              only: dev
+      - dockerpublish:
+          requires:
+            - dockerbuild
+          filters:
+            branches:
+              only: dev
+
   pull_request:
     jobs:
       - build:
@@ -489,6 +538,10 @@ workflows:
             branches:
               ignore: [main, dev]
       - lint:
+          filters:
+            branches:
+              ignore: [main, dev]
+      - dockerbuild:
           filters:
             branches:
               ignore: [main, dev]
