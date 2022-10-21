@@ -48,7 +48,7 @@ jobs:
   build:
     docker:
       - image: cimg/node:16.18.0
-    working_directory: ~/inreach-api
+    working_directory: /mnt/ramdisk/inreach-api
     steps:
       - checkout
       - restore_cache:
@@ -60,7 +60,7 @@ jobs:
           command: node --version
       - run:
           name: Install Packages
-          command: yarn install --frozen-lockfile --cache-folder ~/.cache/yarn
+          command: yarn install --frozen-lockfile --cache-folder /mnt/ramdisk/.cache/yarn
       #Recreate .env file from CircleCI Project Env Vars
       - run:
           name: Create .env file
@@ -76,36 +76,38 @@ jobs:
       - run:
           name: Compile Binary
           command: yarn build
-      - save_cache:
-          paths:
-            - '~/.cache/yarn'
-          key: inreach-api-deps-{{ checksum "yarn.lock" }}
 
   dockerbuild:
     executor: docker-publisher
+    working_directory: /mnt/ramdisk/inreach-api
     steps:
       - checkout
       - setup_remote_docker
+      - restore_cache:
+          name: Restore Cache
+          keys:
+            - inreach-api-deps-{{ checksum "yarn.lock" }}
       - run:
           name: Build Docker Image
-          command: docker build --tag "${IMAGE_TAG}" .
+          command: DOCKER_BUILDKIT=1 docker build --tag "${IMAGE_TAG}" .
       - run:
           name: Archive Docker image
           command: docker save --output image.tar "${IMAGE_TAG}"
       - persist_to_workspace:
-          root: .
+          root: /mnt/ramdisk
           paths:
             - ./image.tar
 
   dockerpublish:
     executor: docker-publisher
+    working_directory: /mnt/ramdisk/inreach-api
     steps:
       - setup_remote_docker
       - attach_workspace:
-          at: /tmp/workspace
+          at: /mnt/ramdisk
       - run:
           name: Load Docker image
-          command: docker load --input /tmp/workspace/image.tar
+          command: docker load --input /mnt/ramdisk/image.tar
       - run:
           name: Login to Github Container Registry
           command: docker login ghcr.io -u ${CR_USER} -p ${CR_PAT}
@@ -116,7 +118,7 @@ jobs:
   unit:
     docker:
       - image: cimg/node:16.18.0
-    working_directory: ~/inreach-api
+    working_directory: /mnt/ramdisk/inreach-api
     steps:
       - checkout
       - restore_cache:
@@ -129,12 +131,7 @@ jobs:
           command: node --version
       - run:
           name: Install Packages
-          command: yarn install --frozen-lockfile --cache-folder ~/.cache/yarn
-      # - run:
-      #     name: Install Cypress
-      #     command: yarn add cypress
-      #save cache for use next tests
-      #Unit Testing
+          command: yarn install --frozen-lockfile --cache-folder /mnt/ramdisk/.cache/yarn
       - run:
           name: 'Unit Testing'
           command: 'yarn pre-unit-test && yarn unit-test'
@@ -146,10 +143,6 @@ jobs:
       - store_artifacts:
           path: ./jestCoverage
           destination: Unit
-      - save_cache:
-          paths:
-            - '~/.cache/yarn'
-          key: inreach-api-deps-{{ checksum "yarn.lock" }}
 
   e2eprepare:
     docker:
@@ -222,8 +215,8 @@ jobs:
             TEST_FILES="$(circleci tests glob "cypress/integration/**/*.js" | circleci tests split --split-by=timings)"
             yarn pre-e2e-test && yarn e2e --spec ${TEST_FILES//$'\n'/','}
       - run:
-          name: 'Show Coverage'
-          command: 'yarn show-coverage'
+          name: 'Create test result folders'
+          command: mkdir cypressCoverage/${CIRCLE_NODE_INDEX} && mkdir mochawesome-report/${CIRCLE_NODE_INDEX}/
       - run:
           name: Move reports to instance folders
           command: |
@@ -244,6 +237,9 @@ jobs:
     steps:
       - attach_workspace:
           at: /mnt/ramdisk
+      - run:
+          name: 'Show Coverage'
+          command: 'yarn show-coverage'
       - run:
           name: 'Generate Report'
           command: 'yarn report:combined'

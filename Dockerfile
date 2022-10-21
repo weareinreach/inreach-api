@@ -9,7 +9,7 @@ WORKDIR /api
 COPY ["./package.json", "./yarn.lock", "./"]
 
 
-RUN yarn install
+RUN --mount=type=cache,target=/mnt/ramdisk/cache/yarn YARN_CACHE_FOLDER=/mnt/ramdisk/.cache/yarn yarn install
 
 COPY . .
 
