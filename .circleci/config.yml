@@ -225,12 +225,8 @@ jobs:
       - run:
           name: Move reports to instance folders
           command: |
-            mkdir cypressCoverage/${CIRCLE_NODE_INDEX} &&
-            mkdir mochawesome-report/${CIRCLE_NODE_INDEX} &&
-            cd cypressCoverage && find . ! -name . -prune ! -name ${CIRCLE_NODE_INDEX} -exec mv {} ${CIRCLE_NODE_INDEX}/ \; &&
-            cd ../mochawesome-report && find . ! -name . -prune ! -name ${CIRCLE_NODE_INDEX} -exec mv {} ${CIRCLE_NODE_INDEX}/ \;
-            # mv cypressCoverage/${CIRCLE_NODE_INDEX}` cypressCoverage/${CIRCLE_NODE_INDEX}/ &&
-            # mv mochawesome-report/* mochawesome-report/${CIRCLE_NODE_INDEX}/
+            cd cypressCoverage && mkdir ${CIRCLE_NODE_INDEX} &&  find . ! -name . -prune ! -name ${CIRCLE_NODE_INDEX} -exec mv {} ${CIRCLE_NODE_INDEX}/ \; &&
+            cd ../mochawesome-report && mkdir ${CIRCLE_NODE_INDEX} && find . ! -name . -prune ! -name ${CIRCLE_NODE_INDEX} -exec mv {} ${CIRCLE_NODE_INDEX}/ \;
       - persist_to_workspace:
           root: /mnt/ramdisk
           paths:
