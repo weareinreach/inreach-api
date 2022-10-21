@@ -216,12 +216,12 @@ jobs:
             yarn pre-e2e-test && yarn e2e --spec ${TEST_FILES//$'\n'/','}
       - run:
           name: 'Create test result folders'
-          command: mkdir cypressCoverage/${CIRCLE_NODE_INDEX} && mkdir mochawesome-report/${CIRCLE_NODE_INDEX}/
+          command: mkdir cypressCov/${CIRCLE_NODE_INDEX} && mkdir mocha-report/${CIRCLE_NODE_INDEX}/
       - run:
           name: Move reports to instance folders
           command: |
-            mv cypressCoverage/* cypressCoverage/${CIRCLE_NODE_INDEX}/ &&
-            mv mochawesome-report/* mochawesome-report/${CIRCLE_NODE_INDEX}/
+            mv cypressCoverage/* cypressCov/${CIRCLE_NODE_INDEX}/ &&
+            mv mochawesome-report/* mocha-report/${CIRCLE_NODE_INDEX}/
       - persist_to_workspace:
           root: /mnt/ramdisk
           paths:
