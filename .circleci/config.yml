@@ -201,14 +201,6 @@ jobs:
     steps:
       - attach_workspace:
           at: /mnt/ramdisk
-      # - run:
-      #     name: Install OS dependencies
-      #     command: apt-get update && apt-get install curl git gpg unzip -y
-      - run:
-          name: Check Node Version
-          command: node --version
-      # Fix to ignore as Cypress:base does not have node version 15.x
-      - checkout
       - run:
           name: Create .env file
           command: |
@@ -235,8 +227,8 @@ jobs:
       - run:
           name: Move reports to instance folders
           command: |
-            mv cypressCoverage/* cypressCoverage/${CIRCLE_NODE_INDEX} &&
-            mv mochawesome-report/* mochawesome-report/${CIRCLE_NODE_INDEX}
+            mv cypressCoverage/* cypressCoverage/${CIRCLE_NODE_INDEX}/ &&
+            mv mochawesome-report/* mochawesome-report/${CIRCLE_NODE_INDEX}/
       - persist_to_workspace:
           root: /mnt/ramdisk
           paths:
