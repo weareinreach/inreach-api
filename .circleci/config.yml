@@ -161,25 +161,25 @@ jobs:
     working_directory: /mnt/ramdisk/inreach-api
     environment:
       # set Cypress to cache its binary on RAM disk
-      CYPRESS_CACHE_FOLDER: ~/.cache/Cypress
+      CYPRESS_CACHE_FOLDER: /mnt/ramdisk/.cache/Cypress
     steps:
       - checkout
       - restore_cache:
           name: Restore Cache
           keys:
-            - inreach-api-test-{{ checksum "yarn.lock" }}
+            - inreach-api-deps-{{ checksum "yarn.lock" }}
       - run:
           name: Install Packages
           command: yarn install --frozen-lockfile --cache-folder ~/.cache/yarn
       - save_cache:
           paths:
             - ~/.cache
-          key: inreach-api-test-{{ checksum "yarn.lock" }}
+          key: inreach-api-deps-{{ checksum "yarn.lock" }}
       - persist_to_workspace:
           root: /mnt/ramdisk
           paths:
             - inreach-api
-            - .cache
+            - .cache/Cypress
   e2e:
     docker:
       # - image: cypress/base:16.17.1
@@ -198,7 +198,7 @@ jobs:
     resource_class: large
     environment:
       # set Cypress to cache its binary on RAM disk
-      CYPRESS_CACHE_FOLDER: ~/.cache/Cypress
+      CYPRESS_CACHE_FOLDER: /mnt/ramdisk/.cache/Cypress
     steps:
       - attach_workspace:
           at: /mnt/ramdisk
