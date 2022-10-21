@@ -154,7 +154,7 @@ jobs:
   e2e:
     docker:
       # - image: cypress/base:16.17.1
-      - image: cimg/node:16.18.0
+      - image: cimg/node:16.18-browsers
         environment:
           ## this enables colors in the output
           TERM: xterm
