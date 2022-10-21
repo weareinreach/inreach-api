@@ -76,6 +76,10 @@ jobs:
       - run:
           name: Compile Binary
           command: yarn build
+      - save_cache:
+          paths:
+            - ~/.cache
+          key: inreach-api-deps-{{ checksum "yarn.lock" }}
 
   dockerbuild:
     executor: docker-publisher
@@ -143,6 +147,10 @@ jobs:
       - store_artifacts:
           path: ./jestCoverage
           destination: Unit
+      - save_cache:
+          paths:
+            - ~/.cache
+          key: inreach-api-deps-{{ checksum "yarn.lock" }}
 
   e2eprepare:
     docker:
@@ -159,14 +167,14 @@ jobs:
       - restore_cache:
           name: Restore Cache
           keys:
-            - inreach-api-e2e-{{ checksum "yarn.lock" }}
+            - inreach-api-test-{{ checksum "yarn.lock" }}
       - run:
           name: Install Packages
           command: yarn install --frozen-lockfile --cache-folder ~/.cache/yarn
       - save_cache:
           paths:
             - ~/.cache
-          key: inreach-api-e2e-{{ checksum "yarn.lock" }}
+          key: inreach-api-test-{{ checksum "yarn.lock" }}
       - persist_to_workspace:
           root: /mnt/ramdisk
           paths:
@@ -276,6 +284,10 @@ jobs:
       - run:
           name: Run linting
           command: 'yarn lint'
+      - save_cache:
+          paths:
+            - ~/.cache
+          key: inreach-api-deps-{{ checksum "yarn.lock" }}
 
   backup_and_restore:
     docker:
@@ -301,6 +313,10 @@ jobs:
       - run:
           name: Run Backup and Restore
           command: yarn backup:prod-staging
+      - save_cache:
+          paths:
+            - ~/.cache
+          key: inreach-api-deps-{{ checksum "yarn.lock" }}
 
   register_migration_stage:
     docker:
@@ -334,6 +350,10 @@ jobs:
               export MIGRATION_FILE=$i
               yarn register-migration
             done
+      - save_cache:
+          paths:
+            - ~/.cache
+          key: inreach-api-deps-{{ checksum "yarn.lock" }}
 
   register_migration_prod:
     docker:
@@ -368,6 +388,10 @@ jobs:
               export MIGRATION_FILE=$i
               yarn register-migration
             done
+      - save_cache:
+          paths:
+            - ~/.cache
+          key: inreach-api-deps-{{ checksum "yarn.lock" }}
 
   migration_prod:
     docker:
@@ -406,6 +430,10 @@ jobs:
       - run:
           name: Register migration
           command: BRANCH=main node ./migrations/triggerRegistration.js
+      - save_cache:
+          paths:
+            - ~/.cache
+          key: inreach-api-deps-{{ checksum "yarn.lock" }}
 
   migration_stage:
     docker:
@@ -444,6 +472,10 @@ jobs:
       - run:
           name: Register migration
           command: BRANCH=dev node ./migrations/triggerRegistration.js
+      - save_cache:
+          paths:
+            - ~/.cache
+          key: inreach-api-deps-{{ checksum "yarn.lock" }}
 
   rollback_prod:
     docker:
@@ -482,6 +514,10 @@ jobs:
       - run:
           name: Register migration
           command: BRANCH=main node ./migrations/triggerRegistration.js
+      - save_cache:
+          paths:
+            - ~/.cache
+          key: inreach-api-deps-{{ checksum "yarn.lock" }}
 
   rollback_stage:
     docker:
@@ -519,6 +555,10 @@ jobs:
       - run:
           name: Register migration
           command: BRANCH=dev node ./migrations/triggerRegistration.js
+      - save_cache:
+          paths:
+            - ~/.cache
+          key: inreach-api-deps-{{ checksum "yarn.lock" }}
 
 workflows:
   version: 2
