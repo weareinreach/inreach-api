@@ -223,7 +223,11 @@ jobs:
             yarn pre-e2e-test && yarn e2e --spec ${TEST_FILES//$'\n'/','}
       - run:
           name: 'Create test result folders'
-          command: mkdir cypressCov/${CIRCLE_NODE_INDEX} && mkdir mocha-report/${CIRCLE_NODE_INDEX}/
+          command: |
+            mkdir cypressCov &&
+            mkdir cypressCov/${CIRCLE_NODE_INDEX} &&
+            mkdir mocha-report &&
+            mkdir mocha-report/${CIRCLE_NODE_INDEX}/
       - run:
           name: Move reports to instance folders
           command: |
