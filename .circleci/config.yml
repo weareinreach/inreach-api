@@ -164,6 +164,8 @@ jobs:
           MONGO_INITDB_ROOT_PASSWORD: password
           MONGO_INITDB_DATABASE: asylum-connect
     working_directory: ~/inreach-api
+    parallelism: 4
+    resource_class: large
     steps:
       - run:
           name: Install OS dependencies
@@ -209,7 +211,9 @@ jobs:
       #Testing
       - run:
           name: 'E2E Automation'
-          command: 'yarn pre-e2e-test && yarn e2e'
+          command: |
+            TEST_FILES="$(circleci tests glob "cypress/integration/**/*.js" | circleci tests split --split-by=timings)"
+            yarn pre-e2e-test && yarn e2e --spec ${TEST_FILES//$'\n'/','}
       - run:
           name: 'Show Coverage'
           command: 'yarn show-coverage'
