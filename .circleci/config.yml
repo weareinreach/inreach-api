@@ -176,6 +176,9 @@ jobs:
           command: node --version
       # Fix to ignore as Cypress:base does not have node version 15.x
       - checkout
+      - run:
+          name: ls
+          command: ls -alh
       - restore_cache:
           name: Restore Cache
           keys:
