@@ -165,7 +165,7 @@ jobs:
           command: yarn install --frozen-lockfile --cache-folder ~/.cache/yarn
       - save_cache:
           paths:
-            - '/mnt/ramdisk/.cache'
+            - ~/.cache
           key: inreach-api-e2e-{{ checksum "yarn.lock" }}
       - persist_to_workspace:
           root: /mnt/ramdisk
@@ -276,10 +276,6 @@ jobs:
       - run:
           name: Run linting
           command: 'yarn lint'
-      - save_cache:
-          paths:
-            - '~/.cache/yarn'
-          key: inreach-api-deps-{{ checksum "yarn.lock" }}
 
   backup_and_restore:
     docker:
