@@ -60,7 +60,7 @@ jobs:
           command: node --version
       - run:
           name: Install Packages
-          command: yarn install --frozen-lockfile --cache-folder /mnt/ramdisk/.cache/yarn
+          command: yarn install --frozen-lockfile --cache-folder ~/.cache/yarn
       #Recreate .env file from CircleCI Project Env Vars
       - run:
           name: Create .env file
@@ -131,14 +131,7 @@ jobs:
           command: node --version
       - run:
           name: Install Packages
-          command: yarn install --frozen-lockfile --cache-folder /mnt/ramdisk/.cache/yarn
-      - run:
-          name: 'ls ramdisk'
-          command: ls -alh /mnt/ramdisk/.cache
-      - run:
-          name: 'ls home'
-          command: ls -alh ~/.cache
-
+          command: yarn install --frozen-lockfile --cache-folder ~/.cache/yarn
       - run:
           name: 'Unit Testing'
           command: 'yarn pre-unit-test && yarn unit-test'
@@ -160,7 +153,7 @@ jobs:
     working_directory: /mnt/ramdisk/inreach-api
     environment:
       # set Cypress to cache its binary on RAM disk
-      CYPRESS_CACHE_FOLDER: /mnt/ramdisk/.cache/Cypress
+      CYPRESS_CACHE_FOLDER: ~/.cache/Cypress
     steps:
       - checkout
       - restore_cache:
@@ -169,7 +162,7 @@ jobs:
             - inreach-api-e2e-{{ checksum "yarn.lock" }}
       - run:
           name: Install Packages
-          command: yarn install --frozen-lockfile --cache-folder /mnt/ramdisk/.cache/yarn
+          command: yarn install --frozen-lockfile --cache-folder ~/.cache/yarn
       - save_cache:
           paths:
             - '/mnt/ramdisk/.cache'
@@ -197,7 +190,7 @@ jobs:
     resource_class: large
     environment:
       # set Cypress to cache its binary on RAM disk
-      CYPRESS_CACHE_FOLDER: /mnt/ramdisk/.cache/Cypress
+      CYPRESS_CACHE_FOLDER: ~/.cache/Cypress
     steps:
       - attach_workspace:
           at: /mnt/ramdisk
@@ -222,17 +215,14 @@ jobs:
             TEST_FILES="$(circleci tests glob "cypress/integration/**/*.js" | circleci tests split --split-by=timings)"
             yarn pre-e2e-test && yarn e2e --spec ${TEST_FILES//$'\n'/','}
       - run:
-          name: 'Create test result folders'
-          command: |
-            mkdir cypressCov &&
-            mkdir cypressCov/${CIRCLE_NODE_INDEX} &&
-            mkdir mocha-report &&
-            mkdir mocha-report/${CIRCLE_NODE_INDEX}/
-      - run:
           name: Move reports to instance folders
           command: |
-            mv cypressCoverage/* cypressCov/${CIRCLE_NODE_INDEX}/ &&
-            mv mochawesome-report/* mocha-report/${CIRCLE_NODE_INDEX}/
+            mkdir cypressCoverage/${CIRCLE_NODE_INDEX} &&
+            mkdir mochawesome-report/${CIRCLE_NODE_INDEX} &&
+            cd cypressCoverage && find . ! -name . -prune ! -name ${CIRCLE_NODE_INDEX} -exec mv {} ${CIRCLE_NODE_INDEX}/ \; &&
+            cd ../mochawesome-report && find . ! -name . -prune ! -name ${CIRCLE_NODE_INDEX} -exec mv {} ${CIRCLE_NODE_INDEX}/ \;
+            # mv cypressCoverage/${CIRCLE_NODE_INDEX}` cypressCoverage/${CIRCLE_NODE_INDEX}/ &&
+            # mv mochawesome-report/* mochawesome-report/${CIRCLE_NODE_INDEX}/
       - persist_to_workspace:
           root: /mnt/ramdisk
           paths:
@@ -269,7 +259,7 @@ jobs:
   lint:
     docker:
       - image: cimg/node:16.18.0
-    working_directory: ~/inreach-api
+    working_directory: /mnt/ramdisk
     steps:
       - checkout
       - restore_cache:
