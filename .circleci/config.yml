@@ -214,6 +214,8 @@ jobs:
           command: |
             TEST_FILES="$(circleci tests glob "cypress/integration/**/*.js" | circleci tests split --split-by=timings)"
             yarn pre-e2e-test && yarn e2e --spec ${TEST_FILES//$'\n'/','}
+      - store_test_results:
+          path: mochawesome-report
       - run:
           name: 'Show Coverage'
           command: 'yarn show-coverage'
