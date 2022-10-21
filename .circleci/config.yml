@@ -92,7 +92,7 @@ jobs:
           command: DOCKER_BUILDKIT=1 docker build --tag "${IMAGE_TAG}" .
       - run:
           name: Archive Docker image
-          command: docker save --output image.tar "${IMAGE_TAG}"
+          command: docker save --output /mnt/ramdisk/image.tar "${IMAGE_TAG}"
       - persist_to_workspace:
           root: /mnt/ramdisk
           paths:
@@ -132,6 +132,13 @@ jobs:
       - run:
           name: Install Packages
           command: yarn install --frozen-lockfile --cache-folder /mnt/ramdisk/.cache/yarn
+      - run:
+          name: 'ls ramdisk'
+          command: ls -alh /mnt/ramdisk/.cache
+      - run:
+          name: 'ls home'
+          command: ls -alh ~/.cache
+
       - run:
           name: 'Unit Testing'
           command: 'yarn pre-unit-test && yarn unit-test'

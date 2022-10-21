@@ -51,6 +51,7 @@ class OrgData {
 						[`service-${faker.address
 							.state()
 							.toLowerCase()
+							.replace(/[^a-zA-Z0-9 ]/g, '')
 							.replace(/\s+/g, '-')}`]: 'true'
 				  }
 				: {};
@@ -60,6 +61,7 @@ class OrgData {
 						[`service-${faker.address
 							.state()
 							.toLowerCase()
+							.replace(/[^a-zA-Z0-9 ]/g, '')
 							.replace(/\s+/g, '-')}`]: 'true'
 				  }
 				: {};
@@ -69,6 +71,7 @@ class OrgData {
 						[`service-${faker.address
 							.city()
 							.toLowerCase()
+							.replace(/[^a-zA-Z0-9 ]/g, '')
 							.replace(/\s+/g, '-')}`]: 'true'
 				  }
 				: {};
@@ -78,6 +81,7 @@ class OrgData {
 						[`service-${faker.address
 							.city()
 							.toLowerCase()
+							.replace(/[^a-zA-Z0-9 ]/g, '')
 							.replace(/\s+/g, '-')}`]: 'true'
 				  }
 				: {};
