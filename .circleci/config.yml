@@ -151,6 +151,34 @@ jobs:
             - '~/.cache/yarn'
           key: inreach-api-deps-{{ checksum "yarn.lock" }}
 
+  e2eprepare:
+    docker:
+      - image: cimg/node:16.18-browsers
+        environment:
+          ## this enables colors in the output
+          TERM: xterm
+    working_directory: /mnt/ramdisk/inreach-api
+    environment:
+      # set Cypress to cache its binary on RAM disk
+      CYPRESS_CACHE_FOLDER: /mnt/ramdisk/.cache/Cypress
+    steps:
+      - checkout
+      - restore_cache:
+          name: Restore Cache
+          keys:
+            - inreach-api-e2e-{{ checksum "yarn.lock" }}
+      - run:
+          name: Install Packages
+          command: yarn install --frozen-lockfile --cache-folder /mnt/ramdisk/.cache/yarn
+      - save_cache:
+          paths:
+            - '/mnt/ramdisk/.cache'
+          key: inreach-api-e2e-{{ checksum "yarn.lock" }}
+      - persist_to_workspace:
+          root: /mnt/ramdisk
+          paths:
+            - inreach-api
+            - .cache
   e2e:
     docker:
       # - image: cypress/base:16.17.1
@@ -164,10 +192,15 @@ jobs:
           MONGO_INITDB_ROOT_USERNAME: user
           MONGO_INITDB_ROOT_PASSWORD: password
           MONGO_INITDB_DATABASE: asylum-connect
-    working_directory: ~/inreach-api
+    working_directory: /mnt/ramdisk/inreach-api
     parallelism: 4
     resource_class: large
+    environment:
+      # set Cypress to cache its binary on RAM disk
+      CYPRESS_CACHE_FOLDER: /mnt/ramdisk/.cache/Cypress
     steps:
+      - attach_workspace:
+          at: /mnt/ramdisk
       # - run:
       #     name: Install OS dependencies
       #     command: apt-get update && apt-get install curl git gpg unzip -y
@@ -176,24 +209,6 @@ jobs:
           command: node --version
       # Fix to ignore as Cypress:base does not have node version 15.x
       - checkout
-      - restore_cache:
-          name: Restore Cache
-          keys:
-            - inreach-api-e2e-{{ checksum "yarn.lock" }}
-            # - inreach-api-cypress-{{ checksum "yarn.lock" }}
-      # - run:
-      #     name: Ignore Engines
-      #     command: yarn config set ignore-engines true
-      - run:
-          name: Install Packages
-          command: yarn install --frozen-lockfile --cache-folder ~/.cache/yarn
-      # - run:
-      #     name: Install NYC
-      #     command: yarn add nyc
-      # - run:
-      #     name: Install Cypress
-      #     command: yarn add cypress@9.7.0
-      #Recreate .env file from CircleCI Project Env Vars
       - run:
           name: Create .env file
           command: |
@@ -205,11 +220,10 @@ jobs:
             SHEETS_API_KEY=$SHEETS_API_KEY
             TEST_DB_URI=$TEST_DB_URI
             EOF
-      #Seed Docker DB
       - run:
           name: 'Seed Docker DB'
           command: yarn seed-docker-db
-      #Testing
+
       - run:
           name: 'E2E Automation'
           command: |
@@ -218,6 +232,26 @@ jobs:
       - run:
           name: 'Show Coverage'
           command: 'yarn show-coverage'
+      - run:
+          name: Move reports to instance folders
+          command: |
+            mv cypressCoverage/* cypressCoverage/${CIRCLE_NODE_INDEX} &&
+            mv mochawesome-report/* mochawesome-report/${CIRCLE_NODE_INDEX}
+      - persist_to_workspace:
+          root: /mnt/ramdisk
+          paths:
+            - inreach-api
+
+  sonar:
+    docker:
+      - image: cimg/node:16.18-browsers
+        environment:
+          ## this enables colors in the output
+          TERM: xterm
+    working_directory: /mnt/ramdisk/inreach-api
+    steps:
+      - attach_workspace:
+          at: /mnt/ramdisk
       - run:
           name: 'Generate Report'
           command: 'yarn report:combined'
@@ -232,10 +266,6 @@ jobs:
             #save cache for use next tests
       - store_test_results:
           path: mochawesome-report
-      - save_cache:
-          paths:
-            - '~/.cache'
-          key: inreach-api-e2e-{{ checksum "yarn.lock" }}
 
   lint:
     docker:
@@ -514,8 +544,21 @@ workflows:
           filters:
             branches:
               only: dev
+      - e2eprepare:
+          filters:
+            branches:
+              only: dev
       - e2e:
           context: SonarCloud
+          requires:
+            - e2eprepare
+          filters:
+            branches:
+              only: dev
+      - sonar:
+          context: SonarCloud
+          requires:
+            - e2e
           filters:
             branches:
               only: dev
@@ -536,8 +579,21 @@ workflows:
           filters:
             branches:
               ignore: [main, dev]
+      - e2eprepare:
+          filters:
+            branches:
+              ignore: [main, dev]
       - e2e:
           context: SonarCloud
+          requires:
+            - e2eprepare
+          filters:
+            branches:
+              ignore: [main, dev]
+      - sonar:
+          context: SonarCloud
+          requires:
+            - e2e
           filters:
             branches:
               ignore: [main, dev]

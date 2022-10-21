@@ -9,7 +9,7 @@ WORKDIR /api
 COPY ["./package.json", "./yarn.lock", "./"]
 
 
-RUN yarn install --frozen-lockfile
+RUN yarn install
 
 COPY . .
 
