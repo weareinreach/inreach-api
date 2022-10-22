@@ -37,11 +37,18 @@ orbs:
   node: circleci/node@5.0.3
   codecov: codecov/codecov@3.2.4
   sonarcloud: sonarsource/sonarcloud@1.1.1
+executors:
+  docker-publisher:
+    environment:
+      IMAGE_TAG: weareinreach/inreach-api:dev
+      IMAGE_DEST: ghcr.io/weareinreach/inreach-api:dev
+    docker:
+      - image: docker:stable
 jobs:
   build:
     docker:
       - image: cimg/node:16.18.0
-    working_directory: ~/inreach-api
+    working_directory: /mnt/ramdisk/inreach-api
     steps:
       - checkout
       - restore_cache:
@@ -71,13 +78,51 @@ jobs:
           command: yarn build
       - save_cache:
           paths:
-            - '~/.cache/yarn'
+            - ~/.cache
           key: inreach-api-deps-{{ checksum "yarn.lock" }}
+
+  dockerbuild:
+    executor: docker-publisher
+    working_directory: /mnt/ramdisk/inreach-api
+    steps:
+      - checkout
+      - setup_remote_docker
+      - restore_cache:
+          name: Restore Cache
+          keys:
+            - inreach-api-deps-{{ checksum "yarn.lock" }}
+      - run:
+          name: Build Docker Image
+          command: DOCKER_BUILDKIT=1 docker build --tag "${IMAGE_TAG}" .
+      - run:
+          name: Archive Docker image
+          command: docker save --output /mnt/ramdisk/image.tar "${IMAGE_TAG}"
+      - persist_to_workspace:
+          root: /mnt/ramdisk
+          paths:
+            - ./image.tar
+
+  dockerpublish:
+    executor: docker-publisher
+    working_directory: /mnt/ramdisk/inreach-api
+    steps:
+      - setup_remote_docker
+      - attach_workspace:
+          at: /mnt/ramdisk
+      - run:
+          name: Load Docker image
+          command: docker load --input /mnt/ramdisk/image.tar
+      - run:
+          name: Login to Github Container Registry
+          command: docker login ghcr.io -u ${CR_USER} -p ${CR_PAT}
+      - run:
+          name: Push Docker Image to Github Container Registry
+          command: docker push ${IMAGE_DEST}
 
   unit:
     docker:
       - image: cimg/node:16.18.0
-    working_directory: ~/inreach-api
+    working_directory: /mnt/ramdisk/inreach-api
     steps:
       - checkout
       - restore_cache:
@@ -91,11 +136,6 @@ jobs:
       - run:
           name: Install Packages
           command: yarn install --frozen-lockfile --cache-folder ~/.cache/yarn
-      # - run:
-      #     name: Install Cypress
-      #     command: yarn add cypress
-      #save cache for use next tests
-      #Unit Testing
       - run:
           name: 'Unit Testing'
           command: 'yarn pre-unit-test && yarn unit-test'
@@ -109,12 +149,41 @@ jobs:
           destination: Unit
       - save_cache:
           paths:
-            - '~/.cache/yarn'
+            - ~/.cache
           key: inreach-api-deps-{{ checksum "yarn.lock" }}
 
+  e2eprepare:
+    docker:
+      - image: cimg/node:16.18-browsers
+        environment:
+          ## this enables colors in the output
+          TERM: xterm
+    working_directory: /mnt/ramdisk/inreach-api
+    environment:
+      # set Cypress to cache its binary on RAM disk
+      CYPRESS_CACHE_FOLDER: /mnt/ramdisk/.cache/Cypress
+    steps:
+      - checkout
+      - restore_cache:
+          name: Restore Cache
+          keys:
+            - inreach-api-deps-{{ checksum "yarn.lock" }}
+      - run:
+          name: Install Packages
+          command: yarn install --frozen-lockfile --cache-folder ~/.cache/yarn
+      - save_cache:
+          paths:
+            - ~/.cache
+          key: inreach-api-deps-{{ checksum "yarn.lock" }}
+      - persist_to_workspace:
+          root: /mnt/ramdisk
+          paths:
+            - inreach-api
+            - .cache/Cypress
   e2e:
     docker:
-      - image: cypress/base:16.17.1
+      # - image: cypress/base:16.17.1
+      - image: cimg/node:16.18-browsers
         environment:
           ## this enables colors in the output
           TERM: xterm
@@ -124,34 +193,15 @@ jobs:
           MONGO_INITDB_ROOT_USERNAME: user
           MONGO_INITDB_ROOT_PASSWORD: password
           MONGO_INITDB_DATABASE: asylum-connect
-    working_directory: ~/inreach-api
+    working_directory: /mnt/ramdisk/inreach-api
+    parallelism: 4
+    resource_class: large
+    environment:
+      # set Cypress to cache its binary on RAM disk
+      CYPRESS_CACHE_FOLDER: /mnt/ramdisk/.cache/Cypress
     steps:
-      - run:
-          name: Install OS dependencies
-          command: apt-get update && apt-get install curl git gpg unzip -y
-      - run:
-          name: Check Node Version
-          command: node --version
-      # Fix to ignore as Cypress:base does not have node version 15.x
-      - checkout
-      - restore_cache:
-          name: Restore Cache
-          keys:
-            - inreach-api-deps-{{ checksum "yarn.lock" }}
-            - inreach-api-cypress-{{ checksum "yarn.lock" }}
-      - run:
-          name: Ignore Engines
-          command: yarn config set ignore-engines true
-      - run:
-          name: Install Packages
-          command: yarn install --frozen-lockfile --cache-folder ~/.cache/yarn
-      - run:
-          name: Install NYC
-          command: yarn add nyc
-      - run:
-          name: Install Cypress
-          command: yarn add cypress@9.7.0
-      #Recreate .env file from CircleCI Project Env Vars
+      - attach_workspace:
+          at: /mnt/ramdisk
       - run:
           name: Create .env file
           command: |
@@ -163,14 +213,36 @@ jobs:
             SHEETS_API_KEY=$SHEETS_API_KEY
             TEST_DB_URI=$TEST_DB_URI
             EOF
-      #Seed Docker DB
       - run:
           name: 'Seed Docker DB'
           command: yarn seed-docker-db
-      #Testing
+
       - run:
           name: 'E2E Automation'
-          command: 'yarn pre-e2e-test && yarn e2e'
+          command: |
+            TEST_FILES="$(circleci tests glob "cypress/integration/**/*.js" | circleci tests split --split-by=timings)"
+            yarn pre-e2e-test && yarn e2e --spec ${TEST_FILES//$'\n'/','}
+      - run:
+          name: Move reports to instance folders
+          command: |
+            cd cypressCoverage && mkdir ${CIRCLE_NODE_INDEX} &&  find . ! -name . -prune ! -name ${CIRCLE_NODE_INDEX} -exec mv {} ${CIRCLE_NODE_INDEX}/ \; &&
+            cd ../mochawesome-report && mkdir ${CIRCLE_NODE_INDEX} && find . ! -name . -prune ! -name ${CIRCLE_NODE_INDEX} -exec mv {} ${CIRCLE_NODE_INDEX}/ \;
+      - persist_to_workspace:
+          root: /mnt/ramdisk
+          paths:
+            - inreach-api
+
+  sonar:
+    docker:
+      - image: cimg/node:16.18-browsers
+        environment:
+          ## this enables colors in the output
+          TERM: xterm
+    working_directory: /mnt/ramdisk/inreach-api
+    resource_class: large
+    steps:
+      - attach_workspace:
+          at: /mnt/ramdisk
       - run:
           name: 'Show Coverage'
           command: 'yarn show-coverage'
@@ -186,15 +258,13 @@ jobs:
           command:
             'yarn post-e2e-test'
             #save cache for use next tests
-      - save_cache:
-          paths:
-            - '~/.cache/Cypress'
-          key: inreach-api-cypress-{{ checksum "yarn.lock" }}
+      - store_test_results:
+          path: mochawesome-report
 
   lint:
     docker:
       - image: cimg/node:16.18.0
-    working_directory: ~/inreach-api
+    working_directory: /mnt/ramdisk
     steps:
       - checkout
       - restore_cache:
@@ -213,7 +283,7 @@ jobs:
           command: 'yarn lint'
       - save_cache:
           paths:
-            - '~/.cache/yarn'
+            - ~/.cache
           key: inreach-api-deps-{{ checksum "yarn.lock" }}
 
   backup_and_restore:
@@ -240,6 +310,10 @@ jobs:
       - run:
           name: Run Backup and Restore
           command: yarn backup:prod-staging
+      - save_cache:
+          paths:
+            - ~/.cache
+          key: inreach-api-deps-{{ checksum "yarn.lock" }}
 
   register_migration_stage:
     docker:
@@ -273,6 +347,10 @@ jobs:
               export MIGRATION_FILE=$i
               yarn register-migration
             done
+      - save_cache:
+          paths:
+            - ~/.cache
+          key: inreach-api-deps-{{ checksum "yarn.lock" }}
 
   register_migration_prod:
     docker:
@@ -307,6 +385,10 @@ jobs:
               export MIGRATION_FILE=$i
               yarn register-migration
             done
+      - save_cache:
+          paths:
+            - ~/.cache
+          key: inreach-api-deps-{{ checksum "yarn.lock" }}
 
   migration_prod:
     docker:
@@ -345,6 +427,10 @@ jobs:
       - run:
           name: Register migration
           command: BRANCH=main node ./migrations/triggerRegistration.js
+      - save_cache:
+          paths:
+            - ~/.cache
+          key: inreach-api-deps-{{ checksum "yarn.lock" }}
 
   migration_stage:
     docker:
@@ -383,6 +469,10 @@ jobs:
       - run:
           name: Register migration
           command: BRANCH=dev node ./migrations/triggerRegistration.js
+      - save_cache:
+          paths:
+            - ~/.cache
+          key: inreach-api-deps-{{ checksum "yarn.lock" }}
 
   rollback_prod:
     docker:
@@ -421,6 +511,10 @@ jobs:
       - run:
           name: Register migration
           command: BRANCH=main node ./migrations/triggerRegistration.js
+      - save_cache:
+          paths:
+            - ~/.cache
+          key: inreach-api-deps-{{ checksum "yarn.lock" }}
 
   rollback_stage:
     docker:
@@ -458,6 +552,10 @@ jobs:
       - run:
           name: Register migration
           command: BRANCH=dev node ./migrations/triggerRegistration.js
+      - save_cache:
+          paths:
+            - ~/.cache
+          key: inreach-api-deps-{{ checksum "yarn.lock" }}
 
 workflows:
   version: 2
@@ -468,19 +566,56 @@ workflows:
           filters:
             branches:
               only: dev
-      - e2e:
-          context: SonarCloud
+      - e2eprepare:
           filters:
             branches:
               only: dev
+      - e2e:
+          context: SonarCloud
+          requires:
+            - e2eprepare
+          filters:
+            branches:
+              only: dev
+      - sonar:
+          context: SonarCloud
+          requires:
+            - e2e
+          filters:
+            branches:
+              only: dev
+      - dockerbuild:
+          filters:
+            branches:
+              only: dev
+      - dockerpublish:
+          requires:
+            - dockerbuild
+          filters:
+            branches:
+              only: dev
+
   pull_request:
     jobs:
       - build:
           filters:
             branches:
               ignore: [main, dev]
+      - e2eprepare:
+          filters:
+            branches:
+              ignore: [main, dev]
       - e2e:
           context: SonarCloud
+          requires:
+            - e2eprepare
+          filters:
+            branches:
+              ignore: [main, dev]
+      - sonar:
+          context: SonarCloud
+          requires:
+            - e2e
           filters:
             branches:
               ignore: [main, dev]
@@ -489,6 +624,10 @@ workflows:
             branches:
               ignore: [main, dev]
       - lint:
+          filters:
+            branches:
+              ignore: [main, dev]
+      - dockerbuild:
           filters:
             branches:
               ignore: [main, dev]
