@@ -2,7 +2,7 @@ version: '3.7'
 services:
  database:
   #Use same image as the one being hosted.
-  image: 'mongo:4.4.10'
+  image: 'mongo:4.4.17'
   container_name: 'mongodb'
   environment:
     - MONGO_INITDB_DATABASE=asylum-connect
