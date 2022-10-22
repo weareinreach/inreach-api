@@ -102,7 +102,7 @@
 		"include": [
 			"**/src/*"
 		],
-		"report-dir": "cypressCov",
+		"report-dir": "cypressCoverage",
 		"reporter": [
 			"html",
 			"json",
