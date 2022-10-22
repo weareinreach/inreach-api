@@ -239,6 +239,7 @@ jobs:
           ## this enables colors in the output
           TERM: xterm
     working_directory: /mnt/ramdisk/inreach-api
+    resource_class: large
     steps:
       - attach_workspace:
           at: /mnt/ramdisk
