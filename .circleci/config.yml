@@ -25,77 +25,119 @@ parameters:
     default: false
     type: boolean
   files:
-    default: ""
+    default: ''
     type: string
   date_pattern:
-    default: ""
+    default: ''
     type: string
   pipeline_id:
-    default: ""
+    default: ''
     type: string
 orbs:
-  node: circleci/node@3.0.0
-  codecov: codecov/codecov@1.1.3
-  sonarcloud: sonarsource/sonarcloud@1.0.3
-jobs: 
+  node: circleci/node@5.0.3
+  codecov: codecov/codecov@3.2.4
+  sonarcloud: sonarsource/sonarcloud@1.1.1
+executors:
+  docker-publisher:
+    environment:
+      IMAGE_TAG: ghcr.io/weareinreach/inreach-api:dev
+    docker:
+      - image: docker:stable
+jobs:
   build:
     docker:
-      - image: cimg/node:16.12.0
-    working_directory: ~/inreach-api
+      - image: cimg/node:16.18.0
+    working_directory: /mnt/ramdisk/inreach-api
     steps:
       - checkout
-      - run: 
+      - restore_cache:
+          name: Restore Yarn Package Cache
+          keys:
+            - inreach-api-deps-{{ checksum "yarn.lock" }}
+      - run:
           name: Check Node Version
           command: node --version
       - run:
           name: Install Packages
-          command: yarn install
-      - save_cache:
-         paths:
-          - node_modules
-          - "~/.cache/Cypress"
-         key: v1-dependencies-{{ checksum "package.json" }}
+          command: yarn install --frozen-lockfile --cache-folder ~/.cache/yarn
       #Recreate .env file from CircleCI Project Env Vars
       - run:
           name: Create .env file
           command: |
-           cat \<< EOF > ./.env
-           MAILGUN_API_KEY=$MAILGUN_API_KEY
-           MAILGUN_DOMAIN=$MAILGUN_DOMAIN
-           DB_URI=$DB_URI
-           SHEETS_API_KEY=$SHEETS_API_KEY
-           EOF
+            cat \<< EOF > ./.env
+            MAILGUN_API_KEY=$MAILGUN_API_KEY
+            MAILGUN_DOMAIN=$MAILGUN_DOMAIN
+            DB_URI=$DB_URI
+            SHEETS_API_KEY=$SHEETS_API_KEY
+            EOF
 
       #Building and Compiling Binary
-      - run: 
+      - run:
           name: Compile Binary
           command: yarn build
+      - save_cache:
+          paths:
+            - ~/.cache
+          key: inreach-api-deps-{{ checksum "yarn.lock" }}
+
+  dockerbuild:
+    executor: docker-publisher
+    working_directory: /mnt/ramdisk/inreach-api
+    steps:
+      - checkout
+      - setup_remote_docker
+      - restore_cache:
+          name: Restore Cache
+          keys:
+            - inreach-api-deps-{{ checksum "yarn.lock" }}
+      - run:
+          name: Build Docker Image
+          command: DOCKER_BUILDKIT=1 docker build --tag "${IMAGE_TAG}" .
+      - run:
+          name: Archive Docker image
+          command: docker save --output /mnt/ramdisk/image.tar "${IMAGE_TAG}"
+      - persist_to_workspace:
+          root: /mnt/ramdisk
+          paths:
+            - ./image.tar
+
+  dockerpublish:
+    executor: docker-publisher
+    working_directory: /mnt/ramdisk/inreach-api
+    steps:
+      - setup_remote_docker
+      - attach_workspace:
+          at: /mnt/ramdisk
+      - run:
+          name: Load Docker image
+          command: docker load --input /mnt/ramdisk/image.tar
+      - run:
+          name: Login to Github Container Registry
+          command: docker login ghcr.io -u ${CR_USER} -p ${CR_PAT}
+      - run:
+          name: Push Docker Image to Github Container Registry
+          command: docker push ${IMAGE_TAG}
 
   unit:
     docker:
-      - image: cimg/node:16.12.0
-    working_directory: ~/inreach-api
+      - image: cimg/node:16.18.0
+    working_directory: /mnt/ramdisk/inreach-api
     steps:
       - checkout
-      - run: 
+      - restore_cache:
+          name: Restore Cache
+          keys:
+            - inreach-api-deps-{{ checksum "yarn.lock" }}
+            # - inreach-api-cypress-{{ checksum "yarn.lock" }}
+      - run:
           name: Check Node Version
           command: node --version
       - run:
           name: Install Packages
-          command: yarn install
+          command: yarn install --frozen-lockfile --cache-folder ~/.cache/yarn
       - run:
-          name: Install Cypress
-          command: yarn add cypress
-      #save cache for use next tests
-      - save_cache:
-         paths:
-          - node_modules
-          - "~/.cache/Cypress"
-         key: v1-dependencies-{{ checksum "package.json" }}
-      #Unit Testing
-      - run: 
-          name: "Unit Testing"
-          command: "yarn pre-unit-test && yarn unit-test" 
+          name: 'Unit Testing'
+          command: 'yarn pre-unit-test && yarn unit-test'
       - codecov/upload:
           file: 'jestCoverage/coverage-final.json'
           flags: 'Unit-Tests'
@@ -104,127 +146,177 @@ jobs:
       - store_artifacts:
           path: ./jestCoverage
           destination: Unit
-    
-  e2e:
+      - save_cache:
+          paths:
+            - ~/.cache
+          key: inreach-api-deps-{{ checksum "yarn.lock" }}
+
+  e2eprepare:
     docker:
-      - image: cypress/base:16.5.0
+      - image: cimg/node:16.18-browsers
         environment:
           ## this enables colors in the output
           TERM: xterm
-      ## MongoDB 
-      - image: mongo:4.4.10
+    working_directory: /mnt/ramdisk/inreach-api
+    environment:
+      # set Cypress to cache its binary on RAM disk
+      CYPRESS_CACHE_FOLDER: /mnt/ramdisk/.cache/Cypress
+    steps:
+      - checkout
+      - restore_cache:
+          name: Restore Cache
+          keys:
+            - inreach-api-deps-{{ checksum "yarn.lock" }}
+      - run:
+          name: Install Packages
+          command: yarn install --frozen-lockfile --cache-folder ~/.cache/yarn
+      - save_cache:
+          paths:
+            - ~/.cache
+          key: inreach-api-deps-{{ checksum "yarn.lock" }}
+      - persist_to_workspace:
+          root: /mnt/ramdisk
+          paths:
+            - inreach-api
+            - .cache/Cypress
+  e2e:
+    docker:
+      # - image: cypress/base:16.17.1
+      - image: cimg/node:16.18-browsers
+        environment:
+          ## this enables colors in the output
+          TERM: xterm
+      ## MongoDB
+      - image: mongo:4.4.17
         environment:
           MONGO_INITDB_ROOT_USERNAME: user
           MONGO_INITDB_ROOT_PASSWORD: password
           MONGO_INITDB_DATABASE: asylum-connect
-    working_directory: ~/inreach-api
+    working_directory: /mnt/ramdisk/inreach-api
+    parallelism: 4
+    resource_class: large
+    environment:
+      # set Cypress to cache its binary on RAM disk
+      CYPRESS_CACHE_FOLDER: /mnt/ramdisk/.cache/Cypress
     steps:
-      - checkout
-      - run: 
-          name: Check Node Version
-          command: node --version
-    # Fix to ignore as Cypress:base does not have node version 15.x
-      - run:
-          name: Ignore Engines
-          command: yarn config set ignore-engines true
-      - run:
-          name: Install Packages
-          command: yarn install
-      - run:
-          name: Install NYC
-          command: yarn add nyc
-      - run:
-          name: Install Cypress
-          command: yarn add cypress@9.7.0
-      #save cache for use next tests
-      - save_cache:
-         paths:
-          - node_modules
-          - "~/.cache/Cypress"
-         key: v1-dependencies-{{ checksum "package.json" }}
-      #Recreate .env file from CircleCI Project Env Vars
+      - attach_workspace:
+          at: /mnt/ramdisk
       - run:
           name: Create .env file
           command: |
-           cat \<< EOF > ./.env
-           MAILGUN_API_KEY=$MAILGUN_API_KEY
-           MAILGUN_DOMAIN=$MAILGUN_DOMAIN
-           DB_URI=$DB_URI_STAGING
-           ENV=TEST
-           SHEETS_API_KEY=$SHEETS_API_KEY
-           TEST_DB_URI=$TEST_DB_URI
-           EOF
-      #Seed Docker DB
+            cat \<< EOF > ./.env
+            MAILGUN_API_KEY=$MAILGUN_API_KEY
+            MAILGUN_DOMAIN=$MAILGUN_DOMAIN
+            DB_URI=$DB_URI_STAGING
+            ENV=TEST
+            SHEETS_API_KEY=$SHEETS_API_KEY
+            TEST_DB_URI=$TEST_DB_URI
+            EOF
       - run:
-          name: "Seed Docker DB"
+          name: 'Seed Docker DB'
           command: yarn seed-docker-db
-      #Testing
-      - run: 
-          name: "E2E Automation"
-          command: "yarn pre-e2e-test && yarn e2e"
+
       - run:
-          name: "Show Coverage"
-          command: "yarn show-coverage"
+          name: 'E2E Automation'
+          command: |
+            TEST_FILES="$(circleci tests glob "cypress/integration/**/*.js" | circleci tests split --split-by=timings)"
+            yarn pre-e2e-test && yarn e2e --spec ${TEST_FILES//$'\n'/','}
       - run:
-          name: "Generate Report"
-          command: "yarn report:combined"
+          name: Move reports to instance folders
+          command: |
+            cd cypressCoverage && mkdir ${CIRCLE_NODE_INDEX} &&  find . ! -name . -prune ! -name ${CIRCLE_NODE_INDEX} -exec mv {} ${CIRCLE_NODE_INDEX}/ \; &&
+            cd ../mochawesome-report && mkdir ${CIRCLE_NODE_INDEX} && find . ! -name . -prune ! -name ${CIRCLE_NODE_INDEX} -exec mv {} ${CIRCLE_NODE_INDEX}/ \;
+      - persist_to_workspace:
+          root: /mnt/ramdisk
+          paths:
+            - inreach-api
+
+  sonar:
+    docker:
+      - image: cimg/node:16.18-browsers
+        environment:
+          ## this enables colors in the output
+          TERM: xterm
+    working_directory: /mnt/ramdisk/inreach-api
+    resource_class: large
+    steps:
+      - attach_workspace:
+          at: /mnt/ramdisk
+      - run:
+          name: 'Show Coverage'
+          command: 'yarn show-coverage'
+      - run:
+          name: 'Generate Report'
+          command: 'yarn report:combined'
       - codecov/upload:
           file: 'coverageReports/coverage-final.json'
           flags: 'Integration'
       - sonarcloud/scan
       - run:
-          name: "Post E2E tasks"
-          command: "yarn post-e2e-test"
+          name: 'Post E2E tasks'
+          command:
+            'yarn post-e2e-test'
+            #save cache for use next tests
+      - store_test_results:
+          path: mochawesome-report
 
   lint:
     docker:
-      - image: cimg/node:16.12.0
-    working_directory: ~/inreach-api
+      - image: cimg/node:16.18.0
+    working_directory: /mnt/ramdisk
     steps:
       - checkout
-      - run: 
+      - restore_cache:
+          name: Restore Cache
+          keys:
+            - inreach-api-deps-{{ checksum "yarn.lock" }}
+      - run:
           name: Check Node Version
           command: node --version
       - run:
           name: Install Packages
-          command: yarn install
-      #save cache for use next tests
-      - save_cache:
-         paths:
-          - node_modules
-          - "~/.cache/Cypress"
-         key: v1-dependencies-{{ checksum "package.json" }}
+          command: yarn install --frozen-lockfile --cache-folder ~/.cache/yarn
       #Run linting
       - run:
           name: Run linting
-          command: "yarn lint"
-  
+          command: 'yarn lint'
+      - save_cache:
+          paths:
+            - ~/.cache
+          key: inreach-api-deps-{{ checksum "yarn.lock" }}
+
   backup_and_restore:
     docker:
-      - image: cimg/node:16.12.0
+      - image: cimg/node:16.18.0
     working_directory: ~/inreach-api
     steps:
       - checkout
+      - restore_cache:
+          name: Restore Cache
+          keys:
+            - inreach-api-deps-{{ checksum "yarn.lock" }}
       #Recreate .env file from CircleCI Project Env Vars
       - run:
           name: Create .env file
           command: |
-           cat \<< EOF > ./.env
-           DB_URI_STAGING=$DB_URI_STAGING
-           DB_URI_PROD=$DB_URI_PROD
-           EOF
+            cat \<< EOF > ./.env
+            DB_URI_STAGING=$DB_URI_STAGING
+            DB_URI_PROD=$DB_URI_PROD
+            EOF
       - run:
           name: Install Packages
-          command: yarn install
+          command: yarn install --frozen-lockfile --cache-folder ~/.cache/yarn
       - run:
           name: Run Backup and Restore
           command: yarn backup:prod-staging
-          
-         
+      - save_cache:
+          paths:
+            - ~/.cache
+          key: inreach-api-deps-{{ checksum "yarn.lock" }}
 
   register_migration_stage:
     docker:
-      - image: cimg/node:16.12.0
+      - image: cimg/node:16.18.0
     working_directory: ~/inreach-api
     environment:
       PIPELINE_ID: << pipeline.parameters.pipeline_id >>
@@ -232,28 +324,36 @@ jobs:
       FILES: << pipeline.parameters.files >>
     steps:
       - checkout
+      - restore_cache:
+          name: Restore Cache
+          keys:
+            - inreach-api-deps-{{ checksum "yarn.lock" }}
       #Recreate .env file from CircleCI Project Env Vars
       - run:
           name: Create .env file
           command: |
-           cat \<< EOF > ./.env
-           DB_URI=$DB_URI_STAGING
-           PROFILE=CI
-           EOF
+            cat \<< EOF > ./.env
+            DB_URI=$DB_URI_STAGING
+            PROFILE=CI
+            EOF
       - run:
           name: Install Packages
-          command: yarn install
-      - run: 
+          command: yarn install --frozen-lockfile --cache-folder ~/.cache/yarn
+      - run:
           name: Register Migration Stage
           command: |
             for i in ${FILES//,/ }; do
               export MIGRATION_FILE=$i
               yarn register-migration
             done
+      - save_cache:
+          paths:
+            - ~/.cache
+          key: inreach-api-deps-{{ checksum "yarn.lock" }}
 
   register_migration_prod:
     docker:
-      - image: cimg/node:16.12.0
+      - image: cimg/node:16.18.0
     working_directory: ~/inreach-api
     environment:
       PIPELINE_ID: << pipeline.parameters.pipeline_id >>
@@ -261,18 +361,22 @@ jobs:
       TYPE: migration_prod
     steps:
       - checkout
+      - restore_cache:
+          name: Restore Cache
+          keys:
+            - inreach-api-deps-{{ checksum "yarn.lock" }}
       #Recreate .env file from CircleCI Project Env Vars
       - run:
           name: Create .env file
           command: |
-           cat \<< EOF > ./.env
-           DB_URI=$DB_URI_PROD
-           PROFILE=CI
-           EOF
+            cat \<< EOF > ./.env
+            DB_URI=$DB_URI_PROD
+            PROFILE=CI
+            EOF
       - run:
           name: Install Packages
-          command: yarn install
-      - run: 
+          command: yarn install --frozen-lockfile --cache-folder ~/.cache/yarn
+      - run:
           name: Register Migration Prof
           command: |
             export  FILES=$(find . -type f -iname "*$DATE_PATTERN*" | cut -c 13-)
@@ -280,11 +384,14 @@ jobs:
               export MIGRATION_FILE=$i
               yarn register-migration
             done
-
+      - save_cache:
+          paths:
+            - ~/.cache
+          key: inreach-api-deps-{{ checksum "yarn.lock" }}
 
   migration_prod:
     docker:
-      - image: cimg/node:16.12.0
+      - image: cimg/node:16.18.0
     working_directory: ~/inreach-api
     environment:
       DATE_PATTERN: << pipeline.parameters.date_pattern>>
@@ -292,18 +399,22 @@ jobs:
       TYPE: migration_prod
     steps:
       - checkout
+      - restore_cache:
+          name: Restore Cache
+          keys:
+            - inreach-api-deps-{{ checksum "yarn.lock" }}
       #Recreate .env file from CircleCI Project Env Vars
       - run:
           name: Create .env file
           command: |
-           cat \<< EOF > ./.env
-           DB_URI=$DB_URI_PROD
-           PROFILE=CI
-           EOF
+            cat \<< EOF > ./.env
+            DB_URI=$DB_URI_PROD
+            PROFILE=CI
+            EOF
       - run:
           name: Install Packages
-          command: yarn install
-      - run: 
+          command: yarn install --frozen-lockfile --cache-folder ~/.cache/yarn
+      - run:
           name: Run migration
           command: |
             export  FILES=$(find . -type f -iname "*$DATE_PATTERN*" | cut -c 13-)
@@ -311,14 +422,18 @@ jobs:
               export MIGRATION_FILE=$i
               yarn run-migration
             done
-      # Unfortunately CircleCI does not allow user or Project Token, Personal Token was used of InReach Service Account. 
-      - run:  
+      # Unfortunately CircleCI does not allow user or Project Token, Personal Token was used of InReach Service Account.
+      - run:
           name: Register migration
           command: BRANCH=main node ./migrations/triggerRegistration.js
- 
+      - save_cache:
+          paths:
+            - ~/.cache
+          key: inreach-api-deps-{{ checksum "yarn.lock" }}
+
   migration_stage:
     docker:
-      - image: cimg/node:16.12.0
+      - image: cimg/node:16.18.0
     working_directory: ~/inreach-api
     environment:
       FILES: << pipeline.parameters.files >>
@@ -326,18 +441,22 @@ jobs:
       TYPE: migration_stage
     steps:
       - checkout
+      - restore_cache:
+          name: Restore Cache
+          keys:
+            - inreach-api-deps-{{ checksum "yarn.lock" }}
       #Recreate .env file from CircleCI Project Env Vars
       - run:
           name: Create .env file
           command: |
-           cat \<< EOF > ./.env
-           DB_URI=$DB_URI_STAGING
-           PROFILE=CI
-           EOF
+            cat \<< EOF > ./.env
+            DB_URI=$DB_URI_STAGING
+            PROFILE=CI
+            EOF
       - run:
           name: Install Packages
-          command: yarn install
-      - run: 
+          command: yarn install --frozen-lockfile --cache-folder ~/.cache/yarn
+      - run:
           name: Run migration
           #Find all files matching regex
           command: |
@@ -346,13 +465,17 @@ jobs:
               yarn run-migration
             done
       # Unfortunately CircleCI does not allow user or Project Token, Personal Token was used of InReach Service Account.
-      - run:  
+      - run:
           name: Register migration
           command: BRANCH=dev node ./migrations/triggerRegistration.js
+      - save_cache:
+          paths:
+            - ~/.cache
+          key: inreach-api-deps-{{ checksum "yarn.lock" }}
 
   rollback_prod:
     docker:
-      - image: cimg/node:16.12.0
+      - image: cimg/node:16.18.0
     working_directory: ~/inreach-api
     environment:
       DATE_PATTERN: << pipeline.parameters.date_pattern >>
@@ -360,18 +483,22 @@ jobs:
       TYPE: rollback_prod
     steps:
       - checkout
+      - restore_cache:
+          name: Restore Cache
+          keys:
+            - inreach-api-deps-{{ checksum "yarn.lock" }}
       #Recreate .env file from CircleCI Project Env Vars
       - run:
           name: Create .env file
           command: |
-           cat \<< EOF > ./.env
-           DB_URI=$DB_URI_PROD
-           PROFILE=CI
-           EOF
+            cat \<< EOF > ./.env
+            DB_URI=$DB_URI_PROD
+            PROFILE=CI
+            EOF
       - run:
           name: Install Packages
-          command: yarn install
-      - run: 
+          command: yarn install --frozen-lockfile --cache-folder ~/.cache/yarn
+      - run:
           name: Run rollback
           command: |
             export  FILES=$(find . -type f -iname "*$DATE_PATTERN*" | cut -c 13-)
@@ -380,13 +507,17 @@ jobs:
               yarn run-rollback
             done
       # Unfortunately CircleCI does not allow user or Project Token, Personal Token was used of InReach Service Account.
-      - run:  
+      - run:
           name: Register migration
           command: BRANCH=main node ./migrations/triggerRegistration.js
+      - save_cache:
+          paths:
+            - ~/.cache
+          key: inreach-api-deps-{{ checksum "yarn.lock" }}
 
   rollback_stage:
     docker:
-      - image: cimg/node:16.12.0
+      - image: cimg/node:16.18.0
     working_directory: ~/inreach-api
     environment:
       FILES: << pipeline.parameters.files >>
@@ -394,28 +525,36 @@ jobs:
       TYPE: rollback_stage
     steps:
       - checkout
+      - restore_cache:
+          name: Restore Cache
+          keys:
+            - inreach-api-deps-{{ checksum "yarn.lock" }}
       #Recreate .env file from CircleCI Project Env Vars
       - run:
           name: Create .env file
           command: |
-           cat \<< EOF > ./.env
-           DB_URI=$DB_URI_STAGING
-           PROFILE=CI
-           EOF
+            cat \<< EOF > ./.env
+            DB_URI=$DB_URI_STAGING
+            PROFILE=CI
+            EOF
       - run:
           name: Install Packages
-          command: yarn install
-      - run: 
+          command: yarn install --frozen-lockfile --cache-folder ~/.cache/yarn
+      - run:
           name: Run rollback
           command: |
             for i in ${FILES//,/ }; do
               export MIGRATION_FILE=$i
               yarn run-rollback
             done
-     # Unfortunately CircleCI does not allow user or Project Token, Personal Token was used of InReach Service Account.
-      - run:  
+      # Unfortunately CircleCI does not allow user or Project Token, Personal Token was used of InReach Service Account.
+      - run:
           name: Register migration
           command: BRANCH=dev node ./migrations/triggerRegistration.js
+      - save_cache:
+          paths:
+            - ~/.cache
+          key: inreach-api-deps-{{ checksum "yarn.lock" }}
 
 workflows:
   version: 2
@@ -426,20 +565,57 @@ workflows:
           filters:
             branches:
               only: dev
-      - e2e:
-         context: SonarCloud
-         filters:
+      - e2eprepare:
+          filters:
             branches:
               only: dev
+      - e2e:
+          context: SonarCloud
+          requires:
+            - e2eprepare
+          filters:
+            branches:
+              only: dev
+      - sonar:
+          context: SonarCloud
+          requires:
+            - e2e
+          filters:
+            branches:
+              only: dev
+      # - dockerbuild:
+      #     filters:
+      #       branches:
+      #         only: dev
+      # - dockerpublish:
+      #     requires:
+      #       - dockerbuild
+      #     filters:
+      #       branches:
+      #         only: dev
+
   pull_request:
     jobs:
       - build:
           filters:
             branches:
               ignore: [main, dev]
+      - e2eprepare:
+          filters:
+            branches:
+              ignore: [main, dev]
       - e2e:
-         context: SonarCloud
-         filters:
+          context: SonarCloud
+          requires:
+            - e2eprepare
+          filters:
+            branches:
+              ignore: [main, dev]
+      - sonar:
+          context: SonarCloud
+          requires:
+            - e2e
+          filters:
             branches:
               ignore: [main, dev]
       - unit:
@@ -450,15 +626,19 @@ workflows:
           filters:
             branches:
               ignore: [main, dev]
+      # - dockerbuild:
+      #     filters:
+      #       branches:
+      #         ignore: [main, dev]
 
   run_back_up_restore:
     when: << pipeline.parameters.backup_and_restore >>
     jobs:
       - backup_and_restore:
-         filters:
+          filters:
             branches:
               only: main
-  
+
   register_migration_stage:
     when: << pipeline.parameters.register_migration >>
     jobs:
@@ -466,7 +646,7 @@ workflows:
           filters:
             branches:
               only: dev
-  
+
   register_migration_prod:
     when: << pipeline.parameters.register_migration >>
     jobs:
@@ -474,7 +654,7 @@ workflows:
           filters:
             branches:
               only: main
-              
+
   migration_prod:
     when: << pipeline.parameters.run_migration_prod >>
     jobs:
@@ -486,15 +666,15 @@ workflows:
               only: main
           requires:
             - hold
-  
+
   migration_stage:
     when: << pipeline.parameters.run_migration_stage >>
     jobs:
       - migration_stage:
           filters:
             branches:
-             only: dev 
-  
+              only: dev
+
   rollback_prod:
     when: << pipeline.parameters.run_rollback_prod >>
     jobs:
@@ -506,7 +686,7 @@ workflows:
               only: main
           requires:
             - hold
-  
+
   rollback_stage:
     when: << pipeline.parameters.run_rollback_stage >>
     jobs:

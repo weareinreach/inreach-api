@@ -28,7 +28,7 @@ class OrgData {
 	constructor(param) {
 		this.is_published = Math.random() < 0.9;
 		this.description = `Organization ${this.#uniqueOrgID} description`;
-		this.name = faker.company.companyName();
+		this.name = faker.company.companyName().split('.').join('');
 		this.is_deleted = Math.random() < 0.1;
 		this.owners = seedFunctions.getArray(randNumber).map(() => {
 			return {
@@ -51,6 +51,7 @@ class OrgData {
 						[`service-${faker.address
 							.state()
 							.toLowerCase()
+							.replace(/[^a-zA-Z0-9 ]/g, '')
 							.replace(/\s+/g, '-')}`]: 'true'
 				  }
 				: {};
@@ -60,6 +61,7 @@ class OrgData {
 						[`service-${faker.address
 							.state()
 							.toLowerCase()
+							.replace(/[^a-zA-Z0-9 ]/g, '')
 							.replace(/\s+/g, '-')}`]: 'true'
 				  }
 				: {};
@@ -69,6 +71,7 @@ class OrgData {
 						[`service-${faker.address
 							.city()
 							.toLowerCase()
+							.replace(/[^a-zA-Z0-9 ]/g, '')
 							.replace(/\s+/g, '-')}`]: 'true'
 				  }
 				: {};
@@ -78,6 +81,7 @@ class OrgData {
 						[`service-${faker.address
 							.city()
 							.toLowerCase()
+							.replace(/[^a-zA-Z0-9 ]/g, '')
 							.replace(/\s+/g, '-')}`]: 'true'
 				  }
 				: {};
@@ -86,7 +90,7 @@ class OrgData {
 				description: faker.lorem.sentence(),
 				is_published: true,
 				is_deleted: Math.random() < 0.5,
-				name: faker.company.companyName(),
+				name: faker.company.companyName().split('.').join(''),
 				slug: `service-slug-${this.#uniqueServiceId}`,
 				slug_ES: `service-slug-${this.#uniqueServiceId}`,
 

@@ -5,7 +5,7 @@
 		"cypress:open": "cypress open --config-file ./cypress.json",
 		"cypress:run": "nyc cypress run --config-file ./cypress.json",
 		"clean:reports": "rm -R -f ./mochawesome-report && rm -R -f ./.nyc_output && rm -R -f ./jestCoverage && rm -R -f ./coverageReports && rm -R -f ./cypressCoverage && rm -R -f ./reports",
-		"combine-reports": "mkdir ./reports && mochawesome-merge mochawesome-report/*.json > ./reports/reporte2e.json",
+		"combine-reports": "mkdir ./reports && mochawesome-merge mochawesome-report/**/*.json > ./reports/reporte2e.json",
 		"generate-report": "marge ./reports/reporte2e.json -f e2e-report -o ./reports",
 		"post-e2e-test": "yarn combine-reports && yarn generate-report",
 		"show-coverage": "npx nyc report --reporter=text",
@@ -44,7 +44,7 @@
 	"dependencies": {
 		"@octokit/auth-token": "^2.5.0",
 		"@octokit/rest": "^18.12.0",
-		"axios": "^0.24.0",
+		"axios": "^0.27.0",
 		"backpack-core": "^0.8.4",
 		"body-parser": "^1.19.0",
 		"cors": "^2.8.5",
@@ -59,6 +59,7 @@
 		"moment": "^2.29.1",
 		"mongodb": "^3.5.6",
 		"mongoose": "^5.9.10",
+		"morgan": "^1.10.0",
 		"node-mongotools": "^2.0.2",
 		"npm-run-all": "^4.1.5",
 		"regenerator-runtime": "^0.13.9",
@@ -67,7 +68,7 @@
 	"devDependencies": {
 		"@babel/core": "^7.9.0",
 		"@babel/preset-env": "^7.9.5",
-		"@cypress/code-coverage": "^3.9.2",
+		"@cypress/code-coverage": "^3.10.0",
 		"@types/node": "^18.8.3",
 		"axios-mock-adapter": "^1.21.2",
 		"babel-eslint": "^10.1.0",
@@ -76,7 +77,7 @@
 		"babel-preset-env": "^1.7.0",
 		"babel-register": "^6.26.0",
 		"csv-writer": "^1.6.0",
-		"cypress": "^6.4.0",
+		"cypress": "^9.7.0",
 		"dotenv-webpack": "^1.7.0",
 		"eslint": "^6.8.0",
 		"husky": "^4.2.5",
@@ -110,7 +111,7 @@
 		]
 	},
 	"engines": {
-		"node": "16.x"
+		"node": "16"
 	},
 	"eslintConfig": {
 		"extends": "eslint:recommended",
@@ -128,7 +129,8 @@
 		},
 		"rules": {
 			"no-console": 0,
-			"no-unused-vars": 1
+			"no-unused-vars": 1,
+			"no-mixed-spaces-and-tabs": 0
 		}
 	},
 	"husky": {

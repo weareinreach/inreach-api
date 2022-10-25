@@ -168,11 +168,13 @@ const CommentSchema = new Schema(
 		comments: [
 			{
 				created_at,
+				updated_at: Date,
 				comment: String,
 				source: String,
 				userId: String,
-				isVerified: {type: Boolean, default: false},
-				is_deleted: {type: Boolean, default: false}
+				userLocation: String,
+				isUserApproved: {type: Boolean, default: false},
+				isDeleted: {type: Boolean, default: false}
 			}
 		]
 	},
