@@ -583,16 +583,16 @@ workflows:
           filters:
             branches:
               only: dev
-      - dockerbuild:
-          filters:
-            branches:
-              only: dev
-      - dockerpublish:
-          requires:
-            - dockerbuild
-          filters:
-            branches:
-              only: dev
+      # - dockerbuild:
+      #     filters:
+      #       branches:
+      #         only: dev
+      # - dockerpublish:
+      #     requires:
+      #       - dockerbuild
+      #     filters:
+      #       branches:
+      #         only: dev
 
   pull_request:
     jobs:
@@ -626,10 +626,10 @@ workflows:
           filters:
             branches:
               ignore: [main, dev]
-      - dockerbuild:
-          filters:
-            branches:
-              ignore: [main, dev]
+      # - dockerbuild:
+      #     filters:
+      #       branches:
+      #         ignore: [main, dev]
 
   run_back_up_restore:
     when: << pipeline.parameters.backup_and_restore >>
