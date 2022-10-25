@@ -31,3 +31,5 @@ server.listen(port, () =>
 	// eslint-disable-next-line
 	console.log(`Listening at: http://localhost:${port}`)
 );
+
+export default server;
