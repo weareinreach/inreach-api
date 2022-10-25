@@ -10,5 +10,11 @@
 			"source": "/(.*)",
 			"destination": "/src/index.js"
 		}
+	],
+	"headers": [
+		{
+			"source": "/(.*)",
+			"headers": [{"key": "Access-Control-Allow-Origin", "value": "*"}]
+		}
 	]
 }
