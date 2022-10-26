@@ -6,6 +6,11 @@
  * @returns A regular expression that matches the string passed in.
  */
 export const fuzzyRegex = (string) => {
+	if (!string)
+		return {
+			$regex: '.*',
+			$options: 'si'
+		};
 	const statement = `${string.split(' ').reduce((prev, curr) => {
 		const regex = `(?:.*${curr.split('').join('.?')})[^A-Za-z0-9]?.*`;
 		return prev ? `${prev} ${regex}` : regex;

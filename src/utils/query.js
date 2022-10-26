@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import {fuzzyRegex} from '../utils/regex';
 const ObjectId = mongoose.Types.ObjectId;
 const ONE_MILE_TO_METER = 1609.344;
 
@@ -69,7 +70,7 @@ export const getOrganizationQuery = (params = {}) => {
 
 	// search by org name
 	if (name && name.trim() !== '""') {
-		query.$text = {$search: name.trim(), $caseSensitive: false};
+		query.name = fuzzyRegex(name.trim());
 	}
 
 	if (owner) {
