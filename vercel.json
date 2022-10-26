@@ -1,0 +1,20 @@
+{
+	"builds": [
+		{
+			"src": "src/index.js",
+			"use": "@vercel/node"
+		}
+	],
+	"rewrites": [
+		{
+			"source": "/(.*)",
+			"destination": "/src/index.js"
+		}
+	],
+	"headers": [
+		{
+			"source": "/(.*)",
+			"headers": [{"key": "Access-Control-Allow-Origin", "value": "*"}]
+		}
+	]
+}
