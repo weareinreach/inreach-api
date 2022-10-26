@@ -12,6 +12,7 @@ import {
 } from '../utils/query';
 import {sendEmail} from '../utils/mail';
 import {shareResource} from '../utils/sendMail';
+import {fuzzyRegex} from '../utils/regex';
 import {Organization, User} from '../mongoose';
 import mongoose from 'mongoose';
 const ObjectId = mongoose.Types.ObjectId;
@@ -99,9 +100,8 @@ export const getOrgs = async (req, res) => {
 export const getOrgsByName = async (req, res) => {
 	const query = req?.params?.name;
 	const {offset} = parsePageQuery(req?.query?.page);
-
 	await Organization.find({
-		name: {$regex: `.*${query}.*`, $options: 'si'}
+		name: fuzzyRegex(query)
 	})
 		.sort({name: 1})
 		.skip(offset)

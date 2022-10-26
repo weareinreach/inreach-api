@@ -15,7 +15,6 @@ const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error(s):'));
 
 db.once('open', () => {
-	process.env.ENV === 'TEST'
-		? console.log('Connected to Docker database!')
-		: console.log('Connected to database!');
+	const {host, name} = db;
+	console.log(`DB - Connected to ${name} on ${host}`);
 });
