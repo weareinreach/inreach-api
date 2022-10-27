@@ -16,6 +16,28 @@ export const getComments = async (req, res) => {
 		.catch((err) => handleErr(err, res));
 };
 
+export const getCommentsByUserId = async (req, res) => {
+	const userId = req?.params.userId;
+	const query = [
+		{
+			$unwind: {
+				path: '$comments'
+			}
+		},
+		{
+			$match: {
+				'comments.userId': userId
+			}
+		}
+	];
+
+	await Comment.aggregate(query)
+		.then((data) => {
+			return res.json({comments: data});
+		})
+		.catch((err) => handleErr(err, res));
+};
+
 export const deleteCommentById = async (req, res) => {
 	const {orgId, serviceId, commentId} = req?.params;
 	const query = getEntityQuery({organizationId: orgId, serviceId: serviceId});
