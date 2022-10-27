@@ -1,9 +1,8 @@
 /**
- * It takes a string and returns a regular expression that will match any string that contains all of
- * the words (allowing for a single wildcard between each letter) in the original string, in any order,
- * with any number of characters between them.
- * @param string - The string to be converted to a regex
- * @returns A regular expression that matches the string passed in.
+ * It takes a string and returns a regex that matches the string with any number of words in between
+ * Within each word, one "non-word (no letters, numbers, or underscore)" character is allowed
+ * @param string - The string to be converted to a regex.
+ * @returns A regular expression object for Mongoose search.
  */
 export const fuzzyRegex = (string) => {
 	if (!string)
@@ -12,8 +11,12 @@ export const fuzzyRegex = (string) => {
 			$options: 'si'
 		};
 	const statement = `${string.split(' ').reduce((prev, curr) => {
-		const regex = `(?:.*${curr.split('').join('.?')})[^A-Za-z0-9]?.*`;
-		return prev ? `${prev} ${regex}` : regex;
+		const escapedWord = curr.split('').reduce((prev, curr) => {
+			return prev ? `${prev}\\W?\\Q${curr}\\E` : `\\Q${curr}\\E`;
+		}, undefined);
+
+		const wordRegex = `(?:.*${escapedWord})\\W?.*`;
+		return prev ? `${prev} ${wordRegex}` : wordRegex;
 	}, undefined)}`;
 	const regex = {
 		$regex: statement,
