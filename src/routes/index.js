@@ -14,7 +14,8 @@ import {
 	updateComments,
 	deleteCommentById,
 	updateCommentById,
-	updateRatings
+	updateRatings,
+	getCommentsByUserId
 } from './entity';
 import {
 	approveOrgOwner,
@@ -152,6 +153,7 @@ versionOneRouter.get(
 );
 
 // Comments - Partially Automation tested
+versionOneRouter.get('/comments/:userId', getCommentsByUserId);
 versionOneRouter.get('/organizations/:orgId/comments', getComments);
 versionOneRouter.patch(
 	'/organizations/:orgId/comments',
