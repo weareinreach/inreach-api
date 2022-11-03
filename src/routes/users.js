@@ -10,6 +10,7 @@ import {
 } from '../utils';
 import {ITEM_PAGE_LIMIT, getUserQuery, parsePageQuery} from '../utils/query';
 import {shareResource} from '../utils/sendMail';
+import {sendEmail} from '../utils/mail';
 import mongoose from 'mongoose';
 const ObjectId = mongoose.Types.ObjectId;
 
@@ -99,6 +100,18 @@ export const createUser = async (req, res) => {
 		const userJSON = userDoc.toJSON();
 		const token = userJSON.hash;
 		const userInfo = removeUserInfo(userJSON);
+		if (req.body.catalogType === 'reviewer') {
+			let mailText =
+				'<p>Hello Admin!</p>' +
+				'<p>' +
+				req.body.name +
+				' from ' +
+				req.body.currentLocation +
+				' has just created a new unverified reviewer account! ' +
+				'Please review this account <a href=https://inreach-admin.herokuapp.com/admin target="_blank">here</a>.</p>' +
+				'<p>The InReach Team</p>';
+			sendEmail('app@inReach.org', 'New Reviewer!', 'text', mailText);
+		}
 		return res.json({created: true, token, userInfo});
 	} catch (err) {
 		handleErr(err, res);
