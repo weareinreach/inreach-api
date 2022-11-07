@@ -110,8 +110,16 @@ export const createUser = async (req, res) => {
 				' has just created a new unverified reviewer account! ' +
 				'Please review this account <a href=https://inreach-admin.herokuapp.com/admin target="_blank">here</a>.</p>' +
 				'<p>The InReach Team</p>';
-			sendEmail('app@inReach.org', 'New Reviewer!', 'text', mailText);
+			[
+				'abby@inreach.org',
+				'kristen@inreach.org',
+				'carissa@inreach.org',
+				'app@inReach.org'
+			].forEach(function (recipient, index, array) {
+				sendEmail(recipient, 'New Reviewer!', 'text', mailText);
+			});
 		}
+
 		return res.json({created: true, token, userInfo});
 	} catch (err) {
 		handleErr(err, res);
