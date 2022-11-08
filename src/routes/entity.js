@@ -18,19 +18,6 @@ export const getComments = async (req, res) => {
 
 export const getCommentsByUserId = async (req, res) => {
 	const userId = req?.params.userId;
-	// const query = [
-	// 	{
-	// 		$unwind: {
-	// 			path: '$comments'
-	// 		}
-	// 	},
-	// 	{
-	// 		$match: {
-	// 			'comments.userId': userId
-	// 		}
-	// 	}
-	// ];
-
 	const query = [
 		{
 			$unwind: {
@@ -68,10 +55,31 @@ export const getCommentsByUserId = async (req, res) => {
 		{
 			$addFields: {
 				serviceObject: {
-					$arrayElemAt: [
-						'$organization.services',
+					$cond: [
 						{
-							$indexOfArray: ['$organization.services._id', '$serviceObjectId']
+							$eq: [
+								{
+									$indexOfArray: [
+										'$organization.services._id',
+										'$serviceObjectId'
+									]
+								},
+								-1
+							]
+						},
+						{
+							name: 'N/A'
+						},
+						{
+							$arrayElemAt: [
+								'$organization.services',
+								{
+									$indexOfArray: [
+										'$organization.services._id',
+										'$serviceObjectId'
+									]
+								}
+							]
 						}
 					]
 				}
@@ -80,8 +88,10 @@ export const getCommentsByUserId = async (req, res) => {
 		{
 			$project: {
 				_id: 1,
+				organizationId: 1,
 				organizationObjectId: 1,
 				organizationName: '$organization.name',
+				serviceId: 1,
 				serviceObjectId: 1,
 				serviceName: '$serviceObject.name',
 				comments: 1
