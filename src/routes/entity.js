@@ -26,7 +26,7 @@ export const getCommentsByUserId = async (req, res) => {
 		},
 		{
 			$match: {
-				'comments.userId': '633cb7fe0c2967d66fbc9623'
+				'comments.userId': userId
 			}
 		},
 		{
