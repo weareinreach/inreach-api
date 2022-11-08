@@ -11,6 +11,7 @@ import {
 import {ITEM_PAGE_LIMIT, getUserQuery, parsePageQuery} from '../utils/query';
 import {shareResource} from '../utils/sendMail';
 import {sendEmail} from '../utils/mail';
+import {getControlPanelBaseUrl} from '../utils/config';
 import mongoose from 'mongoose';
 const ObjectId = mongoose.Types.ObjectId;
 
@@ -101,21 +102,16 @@ export const createUser = async (req, res) => {
 		const token = userJSON.hash;
 		const userInfo = removeUserInfo(userJSON);
 		if (req.body.catalogType === 'reviewer') {
-			let mailText =
-				'<p>Hello Admin!</p>' +
-				'<p>' +
-				req.body.name +
-				' from ' +
-				req.body.currentLocation +
-				' has just created a new unverified reviewer account! ' +
-				'Please review this account <a href=https://inreach-admin.herokuapp.com/admin target="_blank">here</a>.</p>' +
-				'<p>The InReach Team</p>';
+			const mailText = `<p> Hello Admin</p>\n <p>${req.body.name} from ${
+				req.body.currentLocation
+			} has just created a new, unverified reviewer account!\nPlease review this account <a href=${getControlPanelBaseUrl()} target="_blank">here</a>.</p>\n\nThank you,\nThe Inreach Team`;
+
 			[
 				'abby@inreach.org',
 				'kristen@inreach.org',
 				'carissa@inreach.org',
 				'app@inReach.org'
-			].forEach(function (recipient, index, array) {
+			].forEach(function (recipient) {
 				sendEmail(recipient, 'New Reviewer!', 'text', mailText);
 			});
 		}
