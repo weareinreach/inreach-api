@@ -18,6 +18,19 @@ export const getComments = async (req, res) => {
 
 export const getCommentsByUserId = async (req, res) => {
 	const userId = req?.params.userId;
+	// const query = [
+	// 	{
+	// 		$unwind: {
+	// 			path: '$comments'
+	// 		}
+	// 	},
+	// 	{
+	// 		$match: {
+	// 			'comments.userId': userId
+	// 		}
+	// 	}
+	// ];
+
 	const query = [
 		{
 			$unwind: {
@@ -26,7 +39,52 @@ export const getCommentsByUserId = async (req, res) => {
 		},
 		{
 			$match: {
-				'comments.userId': userId
+				'comments.userId': '633cb7fe0c2967d66fbc9623'
+			}
+		},
+		{
+			$addFields: {
+				orgObjectId: {
+					$toObjectId: '$organizationId'
+				},
+				serviceObjectId: {
+					$toObjectId: '$serviceId'
+				}
+			}
+		},
+		{
+			$lookup: {
+				from: 'organizations',
+				localField: 'orgObjectId',
+				foreignField: '_id',
+				as: 'organization'
+			}
+		},
+		{
+			$unwind: {
+				path: '$organization'
+			}
+		},
+		{
+			$addFields: {
+				serviceObject: {
+					$arrayElemAt: [
+						'$organization.services',
+						{
+							$indexOfArray: ['$organization.services._id', '$serviceObjectId']
+						}
+					]
+				}
+			}
+		},
+		{
+			$project: {
+				_id: 1,
+				organizationObjectId: 1,
+				organizationName: '$organization.name',
+				serviceObjectId: 1,
+				serviceName: '$serviceObject.name',
+				comments: 1
 			}
 		}
 	];
