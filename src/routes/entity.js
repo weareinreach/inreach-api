@@ -86,6 +86,11 @@ export const getCommentsByUserId = async (req, res) => {
 				serviceName: '$serviceObject.name',
 				comments: 1
 			}
+		},
+		{
+			$sort: {
+				'comments.created_at': -1
+			}
 		}
 	];
 
