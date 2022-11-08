@@ -160,7 +160,14 @@ export const updateCommentById = async (req, res) => {
 
 export const updateComments = async (req, res) => {
 	const {orgId, serviceId} = req?.params;
-	const {comment, source, userId, userLocation, isUserApproved} = req?.body;
+	const {
+		comment,
+		source,
+		userId,
+		userLocation,
+		isUserApproved,
+		rating
+	} = req?.body;
 	const query = getEntityQuery({organizationId: orgId, serviceId});
 
 	if (!comment) {
@@ -170,7 +177,16 @@ export const updateComments = async (req, res) => {
 	await Comment.updateOne(
 		query,
 		{
-			$push: {comments: {comment, source, userId, userLocation, isUserApproved}}
+			$push: {
+				comments: {
+					comment,
+					source,
+					userId,
+					userLocation,
+					isUserApproved,
+					rating
+				}
+			}
 		},
 		{upsert: true}
 	)
