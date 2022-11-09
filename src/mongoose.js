@@ -173,6 +173,7 @@ const CommentSchema = new Schema(
 				source: String,
 				userId: String,
 				userLocation: String,
+				rating: Number,
 				isUserApproved: {type: Boolean, default: false},
 				isDeleted: {type: Boolean, default: false}
 			}

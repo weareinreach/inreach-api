@@ -28,6 +28,79 @@ export const getCommentsByUserId = async (req, res) => {
 			$match: {
 				'comments.userId': userId
 			}
+		},
+		{
+			$addFields: {
+				orgObjectId: {
+					$toObjectId: '$organizationId'
+				},
+				serviceObjectId: {
+					$toObjectId: '$serviceId'
+				}
+			}
+		},
+		{
+			$lookup: {
+				from: 'organizations',
+				localField: 'orgObjectId',
+				foreignField: '_id',
+				as: 'organization'
+			}
+		},
+		{
+			$unwind: {
+				path: '$organization'
+			}
+		},
+		{
+			$addFields: {
+				serviceObject: {
+					$cond: [
+						{
+							$eq: [
+								{
+									$indexOfArray: [
+										'$organization.services._id',
+										'$serviceObjectId'
+									]
+								},
+								-1
+							]
+						},
+						{
+							name: 'N/A'
+						},
+						{
+							$arrayElemAt: [
+								'$organization.services',
+								{
+									$indexOfArray: [
+										'$organization.services._id',
+										'$serviceObjectId'
+									]
+								}
+							]
+						}
+					]
+				}
+			}
+		},
+		{
+			$project: {
+				_id: 1,
+				organizationId: 1,
+				organizationObjectId: 1,
+				organizationName: '$organization.name',
+				serviceId: 1,
+				serviceObjectId: 1,
+				serviceName: '$serviceObject.name',
+				comments: 1
+			}
+		},
+		{
+			$sort: {
+				'comments.created_at': -1
+			}
 		}
 	];
 
@@ -87,7 +160,14 @@ export const updateCommentById = async (req, res) => {
 
 export const updateComments = async (req, res) => {
 	const {orgId, serviceId} = req?.params;
-	const {comment, source, userId, userLocation, isUserApproved} = req?.body;
+	const {
+		comment,
+		source,
+		userId,
+		userLocation,
+		isUserApproved,
+		rating
+	} = req?.body;
 	const query = getEntityQuery({organizationId: orgId, serviceId});
 
 	if (!comment) {
@@ -97,7 +177,16 @@ export const updateComments = async (req, res) => {
 	await Comment.updateOne(
 		query,
 		{
-			$push: {comments: {comment, source, userId, userLocation, isUserApproved}}
+			$push: {
+				comments: {
+					comment,
+					source,
+					userId,
+					userLocation,
+					isUserApproved,
+					rating
+				}
+			}
 		},
 		{upsert: true}
 	)
