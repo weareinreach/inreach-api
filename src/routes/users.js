@@ -104,7 +104,7 @@ export const createUser = async (req, res) => {
 		if (req.body.catalogType === 'reviewer') {
 			const mailText = `<p> Hello Admin</p>\n <p>${req.body.name} from ${
 				req.body.currentLocation
-			} has just created a new, unverified reviewer account!\nPlease review this account <a href=${getControlPanelBaseUrl()} target="_blank">here</a>.</p>\n\nThank you,\nThe Inreach Team`;
+			} has just created a new, unverified reviewer account!\nPlease review this account <a href=${getControlPanelBaseUrl()} target="_blank">here</a>.</p>\n\nThank you,\nThe InReach Team`;
 
 			[
 				'abby@inreach.org',
