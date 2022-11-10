@@ -1,6 +1,6 @@
 on:
   pull_request:
-    types: [opened,reopened]
+    types: [opened, reopened]
   # push:
   #   branches:
   #     - main
@@ -8,7 +8,7 @@ on:
 env:
   PR_NUMBER: ${{ github.event.number }}
   BASE_BRANCH: ${{ github.base_ref }}
-    
+
 jobs:
   zap_scan_staging_baseline:
     runs-on: ubuntu-latest
@@ -22,7 +22,7 @@ jobs:
         uses: zaproxy/action-baseline@v0.7.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          target: 'https://inreach-api-staging.herokuapp.com/'
+          target: 'https://inreach-api-v1-git-dev-weareinreach.vercel.app/'
           cmd_options: '-a'
 
   zap_scan_production_baseline:
@@ -37,7 +37,7 @@ jobs:
         uses: zaproxy/action-baseline@v0.7.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          target: 'https://inreach-api.herokuapp.com'
+          target: 'https://api.inreach.org'
           cmd_options: '-a'
 
   zap_scan_staging_full:
@@ -52,7 +52,7 @@ jobs:
         uses: zaproxy/action-full-scan@v0.4.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          target: 'https://inreach-api-staging.herokuapp.com/'
+          target: 'https://inreach-api-v1-git-dev-weareinreach.vercel.app/'
           cmd_options: '-a'
 
   zap_scan_production_full:
@@ -67,7 +67,7 @@ jobs:
         uses: zaproxy/action-full-scan@v0.4.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          target: 'https://inreach-api.herokuapp.com'
+          target: 'https://api.inreach.org'
           cmd_options: '-a'
 
   zap_scan_staging_api:
@@ -82,7 +82,7 @@ jobs:
         uses: zaproxy/action-api-scan@v0.2.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          target: 'https://inreach-api-staging.herokuapp.com/'
+          target: 'https://inreach-api-v1-git-dev-weareinreach.vercel.app/'
           cmd_options: '-a'
 
   zap_scan_production_api:
@@ -97,6 +97,5 @@ jobs:
         uses: zaproxy/action-api-scan@v0.2.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          target: 'https://inreach-api.herokuapp.com'
+          target: 'https://api.inreach.org'
           cmd_options: '-a'
-  
