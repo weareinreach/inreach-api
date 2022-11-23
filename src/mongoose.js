@@ -173,6 +173,7 @@ const CommentSchema = new Schema(
 				source: String,
 				userId: String,
 				userLocation: String,
+				rating: Number,
 				isUserApproved: {type: Boolean, default: false},
 				isDeleted: {type: Boolean, default: false}
 			}
@@ -273,6 +274,7 @@ const UserSchema = new Schema(
 		orgType: String,
 		reasonForJoining: String,
 		reviewerQuestions: {
+			reviewerInterested: {type: Boolean, default: false},
 			verifyAnswer: {type: Boolean, default: false},
 			timeCommitAnswer: {type: Boolean, default: false},
 			specifiedTimeCommit: String,
