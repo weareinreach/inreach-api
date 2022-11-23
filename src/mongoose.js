@@ -274,6 +274,7 @@ const UserSchema = new Schema(
 		orgType: String,
 		reasonForJoining: String,
 		reviewerQuestions: {
+			reviewerInterested: {type: Boolean, default: false},
 			verifyAnswer: {type: Boolean, default: false},
 			timeCommitAnswer: {type: Boolean, default: false},
 			specifiedTimeCommit: String,
