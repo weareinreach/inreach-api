@@ -14,7 +14,7 @@ The development lifecycle is controlled by these tools:
 - [Code Coverage](https://app.codecov.io/gh/asylum-connect)
 - [Code Quality](https://sonarcloud.io/organizations/asylum-connect/projects)
 
-In order to run the app you need a [.env][https://www.npmjs.com/package/dotenv] file with a valid `MONGODB_URI` value for the mongodb connection string.
+In order to run the app you need a [.env](https://www.npmjs.com/package/dotenv) file with a valid `MONGODB_URI` value for the mongodb connection string.
 
 CircleCI is being used to enforce Code quality in all pull requests. Passed status checks are necessary in order to merge a PR.
 
