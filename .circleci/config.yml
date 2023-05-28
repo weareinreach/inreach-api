@@ -34,8 +34,8 @@ parameters:
     default: ''
     type: string
 orbs:
-  node: circleci/node@5.0.3
-  codecov: codecov/codecov@3.2.4
+  node: circleci/node@5.1.0
+  codecov: codecov/codecov@3.2.5
   sonarcloud: sonarsource/sonarcloud@1.1.1
 executors:
   docker-publisher:
@@ -46,7 +46,7 @@ executors:
 jobs:
   build:
     docker:
-      - image: cimg/node:16.18.0
+      - image: cimg/node:16.20.0
     working_directory: /mnt/ramdisk/inreach-api
     steps:
       - checkout
@@ -120,7 +120,7 @@ jobs:
 
   unit:
     docker:
-      - image: cimg/node:16.18.0
+      - image: cimg/node:16.20.0
     working_directory: /mnt/ramdisk/inreach-api
     steps:
       - checkout
@@ -153,7 +153,7 @@ jobs:
 
   e2eprepare:
     docker:
-      - image: cimg/node:16.18-browsers
+      - image: cimg/node:16.20-browsers
         environment:
           ## this enables colors in the output
           TERM: xterm
@@ -182,12 +182,12 @@ jobs:
   e2e:
     docker:
       # - image: cypress/base:16.17.1
-      - image: cimg/node:16.18-browsers
+      - image: cimg/node:16.20-browsers
         environment:
           ## this enables colors in the output
           TERM: xterm
       ## MongoDB
-      - image: mongo:4.4.17
+      - image: mongo:4.4.22
         environment:
           MONGO_INITDB_ROOT_USERNAME: user
           MONGO_INITDB_ROOT_PASSWORD: password
@@ -233,7 +233,7 @@ jobs:
 
   sonar:
     docker:
-      - image: cimg/node:16.18-browsers
+      - image: cimg/node:16.20-browsers
         environment:
           ## this enables colors in the output
           TERM: xterm
@@ -262,7 +262,7 @@ jobs:
 
   lint:
     docker:
-      - image: cimg/node:16.18.0
+      - image: cimg/node:16.20.0
     working_directory: /mnt/ramdisk
     steps:
       - checkout
@@ -287,7 +287,7 @@ jobs:
 
   backup_and_restore:
     docker:
-      - image: cimg/node:16.18.0
+      - image: cimg/node:16.20.0
     working_directory: ~/inreach-api
     steps:
       - checkout
@@ -316,7 +316,7 @@ jobs:
 
   register_migration_stage:
     docker:
-      - image: cimg/node:16.18.0
+      - image: cimg/node:16.20.0
     working_directory: ~/inreach-api
     environment:
       PIPELINE_ID: << pipeline.parameters.pipeline_id >>
@@ -353,7 +353,7 @@ jobs:
 
   register_migration_prod:
     docker:
-      - image: cimg/node:16.18.0
+      - image: cimg/node:16.20.0
     working_directory: ~/inreach-api
     environment:
       PIPELINE_ID: << pipeline.parameters.pipeline_id >>
@@ -391,7 +391,7 @@ jobs:
 
   migration_prod:
     docker:
-      - image: cimg/node:16.18.0
+      - image: cimg/node:16.20.0
     working_directory: ~/inreach-api
     environment:
       DATE_PATTERN: << pipeline.parameters.date_pattern>>
@@ -433,7 +433,7 @@ jobs:
 
   migration_stage:
     docker:
-      - image: cimg/node:16.18.0
+      - image: cimg/node:16.20.0
     working_directory: ~/inreach-api
     environment:
       FILES: << pipeline.parameters.files >>
@@ -475,7 +475,7 @@ jobs:
 
   rollback_prod:
     docker:
-      - image: cimg/node:16.18.0
+      - image: cimg/node:16.20.0
     working_directory: ~/inreach-api
     environment:
       DATE_PATTERN: << pipeline.parameters.date_pattern >>
@@ -517,7 +517,7 @@ jobs:
 
   rollback_stage:
     docker:
-      - image: cimg/node:16.18.0
+      - image: cimg/node:16.20.0
     working_directory: ~/inreach-api
     environment:
       FILES: << pipeline.parameters.files >>
