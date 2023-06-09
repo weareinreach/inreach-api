@@ -15,7 +15,7 @@ jobs:
     name: Scan ZAP website Baseline Staging
     steps:
       - name: Checkout
-        uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3
+        uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3
         with:
           ref: code-security
       - name: ZAP Scan
@@ -30,7 +30,7 @@ jobs:
     name: Scan ZAP website Baseline Production
     steps:
       - name: Checkout
-        uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3
+        uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3
         with:
           ref: main
       - name: ZAP Scan
@@ -45,7 +45,7 @@ jobs:
     name: Scan ZAP website Full Staging
     steps:
       - name: Checkout
-        uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3
+        uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3
         with:
           ref: code-security
       - name: ZAP Scan
@@ -60,7 +60,7 @@ jobs:
     name: Scan ZAP website Full Production
     steps:
       - name: Checkout
-        uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3
+        uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3
         with:
           ref: main
       - name: ZAP Scan
@@ -75,7 +75,7 @@ jobs:
     name: Scan ZAP website API Staging
     steps:
       - name: Checkout
-        uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3
+        uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3
         with:
           ref: code-security
       - name: ZAP Scan
@@ -90,7 +90,7 @@ jobs:
     name: Scan ZAP website API Production
     steps:
       - name: Checkout
-        uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3
+        uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3
         with:
           ref: main
       - name: ZAP Scan
